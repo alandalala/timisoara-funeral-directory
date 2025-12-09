@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { Company, SERVICE_LABELS, ServiceTag } from '@/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -22,9 +23,11 @@ export function CompanyCard({ company }: CompanyCardProps) {
     <Card className="hover:shadow-lg transition-shadow duration-200 h-full flex flex-col">
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between gap-2">
-          <CardTitle className="text-lg font-semibold text-slate-900 leading-tight">
-            {company.name}
-          </CardTitle>
+          <Link href={`/company/${company.slug}`}>
+            <CardTitle className="text-lg font-semibold text-slate-900 leading-tight hover:text-blue-600 transition-colors cursor-pointer">
+              {company.name}
+            </CardTitle>
+          </Link>
           <div className="flex gap-1 flex-shrink-0">
             {company.is_verified && (
               <Badge variant="default" className="bg-green-600 hover:bg-green-700 text-xs">
@@ -104,21 +107,18 @@ export function CompanyCard({ company }: CompanyCardProps) {
           {primaryPhone && (
             <a
               href={`tel:${primaryPhone.value}`}
+              onClick={(e) => e.stopPropagation()}
               className="flex-1 bg-blue-600 text-white text-center py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
             >
               📞 Sună acum
             </a>
           )}
-          {company.website && (
-            <a
-              href={company.website}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-4 py-2 border border-slate-300 rounded-lg text-sm font-medium hover:bg-slate-50 transition-colors"
-            >
-              🌐
-            </a>
-          )}
+          <Link
+            href={`/company/${company.slug}`}
+            className="px-4 py-2 border border-slate-300 rounded-lg text-sm font-medium hover:bg-slate-50 transition-colors"
+          >
+            Detalii →
+          </Link>
         </div>
       </CardContent>
     </Card>
