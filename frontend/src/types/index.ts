@@ -35,12 +35,22 @@ export interface Location {
   id: string;
   company_id: string;
   address: string;
+  city?: string | null;
+  county?: string | null;
+  county_id?: number | null;
   geo_point?: {
     type: 'Point';
     coordinates: [number, number]; // [longitude, latitude]
   };
   type: 'headquarters' | 'wake_house' | 'showroom';
   created_at: string;
+}
+
+export interface County {
+  id: number;
+  name: string;
+  slug: string;
+  region?: string | null;
 }
 
 export interface Service {
