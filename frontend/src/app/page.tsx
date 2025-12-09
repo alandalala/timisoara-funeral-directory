@@ -13,8 +13,17 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCounty, setSelectedCounty] = useState<string>('');
+  const [countySearchQuery, setCountySearchQuery] = useState('');
+  const [showCountyDropdown, setShowCountyDropdown] = useState(false);
   const [selectedCity, setSelectedCity] = useState<string>('');
+  const [citySearchQuery, setCitySearchQuery] = useState('');
+  const [showCityDropdown, setShowCityDropdown] = useState(false);
   const [showVerifiedOnly, setShowVerifiedOnly] = useState(false);
+
+  // Filter counties based on search query
+  const filteredCounties = counties.filter(county =>
+    county.name.toLowerCase().includes(countySearchQuery.toLowerCase())
+  );
 
   // Get unique cities from current companies based on selected county
   const availableCities = [...new Set(
@@ -24,6 +33,11 @@ export default function Home() {
       .map(loc => loc.city)
       .filter(Boolean)
   )].sort();
+
+  // Filter cities based on search query
+  const filteredCities = availableCities.filter(city =>
+    city?.toLowerCase().includes(citySearchQuery.toLowerCase())
+  );
 
   useEffect(() => {
     fetchCounties();
@@ -75,23 +89,55 @@ export default function Home() {
     // Filter by verification status
     const matchesVerified = showVerifiedOnly ? company.is_verified : true;
     
-    // Filter by county
+    // Filter by county (exact match if selected, or partial match if searching)
     const matchesCounty = selectedCounty
       ? company.locations?.some(loc => loc.county === selectedCounty)
-      : true;
+      : countySearchQuery
+        ? company.locations?.some(loc => 
+            loc.county?.toLowerCase().includes(countySearchQuery.toLowerCase())
+          )
+        : true;
     
-    // Filter by city
+    // Filter by city (exact match if selected, or partial match if searching)
     const matchesCity = selectedCity
       ? company.locations?.some(loc => loc.city === selectedCity)
-      : true;
-
+      : citySearchQuery
+        ? company.locations?.some(loc => 
+            loc.city?.toLowerCase().includes(citySearchQuery.toLowerCase())
+          )
+        : true;
     return matchesSearch && matchesVerified && matchesCounty && matchesCity;
   });
 
-  // Reset city when county changes
-  const handleCountyChange = (county: string) => {
+  // Handle county selection
+  const handleCountySelect = (county: string) => {
     setSelectedCounty(county);
+    setCountySearchQuery(county);
+    setShowCountyDropdown(false);
+    // Reset city when county changes
     setSelectedCity('');
+    setCitySearchQuery('');
+  };
+
+  // Clear county selection
+  const clearCountySelection = () => {
+    setSelectedCounty('');
+    setCountySearchQuery('');
+    setSelectedCity('');
+    setCitySearchQuery('');
+  };
+
+  // Handle city selection
+  const handleCitySelect = (city: string) => {
+    setSelectedCity(city);
+    setCitySearchQuery(city);
+    setShowCityDropdown(false);
+  };
+
+  // Clear city selection
+  const clearCitySelection = () => {
+    setSelectedCity('');
+    setCitySearchQuery('');
   };
 
   return (
@@ -113,42 +159,119 @@ export default function Home() {
         <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
           {/* Location filters row */}
           <div className="flex flex-col md:flex-row gap-4 mb-4">
-            <div className="flex-1">
+            <div className="flex-1 relative">
               <label className="block text-sm font-medium text-slate-700 mb-1">
                 📍 Județ
               </label>
-              <select
-                value={selectedCounty}
-                onChange={(e) => handleCountyChange(e.target.value)}
-                className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              >
-                <option value="">Toate județele</option>
-                {counties.map((county) => (
-                  <option key={county.id} value={county.name}>
-                    {county.name}
-                  </option>
-                ))}
-              </select>
+              <div className="relative">
+                <input
+                  type="text"
+                  value={countySearchQuery}
+                  onChange={(e) => {
+                    setCountySearchQuery(e.target.value);
+                    setSelectedCounty('');
+                    setShowCountyDropdown(true);
+                  }}
+                  onFocus={() => setShowCountyDropdown(true)}
+                  placeholder="Caută județ..."
+                  className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+                {selectedCounty && (
+                  <button
+                    onClick={clearCountySelection}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                  >
+                    ✕
+                  </button>
+                )}
+                {showCountyDropdown && filteredCounties.length > 0 && !selectedCounty && (
+                  <div className="absolute z-20 w-full mt-1 bg-white border border-slate-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                    <button
+                      onClick={() => {
+                        setSelectedCounty('');
+                        setCountySearchQuery('');
+                        setShowCountyDropdown(false);
+                      }}
+                      className="w-full px-3 py-2 text-left hover:bg-slate-100 text-slate-500"
+                    >
+                      Toate județele
+                    </button>
+                    {filteredCounties.map((county) => (
+                      <button
+                        key={county.id}
+                        onClick={() => handleCountySelect(county.name)}
+                        className="w-full px-3 py-2 text-left hover:bg-slate-100"
+                      >
+                        {county.name}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
-            <div className="flex-1">
+            <div className="flex-1 relative">
               <label className="block text-sm font-medium text-slate-700 mb-1">
                 🏙️ Oraș
               </label>
-              <select
-                value={selectedCity}
-                onChange={(e) => setSelectedCity(e.target.value)}
-                className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                disabled={availableCities.length === 0}
-              >
-                <option value="">Toate orașele</option>
-                {availableCities.map((city) => (
-                  <option key={city} value={city}>
-                    {city}
-                  </option>
-                ))}
-              </select>
+              <div className="relative">
+                <input
+                  type="text"
+                  value={citySearchQuery}
+                  onChange={(e) => {
+                    setCitySearchQuery(e.target.value);
+                    setSelectedCity('');
+                    setShowCityDropdown(true);
+                  }}
+                  onFocus={() => setShowCityDropdown(true)}
+                  placeholder="Caută oraș..."
+                  className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  disabled={availableCities.length === 0}
+                />
+                {selectedCity && (
+                  <button
+                    onClick={clearCitySelection}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                  >
+                    ✕
+                  </button>
+                )}
+                {showCityDropdown && filteredCities.length > 0 && !selectedCity && (
+                  <div className="absolute z-10 w-full mt-1 bg-white border border-slate-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                    <button
+                      onClick={() => {
+                        setSelectedCity('');
+                        setCitySearchQuery('');
+                        setShowCityDropdown(false);
+                      }}
+                      className="w-full px-3 py-2 text-left hover:bg-slate-100 text-slate-500"
+                    >
+                      Toate orașele
+                    </button>
+                    {filteredCities.map((city) => (
+                      <button
+                        key={city}
+                        onClick={() => handleCitySelect(city!)}
+                        className="w-full px-3 py-2 text-left hover:bg-slate-100"
+                      >
+                        {city}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
+
+          {/* Click outside to close dropdowns */}
+          {(showCountyDropdown || showCityDropdown) && (
+            <div
+              className="fixed inset-0 z-0"
+              onClick={() => {
+                setShowCountyDropdown(false);
+                setShowCityDropdown(false);
+              }}
+            />
+          )}
 
           {/* Search and filters row */}
           <div className="flex flex-col md:flex-row gap-4">
@@ -171,11 +294,13 @@ export default function Home() {
             >
               ✅ Doar verificate
             </button>
-            {(selectedCounty || selectedCity || searchQuery || showVerifiedOnly) && (
+            {(selectedCounty || countySearchQuery || selectedCity || citySearchQuery || searchQuery || showVerifiedOnly) && (
               <button
                 onClick={() => {
                   setSelectedCounty('');
+                  setCountySearchQuery('');
                   setSelectedCity('');
+                  setCitySearchQuery('');
                   setSearchQuery('');
                   setShowVerifiedOnly(false);
                 }}
@@ -195,7 +320,9 @@ export default function Home() {
             <span>
               {filteredCompanies.length} {filteredCompanies.length === 1 ? 'firmă găsită' : 'firme găsite'}
               {selectedCounty && ` în ${selectedCounty}`}
+              {!selectedCounty && countySearchQuery && ` (județ: "${countySearchQuery}")`}
               {selectedCity && `, ${selectedCity}`}
+              {!selectedCity && citySearchQuery && ` (oraș: "${citySearchQuery}")`}
             </span>
           )}
         </div>

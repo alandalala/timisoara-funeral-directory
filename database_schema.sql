@@ -1,6 +1,15 @@
 -- Enable PostGIS extension for geospatial queries
 CREATE EXTENSION IF NOT EXISTS postgis;
 
+-- Counties table: Romanian counties reference data
+CREATE TABLE IF NOT EXISTS counties (
+  id SERIAL PRIMARY KEY,
+  name TEXT NOT NULL,
+  slug TEXT UNIQUE NOT NULL,
+  region TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
 -- Companies table: Core business entities
 CREATE TABLE IF NOT EXISTS companies (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -22,6 +31,9 @@ CREATE TABLE IF NOT EXISTS locations (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   company_id UUID REFERENCES companies(id) ON DELETE CASCADE,
   address TEXT NOT NULL,
+  city TEXT,
+  county TEXT,
+  county_id INTEGER REFERENCES counties(id),
   geo_point GEOGRAPHY(Point, 4326),
   type TEXT CHECK (type IN ('headquarters', 'wake_house', 'showroom')),
   created_at TIMESTAMPTZ DEFAULT NOW()
