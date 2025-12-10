@@ -305,8 +305,8 @@ export default function RemovalRequestPage() {
           <div className="mt-8 text-center text-sm text-slate">
             <p>
               Pentru alte întrebări, ne puteți contacta la{' '}
-              <a href="mailto:contact@serviciifunerare.ro" className="text-navy link-animated">
-                contact@serviciifunerare.ro
+              <a href="mailto:contact@cautarefunerare.ro" className="text-navy link-animated">
+                contact@cautarefunerare.ro
               </a>
             </p>
           </div>

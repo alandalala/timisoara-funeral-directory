@@ -7,7 +7,7 @@ const supabase = createClient(
 );
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://serviciifunerare.ro';
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://cautarefunerare.ro';
 
   // Static pages
   const staticPages: MetadataRoute.Sitemap = [

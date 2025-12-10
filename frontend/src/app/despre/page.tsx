@@ -137,7 +137,7 @@ export default function AboutPage() {
               </p>
               <div className="space-y-2">
                 <p className="text-slate">
-                  📧 Email: <a href="mailto:contact@serviciifunerare.ro" className="text-navy link-animated">contact@serviciifunerare.ro</a>
+                  📧 Email: <a href="mailto:contact@cautarefunerare.ro" className="text-navy link-animated">contact@cautarefunerare.ro</a>
                 </p>
                 <p className="text-slate">
                   📝 <Link href="/contact" className="text-navy link-animated">Formular de contact</Link>

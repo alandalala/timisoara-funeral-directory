@@ -1,12 +1,14 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 export default function ContactPage() {
+  const searchParams = useSearchParams();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -16,6 +18,20 @@ export default function ContactPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState('');
+
+  // Pre-fill form from URL parameters (e.g., from "Report a problem" button)
+  useEffect(() => {
+    const subject = searchParams.get('subject');
+    const company = searchParams.get('company');
+    
+    if (subject) {
+      setFormData(prev => ({
+        ...prev,
+        subject: subject,
+        message: company ? `Raportez o problemă referitoare la firma: ${company}\n\nDescriere problemă:\n` : prev.message,
+      }));
+    }
+  }, [searchParams]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -205,10 +221,10 @@ export default function ContactPage() {
                   <div className="text-3xl mb-2">📧</div>
                   <h3 className="font-heading text-charcoal mb-1">Email</h3>
                   <a
-                    href="mailto:contact@serviciifunerare.ro"
+                    href="mailto:contact@cautarefunerare.ro"
                     className="text-navy link-animated"
                   >
-                    contact@serviciifunerare.ro
+                    contact@cautarefunerare.ro
                   </a>
                 </div>
               </CardContent>

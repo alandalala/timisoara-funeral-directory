@@ -8,7 +8,7 @@ test.describe('Homepage', () => {
     await expect(page).toHaveTitle(/Servicii Funerare România/);
     
     // Check main heading is visible
-    await expect(page.getByRole('heading', { name: /Director Servicii Funerare România/i })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /Ghidul Tău de Încredere în Servicii Funerare/i })).toBeVisible();
   });
 
   test('should display company cards', async ({ page }) => {

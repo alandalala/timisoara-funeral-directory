@@ -332,9 +332,11 @@ export default function CompanyDetail({ company }: CompanyDetailProps) {
                 <p className="text-sm text-slate mb-3">
                   Informațiile nu sunt corecte sau doriți să raportați o problemă?
                 </p>
-                <Button variant="outline" className="w-full" size="sm">
-                  🚩 Raportează o problemă
-                </Button>
+                <a href={`/contact?subject=report_error&company=${encodeURIComponent(company.name)}`}>
+                  <Button variant="outline" className="w-full" size="sm">
+                    🚩 Raportează o problemă
+                  </Button>
+                </a>
               </CardContent>
             </Card>
           </div>

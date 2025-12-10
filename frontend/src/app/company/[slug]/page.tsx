@@ -82,7 +82,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   ].filter(Boolean);
 
   // Build canonical URL
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://serviciifunerare.ro';
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://cautarefunerare.ro';
   const canonicalUrl = `${baseUrl}/company/${slug}`;
 
   return {

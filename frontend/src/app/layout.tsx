@@ -16,7 +16,7 @@ const playfair = Playfair_Display({
   display: "swap",
 });
 
-const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://serviciifunerare.ro';
+const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://cautarefunerare.ro';
 
 export const metadata: Metadata = {
   metadataBase: new URL(baseUrl),
@@ -55,7 +55,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "ro_RO",
-    url: "https://servicii-funerare.ro",
+    url: "https://cautarefunerare.ro",
     siteName: "Servicii Funerare România",
     title: "Servicii Funerare România | Director Național Firme Funerare",
     description: "Găsește servicii funerare verificate în toată România. Director complet cu firme funerare în toate județele.",
@@ -79,7 +79,7 @@ export const metadata: Metadata = {
     // google: "your-verification-code",
   },
   alternates: {
-    canonical: "https://servicii-funerare.ro",
+    canonical: "https://cautarefunerare.ro",
   },
 };
 

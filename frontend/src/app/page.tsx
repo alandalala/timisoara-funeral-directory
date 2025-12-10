@@ -159,7 +159,7 @@ export default function Home() {
       <header className="bg-white shadow-soft border-b border-warm-grey" role="banner">
         <div className="max-w-6xl mx-auto px-4 py-8">
           <h1 className="text-3xl md:text-4xl font-heading text-charcoal">
-            🕯️ Director Servicii Funerare România
+            🕯️ Ghidul Tău de Încredere în Servicii Funerare
           </h1>
           <p className="text-slate mt-3 text-lg">
             Găsește servicii funerare verificate în toată România
@@ -497,7 +497,7 @@ export default function Home() {
           
           {/* Copyright */}
           <div className="text-center text-slate">
-            <p className="text-charcoal">© 2025 Director Servicii Funerare România</p>
+            <p className="text-charcoal">© 2025 CăutareFunerare.ro</p>
             <p className="text-sm mt-2">
               Datele sunt verificate cu listele DSP din fiecare județ.
             </p>
