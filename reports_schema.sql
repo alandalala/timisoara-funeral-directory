@@ -60,17 +60,17 @@ CREATE POLICY "Allow public to create removal requests"
     TO public
     WITH CHECK (true);
 
--- Only allow reading own reports (by email)
-CREATE POLICY "Allow reading own reports by email"
+-- Allow public to read all reports (for admin dashboard later)
+CREATE POLICY "Allow public to read reports"
     ON reports FOR SELECT
     TO public
-    USING (reporter_email IS NOT NULL);
+    USING (true);
 
--- Only allow reading own removal requests (by email)
-CREATE POLICY "Allow reading own removal requests by email"
+-- Allow public to read all removal requests (for admin dashboard later)
+CREATE POLICY "Allow public to read removal requests"
     ON removal_requests FOR SELECT
     TO public
-    USING (requester_email IS NOT NULL);
+    USING (true);
 
 -- Update trigger for reports
 CREATE OR REPLACE FUNCTION update_reports_timestamp()
