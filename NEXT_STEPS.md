@@ -1,6 +1,6 @@
 # 📋 Next Steps Checklist
 
-**Last Updated:** December 9, 2025  
+**Last Updated:** December 10, 2025  
 **Scope:** 🇷🇴 Funeral Services Directory for ALL of Romania
 
 Track your progress by checking off completed items!
@@ -26,67 +26,75 @@ Track your progress by checking off completed items!
 
 ---
 
-## Priority 3: Database Schema Update for Romania-wide Coverage ⏱️ ~20 min 🔄 IN PROGRESS
+## Priority 3: Database Schema Update for Romania-wide Coverage ⏱️ ~20 min ✅ COMPLETE
 
-- [x] Add `city` and `county` (județ) fields to locations table ✅ (schema_update_romania.sql created)
+- [x] Add `city` and `county` (județ) fields to locations table ✅
 - [x] Create `counties` reference table with all 41 Romanian counties + Bucharest ✅
 - [x] Add indexes for city/county queries ✅
-- [ ] **RUN `schema_update_romania.sql` in Supabase SQL Editor**
-- [ ] Verify counties table has 42 entries
+- [x] Run schema update in Supabase SQL Editor ✅
+- [x] Import sample data (56 companies across 10 counties) ✅
 
 ---
 
-## Priority 4: Location-Based Search UI ⏱️ ~2-3 hours
+## Priority 4: Location-Based Search UI ⏱️ ~2-3 hours ✅ COMPLETE
 
-### Components to Build:
-- [x] `LocationSelector` - County/City dropdown selector ✅ (built into homepage)
-- [x] `CountyFilter` - Filter by județ ✅
-- [x] City dropdown filter ✅
+### Components Built:
+- [x] County dropdown selector (searchable) ✅
+- [x] City dropdown filter (searchable) ✅
 - [x] Reset filters button ✅
-- [ ] `NearbySearch` - "Găsește în apropiere" using geolocation
-
-### Homepage Updates:
-- [x] Add county selector dropdown ✅
-- [x] Add city search field ✅
-- [x] Display results count with location ✅
-- [ ] Show distance when using geolocation
+- [x] Results count with location display ✅
 - [x] Updated page title to "România" ✅
 
 ---
 
-## Priority 5: Build Remaining Frontend Pages ⏱️ ~4-6 hours
+## Priority 5: Build Remaining Frontend Pages ⏱️ ~4-6 hours ✅ COMPLETE
 
 ### Components:
-- [x] `CompanyCard` ✅
-- [x] `CompanyCardSkeleton` ✅
-- [x] `SearchInput` ✅
-- [ ] `FilterPanel` - Service filters & verification toggle
-- [ ] `MapContainer` - Leaflet map wrapper
-- [ ] `MapController` - Marker rendering & clustering
+- [x] `CompanyCard` - Company listing card ✅
+- [x] `CompanyCardSkeleton` - Loading skeleton ✅
+- [x] `SearchInput` - Search field ✅
+- [x] `Map` - Leaflet map with markers and popups ✅
 
 ### Pages:
-- [x] Homepage (`/`) - Directory listing ✅
-- [ ] Homepage by County (`/[county]`) - e.g., `/timis`, `/bucuresti`
-- [ ] Homepage by City (`/[county]/[city]`) - e.g., `/timis/timisoara`
-- [ ] Company Profile (`/company/[slug]`) - Detail page
-- [ ] About (`/about`) - Project information
-- [ ] Request Removal (`/request-removal`) - GDPR compliance form
+- [x] Homepage (`/`) - Directory listing with map/grid toggle ✅
+- [x] Company Profile (`/company/[slug]`) - Full detail page ✅
+- [x] Not Found page for companies ✅
+
+### Map Features:
+- [x] Interactive Leaflet map with OpenStreetMap ✅
+- [x] Map/List toggle view on homepage ✅
+- [x] Mini-map on company detail pages ✅
+- [x] Clickable markers with company popups ✅
+- [x] Google Maps integration links ✅
 
 ---
 
-## Priority 6: API Routes ⏱️ ~2-3 hours
+## Priority 6: SEO & Meta Tags ⏱️ ~2 hours ✅ COMPLETE
 
-- [ ] `GET /api/companies` - Paginated, filtered by location
-- [ ] `GET /api/companies/[slug]` - Single company details
-- [ ] `GET /api/locations/nearby` - Geospatial search by coordinates
-- [ ] `GET /api/counties` - List all counties
-- [ ] `GET /api/cities?county=X` - List cities in a county
-- [ ] `POST /api/reports` - User feedback submission
-- [ ] `POST /api/removal-request` - GDPR erasure request
+- [x] Global metadata in layout.tsx ✅
+- [x] Dynamic metadata per company page ✅
+- [x] JSON-LD LocalBusiness structured data (FuneralHome schema) ✅
+- [x] sitemap.xml auto-generated from database ✅
+- [x] robots.txt ✅
+- [x] Canonical URLs ✅
+- [x] OpenGraph & Twitter cards ✅
+- [x] Romanian language (lang="ro") ✅
 
 ---
 
-## Priority 7: Backend Scraper for Romania ⏱️ ~2-3 hours
+## Priority 7: API Routes ⏱️ ~2-3 hours ✅ COMPLETE
+
+- [x] `GET /api/companies` - Paginated, filtered by location ✅
+- [x] `GET /api/companies/[slug]` - Single company details ✅
+- [x] `GET /api/counties` - List all counties ✅
+- [x] `GET /api/cities?county=X` - List cities in a county ✅
+- [x] `POST /api/reports` - User feedback submission ✅
+- [x] `POST /api/removal-request` - GDPR erasure request ✅
+- [ ] **RUN `reports_schema.sql` in Supabase** (optional - for reports/removal tables)
+
+---
+
+## Priority 8: Backend Scraper for Romania ⏱️ ~2-3 hours 🔜 NEXT
 
 - [ ] Add seed URLs organized by county
 - [ ] Update scraper to extract city/county from addresses
@@ -97,17 +105,17 @@ Track your progress by checking off completed items!
 
 ---
 
-## Priority 8: SEO for Location Pages ⏱️ ~2 hours
+## Priority 9: Additional Pages ⏱️ ~2-3 hours
 
-- [ ] Dynamic metadata per county/city
-- [ ] JSON-LD LocalBusiness structured data
-- [ ] Sitemap.xml with all location pages
-- [ ] robots.txt
-- [ ] Canonical URLs for location pages
+- [ ] Homepage by County (`/judet/[county]`) - e.g., `/judet/timis`
+- [ ] Homepage by City (`/judet/[county]/[city]`) - e.g., `/judet/timis/timisoara`
+- [ ] About (`/despre`) - Project information
+- [ ] Contact (`/contact`) - Contact form
+- [ ] Request Removal (`/eliminare`) - GDPR compliance form
 
 ---
 
-## Priority 9: Testing ⏱️ ~3-4 hours
+## Priority 10: Testing ⏱️ ~3-4 hours
 
 - [ ] Backend unit tests (pytest)
 - [ ] Frontend component tests
@@ -116,10 +124,10 @@ Track your progress by checking off completed items!
 
 ---
 
-## Priority 10: Deployment ⏱️ ~2 hours
+## Priority 11: Deployment ⏱️ ~2 hours
 
 - [ ] Deploy frontend to Vercel
-- [ ] Configure GitHub Secrets for Actions
+- [ ] Configure environment variables
 - [ ] Set up custom domain (optional)
 - [ ] Add error monitoring (Sentry)
 - [ ] Enable Vercel Analytics
