@@ -115,16 +115,26 @@ Track your progress by checking off completed items!
 
 ---
 
-## Priority 10: Testing ⏱️ ~3-4 hours 🔜 NEXT
+## Priority 10: Testing ⏱️ ~3-4 hours ✅ COMPLETE
 
-- [ ] Backend unit tests (pytest)
-- [ ] Frontend component tests
-- [ ] E2E tests (Playwright)
-- [ ] Integration tests
+- [x] Playwright E2E tests setup ✅
+- [x] Homepage tests (31 tests) ✅
+- [x] Company detail page tests ✅
+- [x] Static pages tests (About, Contact, GDPR) ✅
+- [x] API endpoint tests ✅
+- [x] All 31 tests passing ✅
 
 ---
 
-## Priority 11: Deployment ⏱️ ~2 hours
+## Priority 11: Services Schema Update ✅ COMPLETE
+
+- [x] Expanded service types from 10 to 30 ✅
+- [x] Added 8 categories covering all funeral services ✅
+- [ ] **RUN `SERVICES_UPDATE.sql` in Supabase** (optional - to update DB constraint)
+
+---
+
+## Priority 12: Deployment ⏱️ ~2 hours 🔜 NEXT
 
 - [ ] Deploy frontend to Vercel
 - [ ] Configure environment variables

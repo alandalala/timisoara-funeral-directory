@@ -79,26 +79,88 @@ export interface RemovalRequest {
 }
 
 export type ServiceTag = 
-  | 'transport'
-  | 'repatriation'
-  | 'cremation'
-  | 'embalming'
-  | 'wake_house'
-  | 'coffins'
-  | 'flowers'
-  | 'bureaucracy'
-  | 'religious'
-  | 'monuments';
+  // 1. Documentation & Legal
+  | 'death_certificate'      // Constatare deces & certificat medical
+  | 'death_registration'     // Certificat deces de la primărie
+  | 'permits'                // Autorizații sanitare și îngropare
+  | 'funeral_aid'            // Dosar ajutor înmormântare
+  // 2. Body Care & Storage
+  | 'embalming'              // Îmbălsămare / Tanatopraxy
+  | 'body_preparation'       // Toaletă, îmbrăcare, machiaj
+  | 'refrigeration'          // Frigider mortuar
+  // 3. Transport & Logistics
+  | 'transport'              // Transport funerar local
+  | 'transport_long'         // Transport funerar distanță lungă
+  | 'repatriation'           // Repatriere internațională
+  | 'pallbearers'            // Echipă purtători sicriu
+  // 4. Products
+  | 'coffins'                // Sicrie (economice, lux, zinc)
+  | 'urns'                   // Urne pentru cremație
+  | 'textiles'               // Perne, pături, căptușeli
+  | 'crosses'                // Cruci de lemn
+  // 5. Ritual Essentials
+  | 'coliva'                 // Colivă și colaci
+  | 'liturgical_items'       // Vin, ulei, tămâie, cărbune
+  | 'mourning_items'         // Lumânări, icoane, batiste, prosoape
+  // 6. Ceremony & Venue
+  | 'wake_house'             // Capelă / Cameră mortuară
+  | 'church_service'         // Serviciu religios la biserică
+  | 'flowers'                // Coroane și aranjamente florale
+  | 'music'                  // Cor sau fanfară
+  // 7. Catering & Alms
+  | 'food_packages'          // Pachete pomană
+  | 'catering'               // Catering masă priveghi/praznic
+  | 'restaurant'             // Rezervare restaurant
+  | 'memorial_services'      // Parastase (40 zile, 6 luni, 1 an)
+  // 8. Cemetery Works
+  | 'monuments'              // Monumente granit/marmură
+  | 'crypts'                 // Cripte și cavouri
+  | 'photo_ceramics'         // Fotografii ceramice
+  // Legacy (for backwards compatibility)
+  | 'cremation'              // Incinerare
+  | 'bureaucracy'            // Acte / Formalități (legacy)
+  | 'religious';             // Servicii religioase (legacy)
 
 export const SERVICE_LABELS: Record<ServiceTag, { ro: string; en: string }> = {
-  transport: { ro: 'Transport Funerar', en: 'Funeral Transport' },
+  // 1. Documentation & Legal
+  death_certificate: { ro: 'Constatare Deces', en: 'Death Confirmation' },
+  death_registration: { ro: 'Certificat Deces (Primărie)', en: 'Death Registration' },
+  permits: { ro: 'Autorizații (Sanepid/Îngropare)', en: 'Burial Permits' },
+  funeral_aid: { ro: 'Dosar Ajutor Înmormântare', en: 'Funeral Aid Filing' },
+  // 2. Body Care & Storage
+  embalming: { ro: 'Îmbălsămare / Tanatopraxy', en: 'Embalming' },
+  body_preparation: { ro: 'Toaletă și Îmbrăcare', en: 'Body Preparation' },
+  refrigeration: { ro: 'Frigider Mortuar', en: 'Refrigeration' },
+  // 3. Transport & Logistics
+  transport: { ro: 'Transport Funerar Local', en: 'Local Funeral Transport' },
+  transport_long: { ro: 'Transport Distanță Lungă', en: 'Long Distance Transport' },
   repatriation: { ro: 'Repatriere Internațională', en: 'International Repatriation' },
-  cremation: { ro: 'Incinerare', en: 'Cremation' },
-  embalming: { ro: 'Îmbălsămare', en: 'Embalming' },
-  wake_house: { ro: 'Capelă / Cameră Mortuară', en: 'Wake House' },
+  pallbearers: { ro: 'Echipă Purtători Sicriu', en: 'Pallbearers Team' },
+  // 4. Products
   coffins: { ro: 'Sicrie', en: 'Coffins' },
-  flowers: { ro: 'Aranjamente Florale', en: 'Flower Arrangements' },
-  bureaucracy: { ro: 'Acte / Formalități', en: 'Paperwork/Bureaucracy' },
+  urns: { ro: 'Urne Cremație', en: 'Cremation Urns' },
+  textiles: { ro: 'Textile Funerare', en: 'Funeral Textiles' },
+  crosses: { ro: 'Cruci de Lemn', en: 'Wooden Crosses' },
+  // 5. Ritual Essentials
+  coliva: { ro: 'Colivă și Colaci', en: 'Ritual Foods' },
+  liturgical_items: { ro: 'Articole Liturgice', en: 'Liturgical Items' },
+  mourning_items: { ro: 'Lumânări, Icoane, Batiste', en: 'Mourning Items' },
+  // 6. Ceremony & Venue
+  wake_house: { ro: 'Capelă / Cameră Mortuară', en: 'Wake House/Chapel' },
+  church_service: { ro: 'Serviciu la Biserică', en: 'Church Service' },
+  flowers: { ro: 'Coroane și Flori', en: 'Wreaths & Flowers' },
+  music: { ro: 'Cor / Fanfară', en: 'Choir/Band' },
+  // 7. Catering & Alms
+  food_packages: { ro: 'Pachete Pomană', en: 'Alms Packages' },
+  catering: { ro: 'Catering Praznic', en: 'Memorial Catering' },
+  restaurant: { ro: 'Rezervare Restaurant', en: 'Restaurant Booking' },
+  memorial_services: { ro: 'Parastase (40 zile, 1 an)', en: 'Memorial Services' },
+  // 8. Cemetery Works
+  monuments: { ro: 'Monumente Funerare', en: 'Monuments' },
+  crypts: { ro: 'Cripte și Cavouri', en: 'Crypts & Vaults' },
+  photo_ceramics: { ro: 'Fotografii Ceramice', en: 'Photo Ceramics' },
+  // Legacy
+  cremation: { ro: 'Incinerare', en: 'Cremation' },
+  bureaucracy: { ro: 'Acte / Formalități', en: 'Paperwork' },
   religious: { ro: 'Servicii Religioase', en: 'Religious Services' },
-  monuments: { ro: 'Monumente Funerare', en: 'Monuments' }
 };
