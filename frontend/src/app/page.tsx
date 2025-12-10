@@ -1,11 +1,22 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import dynamic from 'next/dynamic';
 import { supabase } from '@/lib/supabase';
 import { Company, County } from '@/types';
 import { CompanyCard } from '@/components/CompanyCard';
 import { CompanyCardSkeleton } from '@/components/CompanyCardSkeleton';
 import { Input } from '@/components/ui/input';
+
+// Dynamic import for Map to avoid SSR issues
+const Map = dynamic(() => import('@/components/Map').then(mod => ({ default: mod.Map })), {
+  ssr: false,
+  loading: () => (
+    <div className="h-[400px] bg-slate-100 rounded-lg flex items-center justify-center">
+      <div className="text-slate-500">Se încarcă harta...</div>
+    </div>
+  ),
+});
 
 export default function Home() {
   const [companies, setCompanies] = useState<Company[]>([]);
@@ -19,6 +30,8 @@ export default function Home() {
   const [citySearchQuery, setCitySearchQuery] = useState('');
   const [showCityDropdown, setShowCityDropdown] = useState(false);
   const [showVerifiedOnly, setShowVerifiedOnly] = useState(false);
+  const [viewMode, setViewMode] = useState<'grid' | 'map'>('grid');
+  const [selectedMapCompany, setSelectedMapCompany] = useState<Company | null>(null);
 
   // Filter counties based on search query
   const filteredCounties = counties.filter(county =>
@@ -313,57 +326,140 @@ export default function Home() {
         </div>
 
         {/* Results count and location indicator */}
-        <div className="mb-4 text-slate-600">
-          {loading ? (
-            <span>Se încarcă...</span>
-          ) : (
-            <span>
-              {filteredCompanies.length} {filteredCompanies.length === 1 ? 'firmă găsită' : 'firme găsite'}
-              {selectedCounty && ` în ${selectedCounty}`}
-              {!selectedCounty && countySearchQuery && ` (județ: "${countySearchQuery}")`}
-              {selectedCity && `, ${selectedCity}`}
-              {!selectedCity && citySearchQuery && ` (oraș: "${citySearchQuery}")`}
-            </span>
-          )}
+        <div className="mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="text-slate-600">
+            {loading ? (
+              <span>Se încarcă...</span>
+            ) : (
+              <span>
+                {filteredCompanies.length} {filteredCompanies.length === 1 ? 'firmă găsită' : 'firme găsite'}
+                {selectedCounty && ` în ${selectedCounty}`}
+                {!selectedCounty && countySearchQuery && ` (județ: "${countySearchQuery}")`}
+                {selectedCity && `, ${selectedCity}`}
+                {!selectedCity && citySearchQuery && ` (oraș: "${citySearchQuery}")`}
+              </span>
+            )}
+          </div>
+          
+          {/* View Toggle */}
+          <div className="flex gap-2">
+            <button
+              onClick={() => setViewMode('grid')}
+              className={`px-4 py-2 rounded-lg border transition-colors flex items-center gap-2 ${
+                viewMode === 'grid'
+                  ? 'bg-blue-100 border-blue-500 text-blue-700'
+                  : 'bg-white border-slate-300 text-slate-600 hover:bg-slate-50'
+              }`}
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+              </svg>
+              Listă
+            </button>
+            <button
+              onClick={() => setViewMode('map')}
+              className={`px-4 py-2 rounded-lg border transition-colors flex items-center gap-2 ${
+                viewMode === 'map'
+                  ? 'bg-blue-100 border-blue-500 text-blue-700'
+                  : 'bg-white border-slate-300 text-slate-600 hover:bg-slate-50'
+              }`}
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+              </svg>
+              Hartă
+            </button>
+          </div>
         </div>
 
+        {/* Map View */}
+        {viewMode === 'map' && (
+          <div className="mb-6">
+            <Map 
+              companies={filteredCompanies}
+              selectedCompany={selectedMapCompany}
+              onCompanySelect={(company) => setSelectedMapCompany(company)}
+              height="500px"
+              showAllMarkers={true}
+            />
+            {selectedMapCompany && (
+              <div className="mt-4 p-4 bg-white rounded-lg shadow-sm border">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <h3 className="font-semibold text-lg">{selectedMapCompany.name}</h3>
+                    {selectedMapCompany.locations?.[0] && (
+                      <p className="text-slate-600 text-sm">
+                        📍 {selectedMapCompany.locations[0].address}, {selectedMapCompany.locations[0].city}
+                      </p>
+                    )}
+                    {selectedMapCompany.contacts?.[0] && (
+                      <a 
+                        href={`tel:${selectedMapCompany.contacts[0].value}`}
+                        className="text-blue-600 hover:underline text-sm"
+                      >
+                        📞 {selectedMapCompany.contacts[0].value}
+                      </a>
+                    )}
+                  </div>
+                  <div className="flex gap-2">
+                    <a
+                      href={`/company/${selectedMapCompany.slug}`}
+                      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm"
+                    >
+                      Vezi detalii
+                    </a>
+                    <button
+                      onClick={() => setSelectedMapCompany(null)}
+                      className="px-3 py-2 border border-slate-300 rounded-lg hover:bg-slate-50 text-sm"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Company Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {loading ? (
-            // Loading skeletons
-            <>
-              <CompanyCardSkeleton />
-              <CompanyCardSkeleton />
-              <CompanyCardSkeleton />
-              <CompanyCardSkeleton />
-              <CompanyCardSkeleton />
-              <CompanyCardSkeleton />
-            </>
-          ) : filteredCompanies.length > 0 ? (
-            filteredCompanies.map((company) => (
-              <CompanyCard key={company.id} company={company} />
-            ))
-          ) : (
-            <div className="col-span-full text-center py-12">
-              <p className="text-slate-500 text-lg">
-                {companies.length === 0
-                  ? '📭 Nu există încă firme în baza de date. Rulează scraper-ul pentru a adăuga date.'
-                  : '🔍 Nicio firmă nu corespunde criteriilor de căutare.'}
-              </p>
-              {(selectedCounty || selectedCity) && companies.length > 0 && (
-                <button
-                  onClick={() => {
-                    setSelectedCounty('');
-                    setSelectedCity('');
-                  }}
-                  className="mt-4 text-blue-600 hover:underline"
-                >
-                  Caută în toată România
-                </button>
-              )}
-            </div>
-          )}
-        </div>
+        {viewMode === 'grid' && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {loading ? (
+              // Loading skeletons
+              <>
+                <CompanyCardSkeleton />
+                <CompanyCardSkeleton />
+                <CompanyCardSkeleton />
+                <CompanyCardSkeleton />
+                <CompanyCardSkeleton />
+                <CompanyCardSkeleton />
+              </>
+            ) : filteredCompanies.length > 0 ? (
+              filteredCompanies.map((company) => (
+                <CompanyCard key={company.id} company={company} />
+              ))
+            ) : (
+              <div className="col-span-full text-center py-12">
+                <p className="text-slate-500 text-lg">
+                  {companies.length === 0
+                    ? '📭 Nu există încă firme în baza de date. Rulează scraper-ul pentru a adăuga date.'
+                    : '🔍 Nicio firmă nu corespunde criteriilor de căutare.'}
+                </p>
+                {(selectedCounty || selectedCity) && companies.length > 0 && (
+                  <button
+                    onClick={() => {
+                      setSelectedCounty('');
+                      setSelectedCity('');
+                    }}
+                    className="mt-4 text-blue-600 hover:underline"
+                  >
+                    Caută în toată România
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Footer */}

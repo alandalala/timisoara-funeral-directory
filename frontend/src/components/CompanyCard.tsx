@@ -51,17 +51,24 @@ export function CompanyCard({ company }: CompanyCardProps) {
       <CardContent className="flex-1 flex flex-col">
         {/* Location with city/county */}
         {headquarters && (
-          <div className="flex items-start gap-2 text-sm text-slate-600 mb-3">
+          <a
+            href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+              `${headquarters.address}, ${headquarters.city}, Romania`
+            )}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-start gap-2 text-sm text-slate-600 mb-3 hover:text-blue-600 transition-colors group"
+          >
             <span className="text-lg">📍</span>
             <div>
-              <span>{headquarters.address}</span>
+              <span className="group-hover:underline">{headquarters.address}</span>
               {(headquarters.city || headquarters.county) && (
-                <div className="text-xs text-slate-400 mt-0.5">
+                <div className="text-xs text-slate-400 mt-0.5 group-hover:text-blue-500">
                   {headquarters.city}{headquarters.city && headquarters.county && ', '}{headquarters.county}
                 </div>
               )}
             </div>
-          </div>
+          </a>
         )}
 
         {/* Phone */}
