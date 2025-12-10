@@ -154,30 +154,33 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b">
-        <div className="max-w-6xl mx-auto px-4 py-6">
-          <h1 className="text-3xl font-bold text-slate-900">
+    <div className="min-h-screen bg-cream">
+      {/* Header - Soft, welcoming */}
+      <header className="bg-white shadow-soft border-b border-warm-grey" role="banner">
+        <div className="max-w-6xl mx-auto px-4 py-8">
+          <h1 className="text-3xl md:text-4xl font-heading text-charcoal">
             🕯️ Director Servicii Funerare România
           </h1>
-          <p className="text-slate-600 mt-2">
+          <p className="text-slate mt-3 text-lg">
             Găsește servicii funerare verificate în toată România
           </p>
         </div>
       </header>
 
-      {/* Search & Filters */}
-      <div className="max-w-6xl mx-auto px-4 py-6">
-        <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
+      {/* Main content area */}
+      <main id="main-content" role="main" aria-label="Căutare servicii funerare">
+      {/* Search & Filters - Soft card styling */}
+      <div className="max-w-6xl mx-auto px-4 py-8">
+        <section aria-label="Filtre de căutare" className="bg-white rounded-2xl shadow-soft border border-warm-grey p-6 mb-8">
           {/* Location filters row */}
           <div className="flex flex-col md:flex-row gap-4 mb-4">
             <div className="flex-1 relative">
-              <label className="block text-sm font-medium text-slate-700 mb-1">
+              <label htmlFor="county-search" className="block text-sm font-medium text-charcoal mb-2">
                 📍 Județ
               </label>
               <div className="relative">
                 <input
+                  id="county-search"
                   type="text"
                   value={countySearchQuery}
                   onChange={(e) => {
@@ -187,25 +190,28 @@ export default function Home() {
                   }}
                   onFocus={() => setShowCountyDropdown(true)}
                   placeholder="Caută județ..."
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  aria-label="Caută după județ"
+                  aria-expanded={showCountyDropdown}
+                  aria-autocomplete="list"
+                  className="w-full px-4 py-3 border border-warm-grey rounded-xl input-glow"
                 />
                 {selectedCounty && (
                   <button
                     onClick={clearCountySelection}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate hover:text-charcoal transition-colors"
                   >
                     ✕
                   </button>
                 )}
                 {showCountyDropdown && filteredCounties.length > 0 && !selectedCounty && (
-                  <div className="absolute z-20 w-full mt-1 bg-white border border-slate-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                  <div className="absolute z-20 w-full mt-2 bg-white border border-warm-grey rounded-xl shadow-soft-lg max-h-60 overflow-y-auto">
                     <button
                       onClick={() => {
                         setSelectedCounty('');
                         setCountySearchQuery('');
                         setShowCountyDropdown(false);
                       }}
-                      className="w-full px-3 py-2 text-left hover:bg-slate-100 text-slate-500"
+                      className="w-full px-4 py-3 text-left hover:bg-cream text-slate transition-colors"
                     >
                       Toate județele
                     </button>
@@ -213,7 +219,7 @@ export default function Home() {
                       <button
                         key={county.id}
                         onClick={() => handleCountySelect(county.name)}
-                        className="w-full px-3 py-2 text-left hover:bg-slate-100"
+                        className="w-full px-4 py-3 text-left hover:bg-cream transition-colors"
                       >
                         {county.name}
                       </button>
@@ -223,11 +229,12 @@ export default function Home() {
               </div>
             </div>
             <div className="flex-1 relative">
-              <label className="block text-sm font-medium text-slate-700 mb-1">
+              <label htmlFor="city-search" className="block text-sm font-medium text-charcoal mb-2">
                 🏙️ Oraș
               </label>
               <div className="relative">
                 <input
+                  id="city-search"
                   type="text"
                   value={citySearchQuery}
                   onChange={(e) => {
@@ -237,26 +244,29 @@ export default function Home() {
                   }}
                   onFocus={() => setShowCityDropdown(true)}
                   placeholder="Caută oraș..."
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  aria-label="Caută după oraș"
+                  aria-expanded={showCityDropdown}
+                  aria-autocomplete="list"
+                  className="w-full px-4 py-3 border border-warm-grey rounded-xl input-glow disabled:bg-muted disabled:cursor-not-allowed"
                   disabled={availableCities.length === 0}
                 />
                 {selectedCity && (
                   <button
                     onClick={clearCitySelection}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate hover:text-charcoal transition-colors"
                   >
                     ✕
                   </button>
                 )}
                 {showCityDropdown && filteredCities.length > 0 && !selectedCity && (
-                  <div className="absolute z-10 w-full mt-1 bg-white border border-slate-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                  <div className="absolute z-10 w-full mt-2 bg-white border border-warm-grey rounded-xl shadow-soft-lg max-h-60 overflow-y-auto">
                     <button
                       onClick={() => {
                         setSelectedCity('');
                         setCitySearchQuery('');
                         setShowCityDropdown(false);
                       }}
-                      className="w-full px-3 py-2 text-left hover:bg-slate-100 text-slate-500"
+                      className="w-full px-4 py-3 text-left hover:bg-cream text-slate transition-colors"
                     >
                       Toate orașele
                     </button>
@@ -264,7 +274,7 @@ export default function Home() {
                       <button
                         key={city}
                         onClick={() => handleCitySelect(city!)}
-                        className="w-full px-3 py-2 text-left hover:bg-slate-100"
+                        className="w-full px-4 py-3 text-left hover:bg-cream transition-colors"
                       >
                         {city}
                       </button>
@@ -289,20 +299,25 @@ export default function Home() {
           {/* Search and filters row */}
           <div className="flex flex-col md:flex-row gap-4">
             <div className="flex-1">
+              <label htmlFor="name-search" className="sr-only">Caută după nume</label>
               <Input
+                id="name-search"
                 type="text"
                 placeholder="Caută după nume..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full"
+                aria-label="Caută firmă după nume"
+                className="w-full px-4 py-3 border-warm-grey rounded-xl focus:ring-navy/20 focus:border-navy"
               />
             </div>
             <button
               onClick={() => setShowVerifiedOnly(!showVerifiedOnly)}
-              className={`px-4 py-2 rounded-lg border transition-colors ${
+              aria-pressed={showVerifiedOnly}
+              aria-label={showVerifiedOnly ? 'Arată toate firmele' : 'Arată doar firme verificate'}
+              className={`px-5 py-3 rounded-xl border btn-press font-medium ${
                 showVerifiedOnly
-                  ? 'bg-green-100 border-green-500 text-green-700'
-                  : 'bg-white border-slate-300 text-slate-600 hover:bg-slate-50'
+                  ? 'bg-sage/10 border-sage text-sage'
+                  : 'bg-white border-warm-grey text-slate hover:bg-cream'
               }`}
             >
               ✅ Doar verificate
@@ -317,17 +332,18 @@ export default function Home() {
                   setSearchQuery('');
                   setShowVerifiedOnly(false);
                 }}
-                className="px-4 py-2 rounded-lg border border-red-300 text-red-600 hover:bg-red-50 transition-colors"
+                aria-label="Resetează toate filtrele"
+                className="px-5 py-3 rounded-xl border border-rose/50 text-rose hover:bg-rose/5 btn-press"
               >
                 ✕ Resetează filtrele
               </button>
             )}
           </div>
-        </div>
+        </section>
 
         {/* Results count and location indicator */}
-        <div className="mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div className="text-slate-600">
+        <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="text-slate">
             {loading ? (
               <span>Se încarcă...</span>
             ) : (
@@ -341,14 +357,14 @@ export default function Home() {
             )}
           </div>
           
-          {/* View Toggle */}
+          {/* View Toggle - Softer styling */}
           <div className="flex gap-2">
             <button
               onClick={() => setViewMode('grid')}
-              className={`px-4 py-2 rounded-lg border transition-colors flex items-center gap-2 ${
+              className={`px-4 py-2.5 rounded-xl border btn-press flex items-center gap-2 ${
                 viewMode === 'grid'
-                  ? 'bg-blue-100 border-blue-500 text-blue-700'
-                  : 'bg-white border-slate-300 text-slate-600 hover:bg-slate-50'
+                  ? 'bg-navy/10 border-navy text-navy'
+                  : 'bg-white border-warm-grey text-slate hover:bg-cream'
               }`}
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -358,10 +374,10 @@ export default function Home() {
             </button>
             <button
               onClick={() => setViewMode('map')}
-              className={`px-4 py-2 rounded-lg border transition-colors flex items-center gap-2 ${
+              className={`px-4 py-2.5 rounded-xl border btn-press flex items-center gap-2 ${
                 viewMode === 'map'
-                  ? 'bg-blue-100 border-blue-500 text-blue-700'
-                  : 'bg-white border-slate-300 text-slate-600 hover:bg-slate-50'
+                  ? 'bg-navy/10 border-navy text-navy'
+                  : 'bg-white border-warm-grey text-slate hover:bg-cream'
               }`}
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -374,7 +390,7 @@ export default function Home() {
 
         {/* Map View */}
         {viewMode === 'map' && (
-          <div className="mb-6">
+          <div className="mb-8">
             <Map 
               companies={filteredCompanies}
               selectedCompany={selectedMapCompany}
@@ -383,19 +399,19 @@ export default function Home() {
               showAllMarkers={true}
             />
             {selectedMapCompany && (
-              <div className="mt-4 p-4 bg-white rounded-lg shadow-sm border">
+              <div className="mt-4 p-5 bg-white rounded-2xl shadow-soft border border-warm-grey">
                 <div className="flex items-start justify-between">
                   <div>
-                    <h3 className="font-semibold text-lg">{selectedMapCompany.name}</h3>
+                    <h3 className="font-heading text-xl text-charcoal">{selectedMapCompany.name}</h3>
                     {selectedMapCompany.locations?.[0] && (
-                      <p className="text-slate-600 text-sm">
+                      <p className="text-slate text-sm mt-1">
                         📍 {selectedMapCompany.locations[0].address}, {selectedMapCompany.locations[0].city}
                       </p>
                     )}
                     {selectedMapCompany.contacts?.[0] && (
                       <a 
                         href={`tel:${selectedMapCompany.contacts[0].value}`}
-                        className="text-blue-600 hover:underline text-sm"
+                        className="text-navy hover:text-navy-dark text-sm inline-block mt-1"
                       >
                         📞 {selectedMapCompany.contacts[0].value}
                       </a>
@@ -404,13 +420,13 @@ export default function Home() {
                   <div className="flex gap-2">
                     <a
                       href={`/company/${selectedMapCompany.slug}`}
-                      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm"
+                      className="px-5 py-2.5 bg-navy text-white rounded-xl hover:bg-navy-dark transition-colors text-sm font-medium"
                     >
                       Vezi detalii
                     </a>
                     <button
                       onClick={() => setSelectedMapCompany(null)}
-                      className="px-3 py-2 border border-slate-300 rounded-lg hover:bg-slate-50 text-sm"
+                      className="px-4 py-2.5 border border-warm-grey rounded-xl hover:bg-cream transition-colors text-sm"
                     >
                       ✕
                     </button>
@@ -423,7 +439,7 @@ export default function Home() {
 
         {/* Company Grid */}
         {viewMode === 'grid' && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-stagger">
             {loading ? (
               // Loading skeletons
               <>
@@ -439,8 +455,8 @@ export default function Home() {
                 <CompanyCard key={company.id} company={company} />
               ))
             ) : (
-              <div className="col-span-full text-center py-12">
-                <p className="text-slate-500 text-lg">
+              <div className="col-span-full text-center py-16 animate-fade-in">
+                <p className="text-slate text-lg">
                   {companies.length === 0
                     ? '📭 Nu există încă firme în baza de date. Rulează scraper-ul pentru a adăuga date.'
                     : '🔍 Nicio firmă nu corespunde criteriilor de căutare.'}
@@ -451,7 +467,7 @@ export default function Home() {
                       setSelectedCounty('');
                       setSelectedCity('');
                     }}
-                    className="mt-4 text-blue-600 hover:underline"
+                    className="mt-4 text-navy hover:text-navy-dark link-animated"
                   >
                     Caută în toată România
                   </button>
@@ -461,26 +477,27 @@ export default function Home() {
           </div>
         )}
       </div>
+      </main>
 
-      {/* Footer */}
-      <footer className="bg-white border-t mt-12 py-8">
+      {/* Footer - Soft, supportive */}
+      <footer className="bg-white border-t border-warm-grey mt-16 py-10" role="contentinfo">
         <div className="max-w-6xl mx-auto px-4">
           {/* Navigation Links */}
-          <div className="flex flex-wrap justify-center gap-6 mb-6">
-            <a href="/despre" className="text-slate-600 hover:text-blue-600 transition-colors">
+          <nav aria-label="Link-uri subsol" className="flex flex-wrap justify-center gap-8 mb-8">
+            <a href="/despre" className="text-slate link-animated">
               Despre Noi
             </a>
-            <a href="/contact" className="text-slate-600 hover:text-blue-600 transition-colors">
+            <a href="/contact" className="text-slate link-animated">
               Contact
             </a>
-            <a href="/eliminare" className="text-slate-600 hover:text-blue-600 transition-colors">
+            <a href="/eliminare" className="text-slate link-animated">
               Solicită Ștergerea Datelor
             </a>
-          </div>
+          </nav>
           
           {/* Copyright */}
-          <div className="text-center text-slate-500">
-            <p>© 2025 Director Servicii Funerare România</p>
+          <div className="text-center text-slate">
+            <p className="text-charcoal">© 2025 Director Servicii Funerare România</p>
             <p className="text-sm mt-2">
               Datele sunt verificate cu listele DSP din fiecare județ.
             </p>

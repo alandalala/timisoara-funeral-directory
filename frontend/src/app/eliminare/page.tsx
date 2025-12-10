@@ -57,17 +57,17 @@ export default function RemovalRequestPage() {
 
   if (submitted) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <Card className="max-w-md mx-4">
-          <CardContent className="pt-6 text-center">
-            <div className="text-6xl mb-4">✅</div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">
+      <div className="min-h-screen bg-cream flex items-center justify-center">
+        <Card className="max-w-md mx-4 bg-white border-warm-grey rounded-2xl shadow-soft animate-fade-in">
+          <CardContent className="pt-8 text-center">
+            <div className="text-6xl mb-4" aria-hidden="true">✅</div>
+            <h2 className="text-2xl font-heading text-charcoal mb-2">
               Cerere Înregistrată
             </h2>
-            <p className="text-gray-600 mb-4">
+            <p className="text-slate mb-4">
               Cererea dvs. de eliminare a fost înregistrată cu succes.
             </p>
-            <p className="text-sm text-gray-500 mb-6">
+            <p className="text-sm text-slate/80 mb-6">
               În conformitate cu GDPR, cererea va fi procesată în maximum 30 de zile. 
               Veți primi o confirmare pe email când procesarea este completă.
             </p>
@@ -81,19 +81,20 @@ export default function RemovalRequestPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-cream">
       {/* Header */}
-      <header className="bg-white border-b">
+      <header className="bg-white border-b border-warm-grey" role="banner">
         <div className="container mx-auto px-4 py-4">
           <Link
             href="/"
-            className="inline-flex items-center text-gray-600 hover:text-gray-900 transition-colors"
+            className="inline-flex items-center text-slate link-animated"
           >
             <svg
               className="w-5 h-5 mr-2"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
+              aria-hidden="true"
             >
               <path
                 strokeLinecap="round"
@@ -108,35 +109,35 @@ export default function RemovalRequestPage() {
       </header>
 
       {/* Main Content */}
-      <main className="container mx-auto px-4 py-12">
-        <div className="max-w-2xl mx-auto">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
+      <main id="main-content" className="container mx-auto px-4 py-12" role="main">
+        <div className="max-w-2xl mx-auto animate-fade-in">
+          <h1 className="text-4xl font-heading text-charcoal mb-4">
             Solicitare Eliminare Date
           </h1>
           
           {/* GDPR Info Box */}
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-8">
-            <h2 className="font-semibold text-blue-900 mb-2">
+          <div className="bg-navy/5 border border-navy/10 rounded-2xl p-5 mb-8">
+            <h2 className="font-heading text-charcoal mb-2">
               🔒 Drepturile dvs. conform GDPR
             </h2>
-            <p className="text-blue-800 text-sm">
+            <p className="text-slate text-sm">
               În conformitate cu Regulamentul General privind Protecția Datelor (GDPR), 
               aveți dreptul de a solicita ștergerea datelor dvs. personale sau ale firmei dvs. 
               din directorul nostru. Vom procesa cererea în maximum 30 de zile.
             </p>
           </div>
 
-          <Card>
+          <Card className="bg-white border-warm-grey rounded-2xl shadow-soft">
             <CardHeader>
-              <CardTitle>Formular de Solicitare</CardTitle>
+              <CardTitle className="font-heading text-charcoal">Formular de Solicitare</CardTitle>
             </CardHeader>
             <CardContent>
               <form onSubmit={handleSubmit} className="space-y-6">
                 {/* Company Info */}
-                <div className="border-b pb-4 mb-4">
-                  <h3 className="font-medium text-gray-900 mb-4">Informații Firmă</h3>
+                <div className="border-b border-warm-grey pb-4 mb-4">
+                  <h3 className="font-medium text-charcoal mb-4">Informații Firmă</h3>
                   <div>
-                    <label htmlFor="company_name" className="block text-sm font-medium text-gray-700 mb-1">
+                    <label htmlFor="company_name" className="block text-sm font-medium text-charcoal mb-2">
                       Denumirea Firmei *
                     </label>
                     <Input
@@ -148,19 +149,19 @@ export default function RemovalRequestPage() {
                       onChange={handleChange}
                       placeholder="Ex: Servicii Funerare Example SRL"
                     />
-                    <p className="text-xs text-gray-500 mt-1">
+                    <p className="text-xs text-slate/70 mt-1">
                       Introduceți numele exact al firmei așa cum apare în director
                     </p>
                   </div>
                 </div>
 
                 {/* Requester Info */}
-                <div className="border-b pb-4 mb-4">
-                  <h3 className="font-medium text-gray-900 mb-4">Datele Solicitantului</h3>
+                <div className="border-b border-warm-grey pb-4 mb-4">
+                  <h3 className="font-medium text-charcoal mb-4">Datele Solicitantului</h3>
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                     <div>
-                      <label htmlFor="requester_name" className="block text-sm font-medium text-gray-700 mb-1">
+                      <label htmlFor="requester_name" className="block text-sm font-medium text-charcoal mb-2">
                         Nume și Prenume *
                       </label>
                       <Input
@@ -174,7 +175,7 @@ export default function RemovalRequestPage() {
                       />
                     </div>
                     <div>
-                      <label htmlFor="requester_email" className="block text-sm font-medium text-gray-700 mb-1">
+                      <label htmlFor="requester_email" className="block text-sm font-medium text-charcoal mb-2">
                         Email *
                       </label>
                       <Input
@@ -191,7 +192,7 @@ export default function RemovalRequestPage() {
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label htmlFor="requester_phone" className="block text-sm font-medium text-gray-700 mb-1">
+                      <label htmlFor="requester_phone" className="block text-sm font-medium text-charcoal mb-2">
                         Telefon (opțional)
                       </label>
                       <Input
@@ -204,7 +205,7 @@ export default function RemovalRequestPage() {
                       />
                     </div>
                     <div>
-                      <label htmlFor="relationship" className="block text-sm font-medium text-gray-700 mb-1">
+                      <label htmlFor="relationship" className="block text-sm font-medium text-charcoal mb-2">
                         Relația cu firma *
                       </label>
                       <select
@@ -213,7 +214,7 @@ export default function RemovalRequestPage() {
                         required
                         value={formData.relationship}
                         onChange={handleChange}
-                        className="w-full h-10 px-3 rounded-md border border-gray-300 bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full h-11 px-4 rounded-xl border border-[var(--warm-grey)] bg-white text-charcoal input-glow"
                       >
                         <option value="">Selectează</option>
                         <option value="owner">Proprietar / Administrator</option>
@@ -227,7 +228,7 @@ export default function RemovalRequestPage() {
 
                 {/* Reason */}
                 <div>
-                  <label htmlFor="reason" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="reason" className="block text-sm font-medium text-charcoal mb-2">
                     Motivul solicitării *
                   </label>
                   <select
@@ -236,7 +237,7 @@ export default function RemovalRequestPage() {
                     required
                     value={formData.reason}
                     onChange={handleChange}
-                    className="w-full h-10 px-3 rounded-md border border-gray-300 bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
+                    className="w-full h-11 px-4 rounded-xl border border-[var(--warm-grey)] bg-white text-charcoal input-glow mb-4"
                   >
                     <option value="">Selectează motivul</option>
                     <option value="business_closed">Firma nu mai există / S-a închis</option>
@@ -246,7 +247,7 @@ export default function RemovalRequestPage() {
                     <option value="other">Alt motiv</option>
                   </select>
 
-                  <label htmlFor="additional_info" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="additional_info" className="block text-sm font-medium text-charcoal mb-2">
                     Informații suplimentare (opțional)
                   </label>
                   <textarea
@@ -256,19 +257,19 @@ export default function RemovalRequestPage() {
                     value={formData.additional_info}
                     onChange={handleChange}
                     placeholder="Adăugați orice informații relevante pentru procesarea cererii..."
-                    className="w-full px-3 py-2 rounded-md border border-gray-300 bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                    className="w-full px-4 py-3 rounded-xl border border-[var(--warm-grey)] bg-white text-charcoal resize-none input-glow"
                   />
                 </div>
 
                 {/* Agreement */}
-                <div className="bg-gray-50 p-4 rounded-lg">
+                <div className="bg-cream p-5 rounded-xl">
                   <label className="flex items-start gap-3">
                     <input
                       type="checkbox"
                       required
-                      className="mt-1"
+                      className="mt-1 w-4 h-4 rounded border-warm-grey text-navy focus:ring-navy/20"
                     />
-                    <span className="text-sm text-gray-600">
+                    <span className="text-sm text-slate">
                       Confirm că sunt autorizat să solicit eliminarea acestor date și că informațiile 
                       furnizate sunt corecte. Înțeleg că identitatea mea poate fi verificată înainte 
                       de procesarea cererii.
@@ -277,7 +278,7 @@ export default function RemovalRequestPage() {
                 </div>
 
                 {error && (
-                  <div className="p-3 bg-red-50 border border-red-200 rounded-md text-red-600 text-sm">
+                  <div className="p-4 bg-rose/10 border border-rose/30 rounded-xl text-rose text-sm">
                     {error}
                   </div>
                 )}
@@ -289,10 +290,7 @@ export default function RemovalRequestPage() {
                 >
                   {isSubmitting ? (
                     <>
-                      <svg className="animate-spin -ml-1 mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                      </svg>
+                      <span className="spinner mr-2" />
                       Se procesează...
                     </>
                   ) : (
@@ -304,10 +302,10 @@ export default function RemovalRequestPage() {
           </Card>
 
           {/* Additional Info */}
-          <div className="mt-8 text-center text-sm text-gray-500">
+          <div className="mt-8 text-center text-sm text-slate">
             <p>
               Pentru alte întrebări, ne puteți contacta la{' '}
-              <a href="mailto:contact@serviciifunerare.ro" className="text-blue-600 hover:text-blue-800">
+              <a href="mailto:contact@serviciifunerare.ro" className="text-navy link-animated">
                 contact@serviciifunerare.ro
               </a>
             </p>
@@ -316,10 +314,10 @@ export default function RemovalRequestPage() {
       </main>
 
       {/* Footer */}
-      <footer className="bg-gray-800 text-white py-8 mt-12">
+      <footer className="bg-white border-t border-warm-grey py-10 mt-16" role="contentinfo">
         <div className="container mx-auto px-4 text-center">
-          <p className="text-gray-400">
-            © 2024 Servicii Funerare România. Toate drepturile rezervate.
+          <p className="text-slate">
+            © 2025 Servicii Funerare România. Toate drepturile rezervate.
           </p>
         </div>
       </footer>

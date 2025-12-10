@@ -1,15 +1,19 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Inter, Playfair_Display } from "next/font/google";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
+// Body font - Modern, readable, professional
+const inter = Inter({
+  variable: "--font-inter",
+  subsets: ["latin", "latin-ext"],
+  display: "swap",
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+// Header font - Dignified, traditional, trustworthy
+const playfair = Playfair_Display({
+  variable: "--font-playfair",
+  subsets: ["latin", "latin-ext"],
+  display: "swap",
 });
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://serviciifunerare.ro';
@@ -89,11 +93,15 @@ export default function RootLayout({
       <head>
         <link rel="icon" href="/favicon.ico" sizes="any" />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-        <meta name="theme-color" content="#1e40af" />
+        <meta name="theme-color" content="#4A5D6B" />
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${inter.variable} ${playfair.variable} font-sans antialiased`}
       >
+        {/* Skip to main content link for keyboard navigation */}
+        <a href="#main-content" className="skip-link">
+          Sari la conținut principal
+        </a>
         {children}
       </body>
     </html>

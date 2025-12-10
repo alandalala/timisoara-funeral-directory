@@ -20,29 +20,33 @@ export function CompanyCard({ company }: CompanyCardProps) {
   const headquarters = company.locations?.find((l) => l.type === 'headquarters') || company.locations?.[0];
 
   return (
-    <Card className="hover:shadow-lg transition-shadow duration-200 h-full flex flex-col">
+    <Card 
+      className="bg-white border-warm-grey rounded-2xl h-full flex flex-col animate-fade-in"
+      role="article"
+      aria-label={`${company.name}${company.is_verified ? ' - Verificat DSP' : ''}${company.is_non_stop ? ' - Disponibil 24/7' : ''}`}
+    >
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between gap-2">
-          <Link href={`/company/${company.slug}`}>
-            <CardTitle className="text-lg font-semibold text-slate-900 leading-tight hover:text-blue-600 transition-colors cursor-pointer">
+          <Link href={`/company/${company.slug}`} aria-label={`Vezi detalii pentru ${company.name}`}>
+            <CardTitle className="text-lg font-heading text-charcoal leading-tight link-animated cursor-pointer">
               {company.name}
             </CardTitle>
           </Link>
-          <div className="flex gap-1 flex-shrink-0">
+          <div className="flex gap-1.5 flex-shrink-0" role="list" aria-label="Statusuri">
             {company.is_verified && (
-              <Badge variant="default" className="bg-green-600 hover:bg-green-700 text-xs">
-                ✅ DSP
+              <Badge variant="default" className="bg-sage hover:bg-sage/90 text-white text-xs rounded-lg badge-interactive" role="listitem">
+                <span aria-hidden="true">✅</span> <span>DSP Verificat</span>
               </Badge>
             )}
             {company.is_non_stop && (
-              <Badge variant="secondary" className="text-xs">
-                24/7
+              <Badge variant="secondary" className="text-xs bg-sand/20 text-sand border-sand/30 rounded-lg badge-interactive" role="listitem">
+                Disponibil 24/7
               </Badge>
             )}
           </div>
         </div>
         {company.motto && (
-          <p className="text-sm text-slate-500 italic mt-1">
+          <p className="text-sm text-slate italic mt-2">
             "{company.motto}"
           </p>
         )}
@@ -57,13 +61,13 @@ export function CompanyCard({ company }: CompanyCardProps) {
             )}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-start gap-2 text-sm text-slate-600 mb-3 hover:text-blue-600 transition-colors group"
-          >
-            <span className="text-lg">📍</span>
+            aria-label={`Vezi locația pe Google Maps: ${headquarters.address}, ${headquarters.city}`}
+            className="flex items-start gap-2 text-sm text-slate mb-3 hover:text-navy transition-colors group">
+            <span className="text-lg" aria-hidden="true">📍</span>
             <div>
               <span className="group-hover:underline">{headquarters.address}</span>
               {(headquarters.city || headquarters.county) && (
-                <div className="text-xs text-slate-400 mt-0.5 group-hover:text-blue-500">
+                <div className="text-xs text-slate/70 mt-0.5 group-hover:text-navy">
                   {headquarters.city}{headquarters.city && headquarters.county && ', '}{headquarters.county}
                 </div>
               )}
@@ -77,7 +81,7 @@ export function CompanyCard({ company }: CompanyCardProps) {
             <span className="text-lg">📞</span>
             <a
               href={`tel:${primaryPhone.value}`}
-              className="text-blue-600 hover:underline font-medium"
+              className="text-navy hover:text-navy-dark font-medium transition-colors"
             >
               {primaryPhone.value}
             </a>
@@ -86,22 +90,22 @@ export function CompanyCard({ company }: CompanyCardProps) {
 
         {/* Services */}
         {company.services && company.services.length > 0 && (
-          <div className="mt-auto pt-3 border-t">
-            <div className="flex flex-wrap gap-1">
+          <div className="mt-auto pt-3 border-t border-warm-grey">
+            <div className="flex flex-wrap gap-1.5">
               {company.services.slice(0, 4).map((service) => {
                 const label = SERVICE_LABELS[service.service_tag as ServiceTag];
                 return (
                   <Badge
                     key={service.id}
                     variant="outline"
-                    className="text-xs font-normal"
+                    className="text-xs font-normal border-warm-grey text-slate rounded-lg"
                   >
                     {label?.ro || service.service_tag}
                   </Badge>
                 );
               })}
               {company.services.length > 4 && (
-                <Badge variant="outline" className="text-xs font-normal">
+                <Badge variant="outline" className="text-xs font-normal border-warm-grey text-slate rounded-lg">
                   +{company.services.length - 4}
                 </Badge>
               )}
@@ -109,22 +113,24 @@ export function CompanyCard({ company }: CompanyCardProps) {
           </div>
         )}
 
-        {/* Actions */}
-        <div className="flex gap-2 mt-4">
+        {/* Actions - Softened buttons with micro-interactions */}
+        <div className="flex gap-2 mt-4" role="group" aria-label="Acțiuni">
           {primaryPhone && (
             <a
               href={`tel:${primaryPhone.value}`}
               onClick={(e) => e.stopPropagation()}
-              className="flex-1 bg-blue-600 text-white text-center py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
+              aria-label={`Sună la ${company.name}: ${primaryPhone.value}`}
+              className="flex-1 bg-sage text-white text-center py-2.5 rounded-xl text-sm font-medium btn-press hover:bg-sage/90 min-h-[44px] flex items-center justify-center"
             >
-              📞 Sună acum
+              <span aria-hidden="true">📞</span> Sună acum
             </a>
           )}
           <Link
             href={`/company/${company.slug}`}
-            className="px-4 py-2 border border-slate-300 rounded-lg text-sm font-medium hover:bg-slate-50 transition-colors"
+            aria-label={`Vezi toate detaliile pentru ${company.name}`}
+            className="px-4 py-2.5 border border-warm-grey rounded-xl text-sm font-medium btn-press hover:bg-cream text-charcoal min-h-[44px] flex items-center justify-center"
           >
-            Detalii →
+            Detalii <span aria-hidden="true">→</span>
           </Link>
         </div>
       </CardContent>

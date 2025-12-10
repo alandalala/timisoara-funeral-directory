@@ -12,8 +12,8 @@ import { Button } from '@/components/ui/button';
 const Map = dynamic(() => import('@/components/Map').then(mod => ({ default: mod.Map })), {
   ssr: false,
   loading: () => (
-    <div className="h-[250px] bg-slate-100 rounded-lg flex items-center justify-center">
-      <div className="text-slate-500">Se încarcă harta...</div>
+    <div className="h-[250px] bg-cream rounded-xl flex items-center justify-center">
+      <div className="text-slate">Se încarcă harta...</div>
     </div>
   ),
 });
@@ -36,13 +36,13 @@ export default function CompanyDetail({ company }: CompanyDetailProps) {
   const otherLocations = company.locations?.filter((l) => l.type !== 'headquarters');
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-cream">
       {/* Header */}
-      <header className="bg-white border-b">
+      <header className="bg-white border-b border-warm-grey">
         <div className="container mx-auto px-4 py-4">
           <Link
             href="/"
-            className="inline-flex items-center text-gray-600 hover:text-gray-900 transition-colors"
+            className="inline-flex items-center text-slate hover:text-navy transition-colors"
           >
             <svg
               className="w-5 h-5 mr-2"
@@ -66,21 +66,21 @@ export default function CompanyDetail({ company }: CompanyDetailProps) {
       <main className="container mx-auto px-4 py-8">
         {/* Company Header */}
         <div className="mb-8">
-          <div className="flex flex-wrap items-center gap-3 mb-2">
-            <h1 className="text-3xl font-bold text-gray-900">{company.name}</h1>
+          <div className="flex flex-wrap items-center gap-3 mb-3">
+            <h1 className="text-3xl font-heading text-charcoal">{company.name}</h1>
             {company.is_verified && (
-              <Badge className="bg-green-100 text-green-800 border-green-200">
+              <Badge className="bg-sage/10 text-sage border-sage/30 rounded-lg">
                 ✓ Verificat
               </Badge>
             )}
             {company.is_non_stop && (
-              <Badge className="bg-blue-100 text-blue-800 border-blue-200">
+              <Badge className="bg-sand/20 text-sand border-sand/30 rounded-lg">
                 🕐 Non-Stop
               </Badge>
             )}
           </div>
           {company.motto && (
-            <p className="text-lg text-gray-600 italic">&ldquo;{company.motto}&rdquo;</p>
+            <p className="text-lg text-slate italic">&ldquo;{company.motto}&rdquo;</p>
           )}
         </div>
 
@@ -88,9 +88,9 @@ export default function CompanyDetail({ company }: CompanyDetailProps) {
           {/* Left Column - Main Info */}
           <div className="lg:col-span-2 space-y-6">
             {/* Contact Card */}
-            <Card>
+            <Card className="bg-white border-warm-grey rounded-2xl shadow-soft">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
+                <CardTitle className="flex items-center gap-2 font-heading text-charcoal">
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                   </svg>
@@ -101,18 +101,18 @@ export default function CompanyDetail({ company }: CompanyDetailProps) {
                 {/* Phone Numbers */}
                 {allPhones && allPhones.length > 0 && (
                   <div>
-                    <h4 className="font-medium text-gray-700 mb-2">Telefon</h4>
+                    <h4 className="font-medium text-charcoal mb-2">Telefon</h4>
                     <div className="space-y-2">
                       {allPhones.map((phone) => (
                         <a
                           key={phone.id}
                           href={`tel:${phone.value.replace(/\s/g, '')}`}
-                          className="flex items-center gap-2 text-lg text-blue-600 hover:text-blue-800"
+                          className="flex items-center gap-2 text-lg text-navy hover:text-navy-dark transition-colors"
                         >
                           <span className="text-2xl">📞</span>
                           <span className="font-medium">{phone.value}</span>
                           {phone.is_primary && (
-                            <Badge variant="outline" className="text-xs">Principal</Badge>
+                            <Badge variant="outline" className="text-xs border-warm-grey rounded-lg">Principal</Badge>
                           )}
                         </a>
                       ))}
@@ -123,13 +123,13 @@ export default function CompanyDetail({ company }: CompanyDetailProps) {
                 {/* Email */}
                 {emails && emails.length > 0 && (
                   <div>
-                    <h4 className="font-medium text-gray-700 mb-2">Email</h4>
+                    <h4 className="font-medium text-charcoal mb-2">Email</h4>
                     <div className="space-y-2">
                       {emails.map((email) => (
                         <a
                           key={email.id}
                           href={`mailto:${email.value}`}
-                          className="flex items-center gap-2 text-blue-600 hover:text-blue-800"
+                          className="flex items-center gap-2 text-navy hover:text-navy-dark transition-colors"
                         >
                           <span className="text-xl">✉️</span>
                           <span>{email.value}</span>
@@ -142,12 +142,12 @@ export default function CompanyDetail({ company }: CompanyDetailProps) {
                 {/* Website */}
                 {company.website && (
                   <div>
-                    <h4 className="font-medium text-gray-700 mb-2">Website</h4>
+                    <h4 className="font-medium text-charcoal mb-2">Website</h4>
                     <a
                       href={company.website.startsWith('http') ? company.website : `https://${company.website}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-2 text-blue-600 hover:text-blue-800"
+                      className="flex items-center gap-2 text-navy hover:text-navy-dark transition-colors"
                     >
                       <span className="text-xl">🌐</span>
                       <span>{company.website}</span>
@@ -162,7 +162,7 @@ export default function CompanyDetail({ company }: CompanyDetailProps) {
                       href={`tel:${primaryPhone.value.replace(/\s/g, '')}`}
                       className="block w-full"
                     >
-                      <Button className="w-full bg-green-600 hover:bg-green-700 text-lg py-6">
+                      <Button variant="success" className="w-full text-lg py-6">
                         📞 Sună Acum: {primaryPhone.value}
                       </Button>
                     </a>
@@ -187,9 +187,9 @@ export default function CompanyDetail({ company }: CompanyDetailProps) {
 
             {/* Services Card */}
             {company.services && company.services.length > 0 && (
-              <Card>
+              <Card className="bg-white border-warm-grey rounded-2xl shadow-soft">
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
+                  <CardTitle className="flex items-center gap-2 font-heading text-charcoal">
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
                     </svg>
@@ -203,10 +203,10 @@ export default function CompanyDetail({ company }: CompanyDetailProps) {
                       return (
                         <div
                           key={service.id}
-                          className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg"
+                          className="flex items-center gap-2 p-3 bg-cream rounded-xl"
                         >
-                          <span className="text-green-500">✓</span>
-                          <span>{label?.ro || service.service_tag}</span>
+                          <span className="text-sage">✓</span>
+                          <span className="text-charcoal">{label?.ro || service.service_tag}</span>
                         </div>
                       );
                     })}
@@ -217,12 +217,12 @@ export default function CompanyDetail({ company }: CompanyDetailProps) {
 
             {/* Description Card */}
             {company.description && !company.description.includes('[SAMPLE]') && (
-              <Card>
+              <Card className="bg-white border-warm-grey rounded-2xl shadow-soft">
                 <CardHeader>
-                  <CardTitle>Despre Firmă</CardTitle>
+                  <CardTitle className="font-heading text-charcoal">Despre Firmă</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-gray-700 whitespace-pre-wrap">{company.description}</p>
+                  <p className="text-slate whitespace-pre-wrap">{company.description}</p>
                 </CardContent>
               </Card>
             )}
@@ -231,9 +231,9 @@ export default function CompanyDetail({ company }: CompanyDetailProps) {
           {/* Right Column - Location & Info */}
           <div className="space-y-6">
             {/* Location Card */}
-            <Card>
+            <Card className="bg-white border-warm-grey rounded-2xl shadow-soft">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
+                <CardTitle className="flex items-center gap-2 font-heading text-charcoal">
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -243,7 +243,7 @@ export default function CompanyDetail({ company }: CompanyDetailProps) {
               </CardHeader>
               <CardContent className="space-y-4">
                 {/* Mini Map */}
-                <div className="mb-4">
+                <div className="mb-4 rounded-xl overflow-hidden">
                   <Map 
                     companies={[company]}
                     selectedCompany={company}
@@ -254,9 +254,9 @@ export default function CompanyDetail({ company }: CompanyDetailProps) {
 
                 {headquarters && (
                   <div>
-                    <h4 className="font-medium text-gray-700 mb-1">Sediu Principal</h4>
-                    <p className="text-gray-600">{headquarters.address}</p>
-                    <p className="text-gray-600">
+                    <h4 className="font-medium text-charcoal mb-1">Sediu Principal</h4>
+                    <p className="text-slate">{headquarters.address}</p>
+                    <p className="text-slate">
                       {headquarters.city}
                       {headquarters.county && `, jud. ${headquarters.county}`}
                     </p>
@@ -268,7 +268,7 @@ export default function CompanyDetail({ company }: CompanyDetailProps) {
                       )}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 mt-2 text-blue-600 hover:text-blue-800 text-sm"
+                      className="inline-flex items-center gap-1 mt-2 text-navy hover:text-navy-dark text-sm transition-colors"
                     >
                       <span>📍</span> Vezi pe Google Maps
                     </a>
@@ -276,16 +276,16 @@ export default function CompanyDetail({ company }: CompanyDetailProps) {
                 )}
 
                 {otherLocations && otherLocations.length > 0 && (
-                  <div className="border-t pt-4">
-                    <h4 className="font-medium text-gray-700 mb-2">Alte Locații</h4>
+                  <div className="border-t border-warm-grey pt-4">
+                    <h4 className="font-medium text-charcoal mb-2">Alte Locații</h4>
                     <div className="space-y-3">
                       {otherLocations.map((loc) => (
                         <div key={loc.id} className="text-sm">
-                          <Badge variant="outline" className="mb-1">
+                          <Badge variant="outline" className="mb-1 border-warm-grey rounded-lg">
                             {loc.type === 'wake_house' ? 'Capelă' : 'Showroom'}
                           </Badge>
-                          <p className="text-gray-600">{loc.address}</p>
-                          <p className="text-gray-600">{loc.city}</p>
+                          <p className="text-slate">{loc.address}</p>
+                          <p className="text-slate">{loc.city}</p>
                         </div>
                       ))}
                     </div>
@@ -295,9 +295,9 @@ export default function CompanyDetail({ company }: CompanyDetailProps) {
             </Card>
 
             {/* Info Card */}
-            <Card>
+            <Card className="bg-white border-warm-grey rounded-2xl shadow-soft">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
+                <CardTitle className="flex items-center gap-2 font-heading text-charcoal">
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
@@ -307,19 +307,19 @@ export default function CompanyDetail({ company }: CompanyDetailProps) {
               <CardContent className="space-y-3">
                 {company.fiscal_code && (
                   <div className="flex justify-between text-sm">
-                    <span className="text-gray-500">CUI / CIF:</span>
-                    <span className="font-medium">{company.fiscal_code}</span>
+                    <span className="text-slate">CUI / CIF:</span>
+                    <span className="font-medium text-charcoal">{company.fiscal_code}</span>
                   </div>
                 )}
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-500">Program:</span>
-                  <span className="font-medium">
+                  <span className="text-slate">Program:</span>
+                  <span className="font-medium text-charcoal">
                     {company.is_non_stop ? 'Non-Stop (24/7)' : 'Program normal'}
                   </span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-500">Status:</span>
-                  <span className={`font-medium ${company.is_verified ? 'text-green-600' : 'text-gray-600'}`}>
+                  <span className="text-slate">Status:</span>
+                  <span className={`font-medium ${company.is_verified ? 'text-sage' : 'text-slate'}`}>
                     {company.is_verified ? '✓ Verificat' : 'Neverificat'}
                   </span>
                 </div>
@@ -327,9 +327,9 @@ export default function CompanyDetail({ company }: CompanyDetailProps) {
             </Card>
 
             {/* Report Card */}
-            <Card className="bg-gray-50">
+            <Card className="bg-cream border-warm-grey rounded-2xl">
               <CardContent className="pt-6">
-                <p className="text-sm text-gray-600 mb-3">
+                <p className="text-sm text-slate mb-3">
                   Informațiile nu sunt corecte sau doriți să raportați o problemă?
                 </p>
                 <Button variant="outline" className="w-full" size="sm">
@@ -342,10 +342,10 @@ export default function CompanyDetail({ company }: CompanyDetailProps) {
       </main>
 
       {/* Footer */}
-      <footer className="bg-gray-800 text-white py-8 mt-12">
+      <footer className="bg-white border-t border-warm-grey py-10 mt-16">
         <div className="container mx-auto px-4 text-center">
-          <p className="text-gray-400">
-            © 2024 Servicii Funerare România. Toate drepturile rezervate.
+          <p className="text-slate">
+            © 2025 Servicii Funerare România. Toate drepturile rezervate.
           </p>
         </div>
       </footer>
