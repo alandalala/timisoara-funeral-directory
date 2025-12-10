@@ -105,17 +105,17 @@ Track your progress by checking off completed items!
 
 ---
 
-## Priority 9: Additional Pages ⏱️ ~2-3 hours
+## Priority 9: Additional Pages ⏱️ ~2-3 hours ✅ COMPLETE
 
-- [ ] Homepage by County (`/judet/[county]`) - e.g., `/judet/timis`
-- [ ] Homepage by City (`/judet/[county]/[city]`) - e.g., `/judet/timis/timisoara`
-- [ ] About (`/despre`) - Project information
-- [ ] Contact (`/contact`) - Contact form
-- [ ] Request Removal (`/eliminare`) - GDPR compliance form
+- [x] About (`/despre`) - Project information ✅
+- [x] Contact (`/contact`) - Contact form ✅
+- [x] GDPR Removal Request (`/eliminare`) - Removal request form ✅
+- [ ] Homepage by County (`/judet/[county]`) - e.g., `/judet/timis` (optional)
+- [ ] Homepage by City (`/judet/[county]/[city]`) - e.g., `/judet/timis/timisoara` (optional)
 
 ---
 
-## Priority 10: Testing ⏱️ ~3-4 hours
+## Priority 10: Testing ⏱️ ~3-4 hours 🔜 NEXT
 
 - [ ] Backend unit tests (pytest)
 - [ ] Frontend component tests

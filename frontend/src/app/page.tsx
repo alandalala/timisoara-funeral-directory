@@ -464,14 +464,27 @@ export default function Home() {
 
       {/* Footer */}
       <footer className="bg-white border-t mt-12 py-8">
-        <div className="max-w-6xl mx-auto px-4 text-center text-slate-500">
-          <p>© 2025 Director Servicii Funerare România</p>
-          <p className="text-sm mt-2">
-            Datele sunt verificate cu listele DSP din fiecare județ.
-            <a href="/request-removal" className="text-blue-600 hover:underline ml-1">
-              Solicită ștergerea datelor
+        <div className="max-w-6xl mx-auto px-4">
+          {/* Navigation Links */}
+          <div className="flex flex-wrap justify-center gap-6 mb-6">
+            <a href="/despre" className="text-slate-600 hover:text-blue-600 transition-colors">
+              Despre Noi
             </a>
-          </p>
+            <a href="/contact" className="text-slate-600 hover:text-blue-600 transition-colors">
+              Contact
+            </a>
+            <a href="/eliminare" className="text-slate-600 hover:text-blue-600 transition-colors">
+              Solicită Ștergerea Datelor
+            </a>
+          </div>
+          
+          {/* Copyright */}
+          <div className="text-center text-slate-500">
+            <p>© 2025 Director Servicii Funerare România</p>
+            <p className="text-sm mt-2">
+              Datele sunt verificate cu listele DSP din fiecare județ.
+            </p>
+          </div>
         </div>
       </footer>
     </div>
