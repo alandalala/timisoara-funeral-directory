@@ -31,7 +31,6 @@ export async function GET(request: NextRequest) {
         services (*),
         locations (*)
       `, { count: 'exact' })
-      .eq('status', 'active')
       .order('is_verified', { ascending: false })
       .order('name', { ascending: true });
 
