@@ -80,6 +80,13 @@ export default function Home() {
   useEffect(() => {
     fetchCounties();
     fetchCompanies();
+    
+    // Read search parameter from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const searchParam = urlParams.get('search');
+    if (searchParam) {
+      setSearchQuery(searchParam);
+    }
   }, []);
 
   // Clear map bounds when leaving split view
