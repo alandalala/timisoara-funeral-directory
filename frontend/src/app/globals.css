@@ -180,6 +180,15 @@
 .bg-sand { background-color: var(--sand); }
 .bg-rose { background-color: var(--rose); }
 
+/* Force white text on colored backgrounds */
+.bg-sage,
+.bg-navy,
+.bg-navy-dark,
+.bg-slate,
+.bg-rose {
+  color: #FFFFFF !important;
+}
+
 /* Semantic Text Colors */
 .text-navy { color: var(--navy); }
 .text-navy-dark { color: var(--navy-dark); }

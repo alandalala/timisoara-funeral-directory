@@ -18,6 +18,21 @@ const Map = dynamic(() => import('@/components/Map').then(mod => ({ default: mod
   ),
 });
 
+// Normalize Romanian diacritics for search (ă→a, â→a, î→i, ș→s, ț→t)
+function normalizeRomanian(text: string): string {
+  return text
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '') // Remove diacritical marks
+    .replace(/ă/g, 'a')
+    .replace(/â/g, 'a')
+    .replace(/î/g, 'i')
+    .replace(/ș/g, 's')
+    .replace(/ş/g, 's') // Alternative ș
+    .replace(/ț/g, 't')
+    .replace(/ţ/g, 't'); // Alternative ț
+}
+
 export default function Home() {
   const [companies, setCompanies] = useState<Company[]>([]);
   const [counties, setCounties] = useState<County[]>([]);
@@ -33,9 +48,9 @@ export default function Home() {
   const [viewMode, setViewMode] = useState<'grid' | 'map'>('grid');
   const [selectedMapCompany, setSelectedMapCompany] = useState<Company | null>(null);
 
-  // Filter counties based on search query
+  // Filter counties based on search query (supports searching without diacritics)
   const filteredCounties = counties.filter(county =>
-    county.name.toLowerCase().includes(countySearchQuery.toLowerCase())
+    normalizeRomanian(county.name).includes(normalizeRomanian(countySearchQuery))
   );
 
   // Get unique cities from current companies based on selected county
@@ -47,9 +62,9 @@ export default function Home() {
       .filter(Boolean)
   )].sort();
 
-  // Filter cities based on search query
+  // Filter cities based on search query (supports searching without diacritics)
   const filteredCities = availableCities.filter(city =>
-    city?.toLowerCase().includes(citySearchQuery.toLowerCase())
+    normalizeRomanian(city || '').includes(normalizeRomanian(citySearchQuery))
   );
 
   useEffect(() => {
@@ -94,10 +109,9 @@ export default function Home() {
   }
 
   const filteredCompanies = companies.filter((company) => {
-    // Filter by name search
-    const matchesSearch = company.name
-      .toLowerCase()
-      .includes(searchQuery.toLowerCase());
+    // Filter by name search (supports searching without diacritics)
+    const matchesSearch = normalizeRomanian(company.name)
+      .includes(normalizeRomanian(searchQuery));
     
     // Filter by verification status
     const matchesVerified = showVerifiedOnly ? company.is_verified : true;
@@ -107,7 +121,7 @@ export default function Home() {
       ? company.locations?.some(loc => loc.county === selectedCounty)
       : countySearchQuery
         ? company.locations?.some(loc => 
-            loc.county?.toLowerCase().includes(countySearchQuery.toLowerCase())
+            normalizeRomanian(loc.county || '').includes(normalizeRomanian(countySearchQuery))
           )
         : true;
     
@@ -116,7 +130,7 @@ export default function Home() {
       ? company.locations?.some(loc => loc.city === selectedCity)
       : citySearchQuery
         ? company.locations?.some(loc => 
-            loc.city?.toLowerCase().includes(citySearchQuery.toLowerCase())
+            normalizeRomanian(loc.city || '').includes(normalizeRomanian(citySearchQuery))
           )
         : true;
     return matchesSearch && matchesVerified && matchesCounty && matchesCity;
@@ -313,14 +327,18 @@ export default function Home() {
             <button
               onClick={() => setShowVerifiedOnly(!showVerifiedOnly)}
               aria-pressed={showVerifiedOnly}
-              aria-label={showVerifiedOnly ? 'Arată toate firmele' : 'Arată doar firme verificate'}
-              className={`px-5 py-3 rounded-xl border btn-press font-medium ${
-                showVerifiedOnly
-                  ? 'bg-sage/10 border-sage text-sage'
-                  : 'bg-white border-warm-grey text-slate hover:bg-cream'
+              className={`flex items-center gap-2 px-4 py-3 rounded-xl border font-medium transition-all ${
+                showVerifiedOnly 
+                  ? 'bg-sage text-white border-sage' 
+                  : 'bg-white text-slate border-warm-grey hover:bg-cream'
               }`}
             >
-              ✅ Doar verificate
+              {showVerifiedOnly && (
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
+              )}
+              Verificate DSP
             </button>
             {(selectedCounty || countySearchQuery || selectedCity || citySearchQuery || searchQuery || showVerifiedOnly) && (
               <button

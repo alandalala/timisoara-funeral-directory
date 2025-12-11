@@ -9,18 +9,18 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-[var(--navy)] text-white hover:bg-[var(--navy-dark)]",
+        default: "bg-[var(--navy)] text-white hover:bg-[var(--navy-dark)] [color:white]",
         destructive:
-          "bg-[var(--rose)] text-white hover:bg-[var(--rose)]/90 focus-visible:ring-[var(--rose)]/20",
+          "bg-[var(--rose)] text-white hover:bg-[var(--rose)]/90 focus-visible:ring-[var(--rose)]/20 [color:white]",
         outline:
           "border border-[var(--warm-grey)] bg-white shadow-soft hover:bg-[var(--cream)] dark:bg-input/30 dark:border-input dark:hover:bg-input/50",
         secondary:
-          "bg-[var(--slate)] text-white hover:bg-[var(--slate)]/90",
+          "bg-[var(--slate)] text-white hover:bg-[var(--slate)]/90 [color:white]",
         ghost:
           "hover:bg-[var(--cream)] hover:text-[var(--charcoal)]",
         link: "text-[var(--navy)] underline-offset-4 hover:underline",
         success:
-          "bg-[var(--sage)] text-white hover:bg-[var(--sage)]/90",
+          "bg-[var(--sage)] text-white hover:bg-[var(--sage)]/90 [color:white]",
       },
       size: {
         default: "h-11 px-5 py-2.5 has-[>svg]:px-4",
