@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Playfair_Display } from "next/font/google";
+import { Inter, Playfair_Display, Lora } from "next/font/google";
 import "./globals.css";
 
 // Body font - Modern, readable, professional
@@ -14,6 +14,14 @@ const playfair = Playfair_Display({
   variable: "--font-playfair",
   subsets: ["latin", "latin-ext"],
   display: "swap",
+});
+
+// Quote/Motto font - Elegant italic serif
+const lora = Lora({
+  variable: "--font-lora",
+  subsets: ["latin", "latin-ext"],
+  display: "swap",
+  style: ["normal", "italic"],
 });
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://cautarefunerare.ro';
@@ -96,7 +104,7 @@ export default function RootLayout({
         <meta name="theme-color" content="#4A5D6B" />
       </head>
       <body
-        className={`${inter.variable} ${playfair.variable} font-sans antialiased`}
+        className={`${inter.variable} ${playfair.variable} ${lora.variable} font-sans antialiased`}
       >
         {/* Skip to main content link for keyboard navigation */}
         <a href="#main-content" className="skip-link">

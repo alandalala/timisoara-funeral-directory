@@ -20,6 +20,8 @@ export interface Company {
   contacts?: Contact[];
   services?: Service[];
   locations?: Location[];
+  reviews?: Review[];
+  review_summary?: ReviewSummary | null;
 }
 
 export interface Contact {
@@ -77,6 +79,48 @@ export interface RemovalRequest {
   status: 'pending' | 'approved' | 'rejected' | 'completed';
   created_at: string;
 }
+
+export interface Review {
+  id: string;
+  company_id: string;
+  source: 'google' | 'facebook' | 'manual';
+  author_name?: string | null;
+  author_location?: string | null;
+  rating?: number | null;
+  content?: string | null;
+  sentiment_tags?: string[] | null;
+  review_date?: string | null;
+  source_url?: string | null;
+  is_featured: boolean;
+  created_at: string;
+}
+
+export interface ReviewSummary {
+  id: string;
+  company_id: string;
+  total_reviews: number;
+  average_rating?: number | null;
+  google_rating?: number | null;
+  facebook_rating?: number | null;
+  top_sentiment_tags?: string[] | null;
+  last_scraped_at?: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+// Sentiment tag labels for display
+export const SENTIMENT_LABELS: Record<string, { ro: string; icon: string }> = {
+  'profesionalism': { ro: 'Profesionalism', icon: '✓' },
+  'raspuns_rapid': { ro: 'Răspuns Rapid', icon: '✓' },
+  'empatie': { ro: 'Empatie', icon: '✓' },
+  'preturi_corecte': { ro: 'Prețuri Corecte', icon: '✓' },
+  'comunicare': { ro: 'Comunicare Bună', icon: '✓' },
+  'punctualitate': { ro: 'Punctualitate', icon: '✓' },
+  'respect': { ro: 'Respect', icon: '✓' },
+  'calitate': { ro: 'Calitate Servicii', icon: '✓' },
+  'disponibilitate': { ro: 'Disponibilitate', icon: '✓' },
+  'curatenie': { ro: 'Curățenie', icon: '✓' },
+};
 
 export type ServiceTag = 
   // 1. Documentation & Legal

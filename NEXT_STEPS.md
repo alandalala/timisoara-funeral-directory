@@ -134,7 +134,70 @@ Track your progress by checking off completed items!
 
 ---
 
-## Priority 12: Deployment ⏱️ ~2 hours 🔜 NEXT
+## Priority 12: UI "Tactile Luxury" Redesign ⏱️ ~8-10 hours ✅ COMPLETE
+
+### 12.1 Visual Language & "Tactile" Feel ✅ COMPLETE
+Update the design system to reflect a 'Tactile Luxury' aesthetic.
+
+- [x] **Color Palette**: Replace current colors with 'Matte Gold' and 'Deep Navy' theme ✅
+  - Primary buttons/active states: `#C1A050` (Matte Gold)
+  - Headers: `#001D3D` (Deep Navy)
+  - Background: `#FAF9F6` (Warm Alabaster) instead of pure white
+- [x] **Typography**: Update H1-H3 headers to Playfair Display or Cinzel for institutional trust ✅
+  - Keep body text as Lato or Open Sans for legibility
+- [x] **Texture**: Apply subtle noise/grain overlay (opacity 3%) to background to simulate high-quality paper ✅
+- [x] **Depth**: Update card shadows to deep and diffused effect ✅
+  - Example: `box-shadow: 0 10px 30px -10px rgba(0, 29, 61, 0.15)`
+  - Create a 'lifted' tactile effect on cards
+
+### 12.2 Advanced Mobile Filtering (Bottom Sheet Pattern) ✅ COMPLETE
+Refactor mobile filtering UX to use 'Bottom Sheet' instead of full-screen modal.
+
+- [x] **Bottom Sheet Interaction**: When 'Filter' button is tapped, slide up drawer covering 85% of screen ✅
+  - Keep listing context visible behind dimmed overlay
+- [x] **Quick Filter Chips**: Add horizontal scrolling list of 'Chips' above results list ✅
+  - High-frequency toggles: 'Verificat DSP', '24/7'
+- [x] **Real-Time Feedback**: 'Apply' button dynamically shows result count ✅
+  - Example: 'Arată 14 Rezultate' before clicking
+
+### 12.3 Trust Architecture (Badges & Transparency) ✅ COMPLETE
+Implement tiered 'Verification Badge' system on all provider cards.
+
+- [x] **Badge 1 (Identity)**: Added DSP badge with Shield icon in Matte Gold ✅
+  - For providers with verified state licenses
+- [x] **Badge 2 (Pricing)**: Added 'Preț' badge in Deep Navy ✅
+  - For providers who have uploaded their General Price List
+- [x] **Price Display**: Added 'De la X RON' format ✅
+  - Tooltip on hover with price breakdown for transparency
+- [x] **Social Proof**: Added 'X+ familii' counter ✅
+  - Displays next to 24/7 badge for community trust
+
+### 12.4 Listing Card Optimization (Conversion & Accessibility) ✅ COMPLETE
+Redesign listing card component for maximum conversion and accessibility.
+
+- [x] **Click Target Architecture**: Card white space clickable via JS onClick handler ✅
+  - Title is primary semantic link
+  - Interactive elements (buttons, links) have stopPropagation
+- [x] **Call Button**: Circular 44x44px call button in bottom right ✅
+  - Distinct from 'View Details' action
+  - Proper touch target size for mobile
+- [x] **Sentiment Tags**: Display 2-3 sentiment chips based on company attributes ✅
+  - Styled as neutral grey pills (Profesionist, Disponibil, Complet, etc.)
+
+### 12.5 Desktop Layout (Split View Architecture) ✅ COMPLETE
+Update Desktop Search Results to 'Split View' layout.
+
+- [x] **Split Layout**: Fixed Map to right 40% of viewport ✅
+  - Cards list scrolls independently on left 60%
+  - Card hover highlights marker on map
+- [x] **Horizontal Filter Bar**: Moved filters to sticky toolbar above list ✅
+  - Dropdowns for 'Județ' and 'Oraș'
+  - Quick toggle buttons for DSP and 24/7
+  - 'Mai multe filtre' button for advanced options
+
+---
+
+## Priority 13: Deployment ⏱️ ~2 hours
 
 - [ ] Deploy frontend to Vercel
 - [ ] Configure environment variables

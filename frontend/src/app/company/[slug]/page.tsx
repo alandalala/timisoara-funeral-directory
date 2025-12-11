@@ -22,7 +22,9 @@ async function getCompany(slug: string): Promise<Company | null> {
       *,
       contacts (*),
       services (*),
-      locations (*)
+      locations (*),
+      reviews (*),
+      review_summary:review_summaries (*)
     `)
     .eq('slug', slug)
     .single();
@@ -32,7 +34,13 @@ async function getCompany(slug: string): Promise<Company | null> {
     return null;
   }
 
-  return data as Company;
+  // Transform review_summary from array to single object (Supabase returns array for joins)
+  const company = data as any;
+  if (company.review_summary && Array.isArray(company.review_summary)) {
+    company.review_summary = company.review_summary[0] || null;
+  }
+
+  return company as Company;
 }
 
 // Generate dynamic metadata for SEO

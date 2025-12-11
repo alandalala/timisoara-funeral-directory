@@ -1,12 +1,13 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import { supabase } from '@/lib/supabase';
 import { Company, County } from '@/types';
 import { CompanyCard } from '@/components/CompanyCard';
 import { CompanyCardSkeleton } from '@/components/CompanyCardSkeleton';
 import { Input } from '@/components/ui/input';
+import { BottomSheet } from '@/components/BottomSheet';
 
 // Dynamic import for Map to avoid SSR issues
 const Map = dynamic(() => import('@/components/Map').then(mod => ({ default: mod.Map })), {
@@ -17,6 +18,9 @@ const Map = dynamic(() => import('@/components/Map').then(mod => ({ default: mod
     </div>
   ),
 });
+
+// Import map utilities for bounds filtering
+import { MapBounds, isCompanyInBounds } from '@/components/Map';
 
 // Normalize Romanian diacritics for search (ă→a, â→a, î→i, ș→s, ț→t)
 function normalizeRomanian(text: string): string {
@@ -45,8 +49,14 @@ export default function Home() {
   const [citySearchQuery, setCitySearchQuery] = useState('');
   const [showCityDropdown, setShowCityDropdown] = useState(false);
   const [showVerifiedOnly, setShowVerifiedOnly] = useState(false);
-  const [viewMode, setViewMode] = useState<'grid' | 'map'>('grid');
+  const [show24Only, setShow24Only] = useState(false);
+  const [viewMode, setViewMode] = useState<'grid' | 'map' | 'split'>('grid');
   const [selectedMapCompany, setSelectedMapCompany] = useState<Company | null>(null);
+  const [showMobileFilters, setShowMobileFilters] = useState(false);
+  const [mapBounds, setMapBounds] = useState<MapBounds | null>(null);
+  const [userInteractedWithMap, setUserInteractedWithMap] = useState(false);
+  const mapInitializedRef = useRef(false);
+  const boundsChangeCountRef = useRef(0);
 
   // Filter counties based on search query (supports searching without diacritics)
   const filteredCounties = counties.filter(county =>
@@ -71,6 +81,13 @@ export default function Home() {
     fetchCounties();
     fetchCompanies();
   }, []);
+
+  // Clear map bounds when leaving split view
+  useEffect(() => {
+    if (viewMode !== 'split') {
+      setMapBounds(null);
+    }
+  }, [viewMode]);
 
   async function fetchCounties() {
     try {
@@ -116,6 +133,9 @@ export default function Home() {
     // Filter by verification status
     const matchesVerified = showVerifiedOnly ? company.is_verified : true;
     
+    // Filter by 24/7 availability
+    const matches24 = show24Only ? company.is_non_stop : true;
+    
     // Filter by county (exact match if selected, or partial match if searching)
     const matchesCounty = selectedCounty
       ? company.locations?.some(loc => loc.county === selectedCounty)
@@ -133,8 +153,31 @@ export default function Home() {
             normalizeRomanian(loc.city || '').includes(normalizeRomanian(citySearchQuery))
           )
         : true;
-    return matchesSearch && matchesVerified && matchesCounty && matchesCity;
+    return matchesSearch && matchesVerified && matches24 && matchesCounty && matchesCity;
   });
+
+  // For split view - show all filtered companies (no bounds filtering)
+  // The map shows markers for context, but cards show all matching results
+  const splitViewCompanies = filteredCompanies;
+
+  // Reset map interaction flag when filters change
+  useEffect(() => {
+    setUserInteractedWithMap(false);
+    boundsChangeCountRef.current = 0;
+    mapInitializedRef.current = false;
+  }, [searchQuery, selectedCounty, selectedCity, showVerifiedOnly, show24Only]);
+
+  // Handle map bounds change - only count as user interaction after map has initialized
+  const handleBoundsChange = (bounds: MapBounds) => {
+    setMapBounds(bounds);
+    
+    // First 2 bounds changes are typically: initial load + auto-fit
+    // Only after that do we consider it a user interaction
+    boundsChangeCountRef.current += 1;
+    if (boundsChangeCountRef.current > 2) {
+      setUserInteractedWithMap(true);
+    }
+  };
 
   // Handle county selection
   const handleCountySelect = (county: string) => {
@@ -169,35 +212,66 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-cream">
-      {/* Header - Soft, welcoming */}
-      <header className="bg-white shadow-soft border-b border-warm-grey" role="banner">
-        <div className="max-w-6xl mx-auto px-4 py-8">
-          <h1 className="text-3xl md:text-4xl font-heading text-charcoal">
-            🕯️ Ghidul Tău de Încredere în Servicii Funerare
-          </h1>
-          <p className="text-slate mt-3 text-lg">
-            Găsește servicii funerare verificate în toată România
-          </p>
-        </div>
-      </header>
+      {/* Hero Section with Background Image */}
+      <section 
+        className="relative border-b-2 border-warm-grey/50"
+        style={{
+          backgroundImage: 'url("/hero-forest.jpg")',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+        }}
+      >
+        {/* Light overlay - 40% for visible nature texture */}
+        <div 
+          className="absolute inset-0" 
+          style={{ backgroundColor: 'rgba(255, 255, 255, 0.40)' }}
+        ></div>
+        
+        {/* Content wrapper - positioned above overlay */}
+        <div className="relative z-10">
+          {/* Header with Title & Subtitle - NO border */}
+          <header role="banner">
+            <div className="max-w-6xl mx-auto px-4 py-16 md:py-20">
+              <h1 className="text-3xl md:text-4xl lg:text-5xl font-heading text-navy">
+                Ghidul Tău de Încredere în Servicii Funerare
+              </h1>
+              <p className="mt-4 text-lg md:text-xl max-w-2xl" style={{ color: '#001D3D' }}>
+                Găsește servicii funerare verificate în toată România
+              </p>
+            </div>
+          </header>
 
-      {/* Main content area */}
-      <main id="main-content" role="main" aria-label="Căutare servicii funerare">
-      {/* Search & Filters - Soft card styling */}
-      <div className="max-w-6xl mx-auto px-4 py-8">
-        <section aria-label="Filtre de căutare" className="bg-white rounded-2xl shadow-soft border border-warm-grey p-6 mb-8">
-          {/* Location filters row */}
-          <div className="flex flex-col md:flex-row gap-4 mb-4">
-            <div className="flex-1 relative">
-              <label htmlFor="county-search" className="block text-sm font-medium text-charcoal mb-2">
-                📍 Județ
-              </label>
-              <div className="relative">
-                <input
-                  id="county-search"
-                  type="text"
-                  value={countySearchQuery}
-                  onChange={(e) => {
+          {/* Search & Filters - Glassmorphism frosted glass */}
+          <div className="max-w-6xl mx-auto px-4 py-8">
+            <div 
+              aria-label="Filtre de căutare" 
+              className="rounded-3xl p-6 md:p-8 mb-8"
+              style={{
+                backgroundColor: 'rgba(255, 255, 255, 0.85)',
+                backdropFilter: 'blur(12px)',
+                WebkitBackdropFilter: 'blur(12px)',
+                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
+                border: '1px solid rgba(255, 255, 255, 0.3)',
+              }}
+            >
+            {/* Location filters row */}
+            <div className="flex flex-col md:flex-row gap-4 mb-4">
+              <div className="flex-1 relative">
+                <label htmlFor="county-search" className="block text-sm font-medium text-charcoal mb-2">
+                  Județ
+                </label>
+                <div className="relative">
+                  {/* Map Pin Icon */}
+                  <div className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">
+                    <svg className="w-5 h-5 text-slate/40" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                    </svg>
+                  </div>
+                  <input
+                    id="county-search"
+                    type="text"
+                    value={countySearchQuery}
+                    onChange={(e) => {
                     setCountySearchQuery(e.target.value);
                     setSelectedCounty('');
                     setShowCountyDropdown(true);
@@ -207,7 +281,7 @@ export default function Home() {
                   aria-label="Caută după județ"
                   aria-expanded={showCountyDropdown}
                   aria-autocomplete="list"
-                  className="w-full px-4 py-3 border border-warm-grey rounded-xl input-glow"
+                  className="w-full pl-10 pr-4 py-3 border border-warm-grey rounded-xl bg-white/80 backdrop-blur-sm focus:border-sage focus:ring-2 focus:ring-sage/20 transition-all duration-200"
                 />
                 {selectedCounty && (
                   <button
@@ -244,9 +318,15 @@ export default function Home() {
             </div>
             <div className="flex-1 relative">
               <label htmlFor="city-search" className="block text-sm font-medium text-charcoal mb-2">
-                🏙️ Oraș
+                Oraș
               </label>
               <div className="relative">
+                {/* Building Icon for City */}
+                <div className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">
+                  <svg className="w-5 h-5 text-slate/40" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M15 11V5l-3-3-3 3v2H3v14h18V11h-6zm-8 8H5v-2h2v2zm0-4H5v-2h2v2zm0-4H5V9h2v2zm6 8h-2v-2h2v2zm0-4h-2v-2h2v2zm0-4h-2V9h2v2zm0-4h-2V5h2v2zm6 12h-2v-2h2v2zm0-4h-2v-2h2v2z"/>
+                  </svg>
+                </div>
                 <input
                   id="city-search"
                   type="text"
@@ -261,7 +341,7 @@ export default function Home() {
                   aria-label="Caută după oraș"
                   aria-expanded={showCityDropdown}
                   aria-autocomplete="list"
-                  className="w-full px-4 py-3 border border-warm-grey rounded-xl input-glow disabled:bg-muted disabled:cursor-not-allowed"
+                  className="w-full pl-10 pr-4 py-3 border border-warm-grey rounded-xl bg-white/80 backdrop-blur-sm focus:border-sage focus:ring-2 focus:ring-sage/20 transition-all duration-200 disabled:bg-muted disabled:cursor-not-allowed"
                   disabled={availableCities.length === 0}
                 />
                 {selectedCity && (
@@ -312,8 +392,14 @@ export default function Home() {
 
           {/* Search and filters row */}
           <div className="flex flex-col md:flex-row gap-4">
-            <div className="flex-1">
+            <div className="flex-1 relative">
               <label htmlFor="name-search" className="sr-only">Caută după nume</label>
+              {/* Magnifying Glass Icon */}
+              <div className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none z-10">
+                <svg className="w-5 h-5 text-slate/40" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </div>
               <Input
                 id="name-search"
                 type="text"
@@ -321,26 +407,52 @@ export default function Home() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 aria-label="Caută firmă după nume"
-                className="w-full px-4 py-3 border-warm-grey rounded-xl focus:ring-navy/20 focus:border-navy"
+                className="w-full pl-10 pr-4 py-3 border-warm-grey rounded-xl bg-white/80 backdrop-blur-sm focus:border-sage focus:ring-2 focus:ring-sage/20 transition-all duration-200"
               />
             </div>
             <button
               onClick={() => setShowVerifiedOnly(!showVerifiedOnly)}
               aria-pressed={showVerifiedOnly}
-              className={`flex items-center gap-2 px-4 py-3 rounded-xl border font-medium transition-all ${
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-medium transition-all duration-200 ${
                 showVerifiedOnly 
-                  ? 'bg-sage text-white border-sage' 
-                  : 'bg-white text-slate border-warm-grey hover:bg-cream'
+                  ? 'text-white shadow-md' 
+                  : 'bg-slate-100 text-slate-600 border border-slate-200 hover:bg-slate-200'
               }`}
+              style={showVerifiedOnly ? { backgroundColor: '#C1A050' } : {}}
             >
-              {showVerifiedOnly && (
+              {showVerifiedOnly ? (
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
+              ) : (
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               )}
               Verificate DSP
             </button>
-            {(selectedCounty || countySearchQuery || selectedCity || citySearchQuery || searchQuery || showVerifiedOnly) && (
+            <button
+              onClick={() => setShow24Only(!show24Only)}
+              aria-pressed={show24Only}
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-medium transition-all duration-200 ${
+                show24Only 
+                  ? 'text-white shadow-md' 
+                  : 'bg-slate-100 text-slate-600 border border-slate-200 hover:bg-slate-200'
+              }`}
+              style={show24Only ? { backgroundColor: '#C1A050' } : {}}
+            >
+              {show24Only ? (
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
+              ) : (
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              )}
+              24/7
+            </button>
+            {(selectedCounty || countySearchQuery || selectedCity || citySearchQuery || searchQuery || showVerifiedOnly || show24Only) && (
               <button
                 onClick={() => {
                   setSelectedCounty('');
@@ -349,6 +461,7 @@ export default function Home() {
                   setCitySearchQuery('');
                   setSearchQuery('');
                   setShowVerifiedOnly(false);
+                  setShow24Only(false);
                 }}
                 aria-label="Resetează toate filtrele"
                 className="px-5 py-3 rounded-xl border border-rose/50 text-rose hover:bg-rose/5 btn-press"
@@ -357,17 +470,102 @@ export default function Home() {
               </button>
             )}
           </div>
-        </section>
+            </div>
+          </div>
+        </div>
+      </section>
 
-        {/* Results count and location indicator */}
-        <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div className="text-slate">
-            {loading ? (
-              <span>Se încarcă...</span>
-            ) : (
-              <span>
-                {filteredCompanies.length} {filteredCompanies.length === 1 ? 'firmă găsită' : 'firme găsite'}
-                {selectedCounty && ` în ${selectedCounty}`}
+      {/* Main content area - Results outside gradient */}
+      <main id="main-content" role="main" aria-label="Rezultate căutare">
+        <div className="max-w-6xl mx-auto px-4 py-8">
+          {/* Mobile Filter Button + Quick Filter Chips */}
+          <div className="md:hidden mb-4">
+            {/* Mobile Filter Button */}
+            <div className="flex items-center gap-3 mb-4">
+              <button
+                onClick={() => setShowMobileFilters(true)}
+                className="flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-medium bg-navy text-white shadow-md"
+                style={{ backgroundColor: '#001D3D' }}
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                </svg>
+                Filtre
+                {(selectedCounty || selectedCity || searchQuery || showVerifiedOnly || show24Only) && (
+                  <span className="ml-1 px-1.5 py-0.5 bg-white/20 rounded-full text-xs">
+                    {[selectedCounty, selectedCity, searchQuery, showVerifiedOnly, show24Only].filter(Boolean).length}
+                  </span>
+                )}
+              </button>
+              <span className="text-sm text-slate">
+                {filteredCompanies.length} rezultate
+              </span>
+            </div>
+
+            {/* Horizontal Quick Filter Chips */}
+            <div className="flex gap-2 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">
+              <button
+                onClick={() => setShowVerifiedOnly(!showVerifiedOnly)}
+                className={`flex-shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-full text-sm font-medium transition-all whitespace-nowrap ${
+                  showVerifiedOnly 
+                    ? 'text-white shadow-sm' 
+                    : 'bg-white text-slate-600 border border-slate-200'
+                }`}
+                style={showVerifiedOnly ? { backgroundColor: '#C1A050' } : {}}
+              >
+                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                Verificat DSP
+              </button>
+              <button
+                onClick={() => setShow24Only(!show24Only)}
+                className={`flex-shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-full text-sm font-medium transition-all whitespace-nowrap ${
+                  show24Only 
+                    ? 'text-white shadow-sm' 
+                    : 'bg-white text-slate-600 border border-slate-200'
+                }`}
+                style={show24Only ? { backgroundColor: '#C1A050' } : {}}
+              >
+                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                24/7
+              </button>
+              {selectedCounty && (
+                <button
+                  onClick={() => { setSelectedCounty(''); setCountySearchQuery(''); }}
+                  className="flex-shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-full text-sm font-medium bg-slate-100 text-slate-700 whitespace-nowrap"
+                >
+                  {selectedCounty}
+                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              )}
+              {selectedCity && (
+                <button
+                  onClick={() => { setSelectedCity(''); setCitySearchQuery(''); }}
+                  className="flex-shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-full text-sm font-medium bg-slate-100 text-slate-700 whitespace-nowrap"
+                >
+                  {selectedCity}
+                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Results count and location indicator - Desktop */}
+          <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 hidden md:flex">
+            <div className="text-slate">
+              {loading ? (
+                <span>Se încarcă...</span>
+              ) : (
+                <span>
+                  {filteredCompanies.length} {filteredCompanies.length === 1 ? 'firmă găsită' : 'firme găsite'}
+                  {selectedCounty && ` în ${selectedCounty}`}
                 {!selectedCounty && countySearchQuery && ` (județ: "${countySearchQuery}")`}
                 {selectedCity && `, ${selectedCity}`}
                 {!selectedCity && citySearchQuery && ` (oraș: "${citySearchQuery}")`}
@@ -403,8 +601,154 @@ export default function Home() {
               </svg>
               Hartă
             </button>
+            {/* Split View - Desktop Only */}
+            <button
+              onClick={() => setViewMode('split')}
+              className={`hidden lg:flex px-4 py-2.5 rounded-xl border btn-press items-center gap-2 ${
+                viewMode === 'split'
+                  ? 'bg-navy/10 border-navy text-navy'
+                  : 'bg-white border-warm-grey text-slate hover:bg-cream'
+              }`}
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2" />
+              </svg>
+              Split
+            </button>
           </div>
         </div>
+
+        {/* Split View - Desktop Only (60% list / 40% map) */}
+        {viewMode === 'split' && (
+          <div className="hidden lg:flex gap-6 h-[calc(100vh-200px)] min-h-[600px]">
+            {/* Left Side - Scrollable List (60%) */}
+            <div className="w-[60%] overflow-y-auto pr-4 scrollbar-hide">
+              {/* Horizontal Filter Bar */}
+              <div className="sticky top-0 z-10 bg-cream/95 backdrop-blur-sm pb-4 mb-4 border-b border-warm-grey/30">
+                <div className="flex flex-wrap items-center gap-3">
+                  {/* County Dropdown */}
+                  <div className="relative">
+                    <select
+                      value={selectedCounty}
+                      onChange={(e) => {
+                        setSelectedCounty(e.target.value);
+                        setCountySearchQuery(e.target.value);
+                        setSelectedCity('');
+                        setCitySearchQuery('');
+                      }}
+                      className="appearance-none pl-3 pr-8 py-2 text-sm border border-warm-grey rounded-lg bg-white cursor-pointer hover:border-navy/50 transition-colors"
+                    >
+                      <option value="">Toate județele</option>
+                      {counties.map((county) => (
+                        <option key={county.id} value={county.name}>{county.name}</option>
+                      ))}
+                    </select>
+                    <svg className="w-4 h-4 absolute right-2 top-1/2 -translate-y-1/2 text-slate/50 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </div>
+
+                  {/* City Dropdown */}
+                  <div className="relative">
+                    <select
+                      value={selectedCity}
+                      onChange={(e) => {
+                        setSelectedCity(e.target.value);
+                        setCitySearchQuery(e.target.value);
+                      }}
+                      disabled={availableCities.length === 0}
+                      className="appearance-none pl-3 pr-8 py-2 text-sm border border-warm-grey rounded-lg bg-white cursor-pointer hover:border-navy/50 transition-colors disabled:bg-slate-100 disabled:cursor-not-allowed"
+                    >
+                      <option value="">Toate orașele</option>
+                      {availableCities.map((city) => (
+                        <option key={city} value={city || ''}>{city}</option>
+                      ))}
+                    </select>
+                    <svg className="w-4 h-4 absolute right-2 top-1/2 -translate-y-1/2 text-slate/50 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </div>
+
+                  {/* Quick Filters */}
+                  <button
+                    onClick={() => setShowVerifiedOnly(!showVerifiedOnly)}
+                    className={`px-3 py-2 text-sm rounded-lg transition-all ${
+                      showVerifiedOnly 
+                        ? 'text-white' 
+                        : 'bg-white border border-warm-grey text-slate hover:border-navy/50'
+                    }`}
+                    style={showVerifiedOnly ? { backgroundColor: '#C1A050' } : {}}
+                  >
+                    ✓ DSP
+                  </button>
+                  <button
+                    onClick={() => setShow24Only(!show24Only)}
+                    className={`px-3 py-2 text-sm rounded-lg transition-all ${
+                      show24Only 
+                        ? 'text-white' 
+                        : 'bg-white border border-warm-grey text-slate hover:border-navy/50'
+                    }`}
+                    style={show24Only ? { backgroundColor: '#C1A050' } : {}}
+                  >
+                    24/7
+                  </button>
+
+                  {/* More Filters Button */}
+                  <button
+                    onClick={() => setShowMobileFilters(true)}
+                    className="px-3 py-2 text-sm rounded-lg bg-white border border-warm-grey text-slate hover:border-navy/50 transition-all"
+                  >
+                    Mai multe filtre
+                  </button>
+
+                  {/* Results count */}
+                  <span className="text-sm text-slate ml-auto">
+                    {splitViewCompanies.length} rezultate
+                  </span>
+                </div>
+              </div>
+
+              {/* Cards Grid */}
+              <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
+                {loading ? (
+                  <>
+                    <CompanyCardSkeleton />
+                    <CompanyCardSkeleton />
+                    <CompanyCardSkeleton />
+                    <CompanyCardSkeleton />
+                  </>
+                ) : splitViewCompanies.length > 0 ? (
+                  splitViewCompanies.map((company) => (
+                    <div 
+                      key={company.id}
+                      onMouseEnter={() => setSelectedMapCompany(company)}
+                      onMouseLeave={() => setSelectedMapCompany(null)}
+                    >
+                      <CompanyCard company={company} />
+                    </div>
+                  ))
+                ) : (
+                  <div className="col-span-full text-center py-16">
+                    <p className="text-slate">🔍 Nicio firmă nu corespunde criteriilor.</p>
+                    <p className="text-slate/60 text-sm mt-2">Încercați să modificați filtrele sau căutarea.</p>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Right Side - Fixed Map (40%) */}
+            <div className="w-[40%] sticky top-0 h-full rounded-2xl overflow-hidden shadow-tactile">
+              <Map 
+                companies={filteredCompanies}
+                selectedCompany={selectedMapCompany}
+                onCompanySelect={(company) => setSelectedMapCompany(company)}
+                height="100%"
+                showAllMarkers={true}
+                onBoundsChange={handleBoundsChange}
+              />
+            </div>
+          </div>
+        )}
 
         {/* Map View */}
         {viewMode === 'map' && (
@@ -494,7 +838,7 @@ export default function Home() {
             )}
           </div>
         )}
-      </div>
+        </div>
       </main>
 
       {/* Footer - Soft, supportive */}
@@ -522,6 +866,173 @@ export default function Home() {
           </div>
         </div>
       </footer>
+
+      {/* Mobile Filter Bottom Sheet */}
+      <BottomSheet
+        isOpen={showMobileFilters}
+        onClose={() => setShowMobileFilters(false)}
+        title="Filtre"
+        footer={
+          <button
+            onClick={() => setShowMobileFilters(false)}
+            className="w-full py-3.5 rounded-xl text-white font-medium transition-all"
+            style={{ backgroundColor: '#C1A050' }}
+          >
+            Arată {filteredCompanies.length} {filteredCompanies.length === 1 ? 'Rezultat' : 'Rezultate'}
+          </button>
+        }
+      >
+        <div className="space-y-6">
+          {/* County Filter */}
+          <div>
+            <label className="block text-sm font-medium text-navy mb-2">Județ</label>
+            <div className="relative">
+              <div className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">
+                <svg className="w-5 h-5 text-slate/40" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                </svg>
+              </div>
+              <select
+                value={selectedCounty}
+                onChange={(e) => {
+                  setSelectedCounty(e.target.value);
+                  setCountySearchQuery(e.target.value);
+                  setSelectedCity('');
+                  setCitySearchQuery('');
+                }}
+                className="w-full pl-10 pr-4 py-3 border border-warm-grey rounded-xl bg-white appearance-none"
+              >
+                <option value="">Toate județele</option>
+                {counties.map((county) => (
+                  <option key={county.id} value={county.name}>{county.name}</option>
+                ))}
+              </select>
+              <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
+                <svg className="w-5 h-5 text-slate/40" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          {/* City Filter */}
+          <div>
+            <label className="block text-sm font-medium text-navy mb-2">Oraș</label>
+            <div className="relative">
+              <div className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">
+                <svg className="w-5 h-5 text-slate/40" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M15 11V5l-3-3-3 3v2H3v14h18V11h-6zm-8 8H5v-2h2v2zm0-4H5v-2h2v2zm0-4H5V9h2v2zm6 8h-2v-2h2v2zm0-4h-2v-2h2v2zm0-4h-2V9h2v2zm0-4h-2V5h2v2zm6 12h-2v-2h2v2zm0-4h-2v-2h2v2z"/>
+                </svg>
+              </div>
+              <select
+                value={selectedCity}
+                onChange={(e) => {
+                  setSelectedCity(e.target.value);
+                  setCitySearchQuery(e.target.value);
+                }}
+                disabled={availableCities.length === 0}
+                className="w-full pl-10 pr-4 py-3 border border-warm-grey rounded-xl bg-white appearance-none disabled:bg-slate-100 disabled:text-slate-400"
+              >
+                <option value="">Toate orașele</option>
+                {availableCities.map((city) => (
+                  <option key={city} value={city || ''}>{city}</option>
+                ))}
+              </select>
+              <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
+                <svg className="w-5 h-5 text-slate/40" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          {/* Name Search */}
+          <div>
+            <label className="block text-sm font-medium text-navy mb-2">Caută după nume</label>
+            <div className="relative">
+              <div className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">
+                <svg className="w-5 h-5 text-slate/40" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </div>
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Nume firmă..."
+                className="w-full pl-10 pr-4 py-3 border border-warm-grey rounded-xl bg-white"
+              />
+            </div>
+          </div>
+
+          {/* Toggle Filters */}
+          <div className="space-y-3">
+            <label className="block text-sm font-medium text-navy mb-2">Filtre rapide</label>
+            
+            <button
+              onClick={() => setShowVerifiedOnly(!showVerifiedOnly)}
+              className={`w-full flex items-center justify-between px-4 py-3 rounded-xl border transition-all ${
+                showVerifiedOnly 
+                  ? 'border-transparent text-white' 
+                  : 'border-warm-grey bg-white text-slate-700'
+              }`}
+              style={showVerifiedOnly ? { backgroundColor: '#C1A050' } : {}}
+            >
+              <span className="flex items-center gap-2">
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                Verificat DSP
+              </span>
+              {showVerifiedOnly && (
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
+              )}
+            </button>
+
+            <button
+              onClick={() => setShow24Only(!show24Only)}
+              className={`w-full flex items-center justify-between px-4 py-3 rounded-xl border transition-all ${
+                show24Only 
+                  ? 'border-transparent text-white' 
+                  : 'border-warm-grey bg-white text-slate-700'
+              }`}
+              style={show24Only ? { backgroundColor: '#C1A050' } : {}}
+            >
+              <span className="flex items-center gap-2">
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                Disponibil 24/7
+              </span>
+              {show24Only && (
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
+              )}
+            </button>
+          </div>
+
+          {/* Reset Filters */}
+          {(selectedCounty || selectedCity || searchQuery || showVerifiedOnly || show24Only) && (
+            <button
+              onClick={() => {
+                setSelectedCounty('');
+                setCountySearchQuery('');
+                setSelectedCity('');
+                setCitySearchQuery('');
+                setSearchQuery('');
+                setShowVerifiedOnly(false);
+                setShow24Only(false);
+              }}
+              className="w-full py-3 rounded-xl border border-rose/50 text-rose hover:bg-rose/5 transition-colors"
+            >
+              Resetează toate filtrele
+            </button>
+          )}
+        </div>
+      </BottomSheet>
     </div>
   );
 }

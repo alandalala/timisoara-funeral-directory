@@ -69,12 +69,74 @@ const CITY_COORDINATES: Record<string, [number, number]> = {
 const ROMANIA_CENTER: [number, number] = [45.9432, 25.0094];
 const DEFAULT_ZOOM = 7;
 
+// Bounds type for map viewport
+export interface MapBounds {
+  north: number;
+  south: number;
+  east: number;
+  west: number;
+}
+
+// Get coordinates for a company - exported for use in filtering
+export const getCompanyCoords = (company: Company): [number, number] | null => {
+  const location = company.locations?.[0];
+  if (!location) return null;
+
+  // Check if we have geo_point
+  if (location.geo_point?.coordinates) {
+    return [location.geo_point.coordinates[1], location.geo_point.coordinates[0]];
+  }
+
+  // Try to get from city name
+  if (location.city && CITY_COORDINATES[location.city]) {
+    return CITY_COORDINATES[location.city];
+  }
+
+  return null;
+};
+
+// Get coordinates with offset for map display (to avoid overlapping markers)
+export const getCompanyCoordsWithOffset = (company: Company, index: number = 0): [number, number] | null => {
+  const baseCoords = getCompanyCoords(company);
+  if (!baseCoords) return null;
+  
+  const location = company.locations?.[0];
+  
+  // If we have exact geo_point, use it as-is
+  if (location?.geo_point?.coordinates) {
+    return baseCoords;
+  }
+  
+  // For city fallback coordinates, add a small offset based on company id/index
+  // to spread out markers that would otherwise overlap
+  // Offset is ~200-500m in a circular pattern
+  const seed = company.id ? parseInt(company.id.replace(/\D/g, '').slice(-4) || '0', 10) : index;
+  const angle = (seed * 137.5) % 360; // Golden angle for good distribution
+  const radius = 0.003 + (seed % 5) * 0.001; // ~300-800m offset
+  
+  const offsetLat = radius * Math.cos(angle * Math.PI / 180);
+  const offsetLng = radius * Math.sin(angle * Math.PI / 180);
+  
+  return [baseCoords[0] + offsetLat, baseCoords[1] + offsetLng];
+};
+
+// Check if a company is within given bounds
+export const isCompanyInBounds = (company: Company, bounds: MapBounds): boolean => {
+  const coords = getCompanyCoords(company);
+  if (!coords) return false;
+  
+  const [lat, lng] = coords;
+  return lat >= bounds.south && lat <= bounds.north && 
+         lng >= bounds.west && lng <= bounds.east;
+};
+
 interface MapProps {
   companies: Company[];
   selectedCompany?: Company | null;
   onCompanySelect?: (company: Company) => void;
   height?: string;
   showAllMarkers?: boolean;
+  onBoundsChange?: (bounds: MapBounds) => void;
 }
 
 export function Map({ 
@@ -82,7 +144,8 @@ export function Map({
   selectedCompany, 
   onCompanySelect,
   height = '400px',
-  showAllMarkers = true 
+  showAllMarkers = true,
+  onBoundsChange
 }: MapProps) {
   const [isMounted, setIsMounted] = useState(false);
 
@@ -107,6 +170,7 @@ export function Map({
     onCompanySelect={onCompanySelect}
     height={height}
     showAllMarkers={showAllMarkers}
+    onBoundsChange={onBoundsChange}
   />;
 }
 
@@ -116,7 +180,8 @@ function MapContent({
   selectedCompany, 
   onCompanySelect,
   height,
-  showAllMarkers 
+  showAllMarkers,
+  onBoundsChange
 }: MapProps) {
   const [MapComponents, setMapComponents] = useState<any>(null);
 
@@ -129,6 +194,7 @@ function MapContent({
         Marker: mod.Marker,
         Popup: mod.Popup,
         useMap: mod.useMap,
+        useMapEvents: mod.useMapEvents,
       });
     });
   }, []);
@@ -144,33 +210,77 @@ function MapContent({
     );
   }
 
-  const { MapContainer, TileLayer, Marker, Popup } = MapComponents;
+  const { MapContainer, TileLayer, Marker, Popup, useMapEvents, useMap } = MapComponents;
 
-  // Get coordinates for a company
-  const getCompanyCoords = (company: Company): [number, number] | null => {
-    const location = company.locations?.[0];
-    if (!location) return null;
-
-    // Check if we have geo_point
-    if (location.geo_point?.coordinates) {
-      return [location.geo_point.coordinates[1], location.geo_point.coordinates[0]];
-    }
-
-    // Try to get from city name
-    if (location.city && CITY_COORDINATES[location.city]) {
-      return CITY_COORDINATES[location.city];
-    }
-
+  // Component to track bounds changes
+  function BoundsTracker() {
+    const map = useMapEvents({
+      moveend: () => {
+        if (onBoundsChange) {
+          const bounds = map.getBounds();
+          onBoundsChange({
+            north: bounds.getNorth(),
+            south: bounds.getSouth(),
+            east: bounds.getEast(),
+            west: bounds.getWest(),
+          });
+        }
+      },
+    });
+    
+    // Report initial bounds on mount
+    useEffect(() => {
+      if (onBoundsChange) {
+        // Small delay to ensure map is fully initialized
+        const timer = setTimeout(() => {
+          const bounds = map.getBounds();
+          onBoundsChange({
+            north: bounds.getNorth(),
+            south: bounds.getSouth(),
+            east: bounds.getEast(),
+            west: bounds.getWest(),
+          });
+        }, 100);
+        return () => clearTimeout(timer);
+      }
+    }, [map]);
+    
     return null;
-  };
+  }
 
-  // Filter companies with valid coordinates
+  // Filter companies with valid coordinates and apply offset for display
   const companiesWithCoords = companies
-    .map(company => ({
+    .map((company, index) => ({
       company,
-      coords: getCompanyCoords(company)
+      coords: getCompanyCoordsWithOffset(company, index)
     }))
     .filter(item => item.coords !== null) as { company: Company; coords: [number, number] }[];
+
+  // Component to fit map bounds to show all companies
+  function FitBoundsToCompanies() {
+    const map = useMap();
+    
+    useEffect(() => {
+      if (companiesWithCoords.length === 0) {
+        // No companies, show all of Romania
+        map.setView(ROMANIA_CENTER, DEFAULT_ZOOM);
+        return;
+      }
+      
+      if (companiesWithCoords.length === 1) {
+        // Single company, center on it
+        map.setView(companiesWithCoords[0].coords, 13);
+        return;
+      }
+      
+      // Multiple companies - fit bounds to show all
+      const L = require('leaflet');
+      const bounds = L.latLngBounds(companiesWithCoords.map(c => c.coords));
+      map.fitBounds(bounds, { padding: [50, 50], maxZoom: 14 });
+    }, [map, companiesWithCoords.length]);
+    
+    return null;
+  }
 
   // Determine map center
   let center = ROMANIA_CENTER;
@@ -299,36 +409,11 @@ function MapContent({
           </Marker>
         )}
 
-        <MapUpdater center={center} zoom={zoom} />
+        <BoundsTracker />
+        <FitBoundsToCompanies />
       </MapContainer>
     </div>
   );
-}
-
-// Component to update map view when props change
-function MapUpdater({ center, zoom }: { center: [number, number]; zoom: number }) {
-  const [useMapHook, setUseMapHook] = useState<any>(null);
-
-  useEffect(() => {
-    import('react-leaflet').then((mod) => {
-      setUseMapHook(() => mod.useMap);
-    });
-  }, []);
-
-  useEffect(() => {
-    if (useMapHook) {
-      const MapUpdaterInner = () => {
-        const map = useMapHook();
-        useEffect(() => {
-          map.setView(center, zoom);
-        }, [center, zoom, map]);
-        return null;
-      };
-      // We can't actually render this here, so we handle it differently
-    }
-  }, [useMapHook, center, zoom]);
-
-  return null;
 }
 
 export { CITY_COORDINATES, ROMANIA_CENTER };
