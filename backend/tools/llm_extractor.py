@@ -1,23 +1,35 @@
 """
-LLM Extraction Tool - Uses OpenAI to extract structured data from markdown.
+LLM Extraction Tool - Uses Ollama (local) or OpenAI to extract structured data from markdown.
 """
 from typing import Dict, Optional
 import json
-from openai import OpenAI
-from config.settings import OPENAI_API_KEY, LLM_MODEL, LLM_TEMPERATURE
+import requests
+from config.settings import (
+    OPENAI_API_KEY, LLM_MODEL, LLM_TEMPERATURE,
+    LLM_PROVIDER, OLLAMA_BASE_URL, OLLAMA_MODEL
+)
 
 
 class LLMExtractorTool:
     """
     Tool to extract structured data from website markdown using LLM.
+    Supports both local Ollama and OpenAI backends.
     """
     
-    def __init__(self, api_key: str = OPENAI_API_KEY):
-        if not api_key:
-            raise ValueError("OPENAI_API_KEY must be set")
+    def __init__(self, provider: str = LLM_PROVIDER, api_key: str = OPENAI_API_KEY):
+        self.provider = provider
         
-        self.client = OpenAI(api_key=api_key)
-        self.model = LLM_MODEL
+        if provider == "openai":
+            if not api_key:
+                raise ValueError("OPENAI_API_KEY must be set for OpenAI provider")
+            from openai import OpenAI
+            self.client = OpenAI(api_key=api_key)
+            self.model = LLM_MODEL
+        elif provider == "ollama":
+            self.base_url = OLLAMA_BASE_URL
+            self.model = OLLAMA_MODEL
+        else:
+            raise ValueError(f"Unknown LLM provider: {provider}")
     
     def extract_company_data(self, markdown_content: str, url: str) -> Dict:
         """
@@ -65,17 +77,11 @@ Website Content (Markdown):
 Extract the company information as JSON."""
 
         try:
-            response = self.client.chat.completions.create(
-                model=self.model,
-                messages=[
-                    {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": user_prompt}
-                ],
-                temperature=LLM_TEMPERATURE,
-                response_format={"type": "json_object"}
-            )
+            if self.provider == "ollama":
+                result_text = self._call_ollama(system_prompt, user_prompt)
+            else:
+                result_text = self._call_openai(system_prompt, user_prompt)
             
-            result_text = response.choices[0].message.content
             extracted_data = json.loads(result_text)
             
             # Add source URL
@@ -98,6 +104,36 @@ Extract the company information as JSON."""
                 'success': False,
                 'error': str(e)
             }
+    
+    def _call_ollama(self, system_prompt: str, user_prompt: str) -> str:
+        """Call Ollama API and return response text."""
+        full_prompt = f"{system_prompt}\n\n{user_prompt}"
+        
+        response = requests.post(
+            f"{self.base_url}/api/generate",
+            json={
+                "model": self.model,
+                "prompt": full_prompt,
+                "stream": False,
+                "format": "json"
+            },
+            timeout=120
+        )
+        response.raise_for_status()
+        return response.json()["response"]
+    
+    def _call_openai(self, system_prompt: str, user_prompt: str) -> str:
+        """Call OpenAI API and return response text."""
+        response = self.client.chat.completions.create(
+            model=self.model,
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_prompt}
+            ],
+            temperature=LLM_TEMPERATURE,
+            response_format={"type": "json_object"}
+        )
+        return response.choices[0].message.content
     
     def validate_motto(self, text: str) -> bool:
         """
@@ -128,17 +164,30 @@ A description is:
 Answer with only "MOTTO" or "DESCRIPTION"."""
 
         try:
-            response = self.client.chat.completions.create(
-                model=self.model,
-                messages=[
-                    {"role": "user", "content": prompt}
-                ],
-                temperature=0,
-                max_tokens=10
-            )
+            if self.provider == "ollama":
+                response = requests.post(
+                    f"{self.base_url}/api/generate",
+                    json={
+                        "model": self.model,
+                        "prompt": prompt,
+                        "stream": False
+                    },
+                    timeout=60
+                )
+                response.raise_for_status()
+                result = response.json()["response"].strip().upper()
+            else:
+                response = self.client.chat.completions.create(
+                    model=self.model,
+                    messages=[
+                        {"role": "user", "content": prompt}
+                    ],
+                    temperature=0,
+                    max_tokens=10
+                )
+                result = response.choices[0].message.content.strip().upper()
             
-            result = response.choices[0].message.content.strip().upper()
-            return result == "MOTTO"
+            return "MOTTO" in result
             
         except Exception as e:
             print(f"Error validating motto: {e}")

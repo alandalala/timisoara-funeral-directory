@@ -12,8 +12,9 @@ from tools.dsp_verification import DSPVerificationTool
 from tools.firecrawl_extractor import FirecrawlExtractorTool
 from tools.llm_extractor import LLMExtractorTool
 from tools.supabase_tool import SupabaseTool
+from tools.google_search import GoogleSearchTool
 from models import Company, Contact, Location
-from utils import normalize_phone_number, extract_cui_from_text, rate_limit_delay, check_robots_txt
+from utils import normalize_phone_number, extract_cui_from_text, rate_limit_delay, check_robots_txt, HumanBehaviorSimulator
 from config.settings import SEED_URLS_PATH
 import logging
 
@@ -41,6 +42,8 @@ class FuneralDirectoryScraper:
         self.firecrawl = FirecrawlExtractorTool()
         self.llm_extractor = LLMExtractorTool()
         self.db = SupabaseTool()
+        self.search_tool = GoogleSearchTool()
+        self.behavior = HumanBehaviorSimulator()
         
         self.stats = {
             'processed': 0,
@@ -216,15 +219,24 @@ class FuneralDirectoryScraper:
             logger.error(f"Error transforming data: {e}", exc_info=True)
             return None
     
-    def run(self, urls: list = None):
+    def run(self, urls: list = None, search_mode: bool = False, max_results: int = 5):
         """
         Main execution method.
+        
+        Args:
+            urls: List of URLs to process (optional)
+            search_mode: If True, search for URLs automatically
+            max_results: Max URLs to find when in search_mode
         """
         if urls is None:
-            urls = self.load_seed_urls()
+            if search_mode:
+                logger.info("Search mode enabled - finding funeral home websites...")
+                urls = self.search_tool.find_funeral_homes(total_limit=max_results)
+            else:
+                urls = self.load_seed_urls()
         
         if not urls:
-            logger.error("No URLs to process!")
+            logger.error("No URLs to process! Try running with search_mode=True")
             return
         
         logger.info(f"\n{'='*60}")
@@ -253,8 +265,30 @@ class FuneralDirectoryScraper:
 
 
 if __name__ == "__main__":
+    import argparse
+    
+    parser = argparse.ArgumentParser(description='Funeral Directory Scraper')
+    parser.add_argument('--search', action='store_true', help='Auto-search for funeral homes')
+    parser.add_argument('--limit', type=int, default=5, help='Max URLs to process (default: 5)')
+    parser.add_argument('--url', type=str, help='Single URL to process')
+    parser.add_argument('--test', action='store_true', help='Test mode: search and process 3 URLs')
+    
+    args = parser.parse_args()
+    
     scraper = FuneralDirectoryScraper()
     
-    # You can pass URLs directly or load from seed file
-    # Example: scraper.run(['https://serviciifunerare-timisoara.ro/'])
-    scraper.run()
+    if args.test:
+        # Test mode: auto-search and process first 3 results
+        logger.info("\n" + "="*60)
+        logger.info("TEST MODE - Processing first 3 search results")
+        logger.info("="*60 + "\n")
+        scraper.run(search_mode=True, max_results=3)
+    elif args.url:
+        # Process single URL
+        scraper.run(urls=[args.url])
+    elif args.search:
+        # Auto-search mode
+        scraper.run(search_mode=True, max_results=args.limit)
+    else:
+        # Load from seed file
+        scraper.run()

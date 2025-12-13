@@ -32,27 +32,30 @@ class FirecrawlExtractorTool:
         try:
             print(f"Scraping {url} with Firecrawl...")
             
-            # Basic scrape configuration
-            params = {
-                'formats': ['markdown', 'html'],
-                'onlyMainContent': True,
-                'waitFor': 2000,  # Wait 2 seconds for JS to load
-            }
+            # Scrape with Firecrawl v2 API
+            result = self.app.scrape(
+                url,
+                formats=['markdown', 'html'],
+                only_main_content=True,
+                wait_for=2000,  # Wait 2 seconds for JS to load
+            )
             
-            result = self.app.scrape_url(url, params=params)
-            
-            if result and 'markdown' in result:
-                markdown_content = result['markdown']
+            if result and hasattr(result, 'markdown') and result.markdown:
+                markdown_content = result.markdown
                 
                 # If include_subpages, try to find and scrape common pages
                 subpages_content = ""
                 if include_subpages:
                     subpages_content = self._scrape_subpages(url)
                 
+                metadata = {}
+                if hasattr(result, 'metadata'):
+                    metadata = result.metadata if isinstance(result.metadata, dict) else {}
+                
                 return {
                     'success': True,
                     'markdown': markdown_content + "\n\n" + subpages_content if subpages_content else markdown_content,
-                    'metadata': result.get('metadata', {}),
+                    'metadata': metadata,
                     'url': url
                 }
             else:
@@ -84,14 +87,15 @@ class FirecrawlExtractorTool:
                 subpage_url = urljoin(base_url, subpage)
                 time.sleep(1)  # Brief delay between requests
                 
-                result = self.app.scrape_url(subpage_url, {
-                    'formats': ['markdown'],
-                    'onlyMainContent': True
-                })
+                result = self.app.scrape(
+                    subpage_url,
+                    formats=['markdown'],
+                    only_main_content=True
+                )
                 
-                if result and 'markdown' in result:
+                if result and hasattr(result, 'markdown') and result.markdown:
                     combined_content += f"\n\n--- Content from {subpage} ---\n\n"
-                    combined_content += result['markdown']
+                    combined_content += result.markdown
                     
             except Exception as e:
                 # Subpage might not exist, continue

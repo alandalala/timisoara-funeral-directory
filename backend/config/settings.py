@@ -13,14 +13,29 @@ SUPABASE_SERVICE_KEY = os.getenv("SUPABASE_SERVICE_KEY")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 FIRECRAWL_API_KEY = os.getenv("FIRECRAWL_API_KEY")
 
-# Scraper Settings
-USER_AGENT = "FuneralDirTimisoara/1.0 (+contact@funeraldirectory.ro)"
-MIN_DELAY_SECONDS = 2
-MAX_DELAY_SECONDS = 5
+# Scraper Settings - Human-like behavior
+MIN_DELAY_SECONDS = 3
+MAX_DELAY_SECONDS = 8
 REQUEST_TIMEOUT = 30
 
+# Rotating User Agents (realistic browser signatures)
+USER_AGENTS = [
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:121.0) Gecko/20100101 Firefox/121.0",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.2 Safari/605.1.15",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36 Edg/120.0.0.0",
+]
+
+# Legacy single user agent (for backwards compatibility)
+USER_AGENT = USER_AGENTS[0]
+
 # Agent Settings
-LLM_MODEL = "gpt-4o"
+LLM_PROVIDER = "ollama"  # "openai" or "ollama"
+OLLAMA_BASE_URL = "http://192.168.50.212:11434"
+OLLAMA_MODEL = "qwen3:32b"
+LLM_MODEL = "gpt-4o"  # Fallback for OpenAI
 LLM_TEMPERATURE = 0.1
 MAX_TOKENS = 4000
 
