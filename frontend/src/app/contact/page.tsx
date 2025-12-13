@@ -61,7 +61,7 @@ export default function ContactPage() {
       <div className="min-h-screen bg-cream flex items-center justify-center">
         <Card className="max-w-md mx-4 bg-white border-warm-grey rounded-2xl shadow-soft animate-fade-in">
           <CardContent className="pt-8 text-center">
-            <div className="text-6xl mb-4">✅</div>
+            <div className="mb-4"><svg className="w-16 h-16 mx-auto text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div>
             <h2 className="text-2xl font-heading text-charcoal mb-2">
               Mesaj Trimis!
             </h2>
@@ -206,7 +206,7 @@ export default function ContactPage() {
                       Se trimite...
                     </>
                   ) : (
-                    '📧 Trimite Mesajul'
+                    <><svg className="w-4 h-4 mr-2 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>Trimite Mesajul</>
                   )}
                 </Button>
               </form>
@@ -218,7 +218,9 @@ export default function ContactPage() {
             <Card className="bg-white border-warm-grey rounded-2xl shadow-soft">
               <CardContent className="pt-6">
                 <div className="text-center">
-                  <div className="text-3xl mb-2">📧</div>
+                  <svg className="w-8 h-8 mx-auto mb-2 text-navy" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
+                  </svg>
                   <h3 className="font-heading text-charcoal mb-1">Email</h3>
                   <a
                     href="mailto:contact@cautarefunerare.ro"
@@ -232,9 +234,11 @@ export default function ContactPage() {
             <Card className="bg-white border-warm-grey rounded-2xl shadow-soft">
               <CardContent className="pt-6">
                 <div className="text-center">
-                  <div className="text-3xl mb-2">🕐</div>
+                  <svg className="w-8 h-8 mx-auto mb-2 text-navy" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
                   <h3 className="font-heading text-charcoal mb-1">Timp de răspuns</h3>
-                  <p className="text-slate">24-48 ore lucrătoare</p>
+                  <p className="text-slate">1-2 zile lucrătoare</p>
                 </div>
               </CardContent>
             </Card>
@@ -246,7 +250,7 @@ export default function ContactPage() {
       <footer className="bg-white border-t border-warm-grey py-10 mt-16">
         <div className="container mx-auto px-4 text-center">
           <p className="text-slate">
-            © 2025 Servicii Funerare România. Toate drepturile rezervate.
+            © 2025 CautareFunerare.ro. Toate drepturile rezervate.
           </p>
         </div>
       </footer>

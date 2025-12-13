@@ -40,7 +40,7 @@ test.describe('Homepage', () => {
     await page.waitForTimeout(3000);
     
     // The page should show companies - just verify the page loaded correctly
-    await expect(page.getByRole('heading', { name: /Director Servicii Funerare/i })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /Ghidul Tău de Încredere|Director Servicii Funerare/i })).toBeVisible();
   });
 
   test('should toggle between list and map view', async ({ page }) => {

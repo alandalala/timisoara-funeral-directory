@@ -1,6 +1,6 @@
 # 📋 Next Steps Checklist
 
-**Last Updated:** December 10, 2025  
+**Last Updated:** December 13, 2025  
 **Scope:** 🇷🇴 Funeral Services Directory for ALL of Romania
 
 Track your progress by checking off completed items!
@@ -110,8 +110,7 @@ Track your progress by checking off completed items!
 - [x] About (`/despre`) - Project information ✅
 - [x] Contact (`/contact`) - Contact form ✅
 - [x] GDPR Removal Request (`/eliminare`) - Removal request form ✅
-- [ ] Homepage by County (`/judet/[county]`) - e.g., `/judet/timis` (optional)
-- [ ] Homepage by City (`/judet/[county]/[city]`) - e.g., `/judet/timis/timisoara` (optional)
+- [x] City/County URL routes (`/timisoara`, `/timis`, etc.) - SEO-friendly redirects to search ✅
 
 ---
 
@@ -197,7 +196,45 @@ Update Desktop Search Results to 'Split View' layout.
 
 ---
 
-## Priority 13: Deployment ⏱️ ~2 hours
+## Priority 13: Company Detail Page Redesign ✅ COMPLETE
+
+### 13.1 Hero Section ✅ COMPLETE
+- [x] Static forest hero image (`/hero-forest.jpg`) ✅
+- [x] White text with gradient overlay for visibility ✅
+- [x] Company name, badges, and location displayed prominently ✅
+
+### 13.2 Contact & Info Sections ✅ COMPLETE
+- [x] Email section always visible (shows "Indisponibil" if empty) ✅
+- [x] Website section always visible (shows "Indisponibil" if empty) ✅
+
+### 13.3 Reviews System ✅ COMPLETE
+- [x] Created `reviews` and `review_summaries` database tables ✅
+- [x] Migration file: `migrations/add_reviews_tables.sql` ✅
+- [x] ReviewSection component with real data or `[SAMPLE]` placeholders ✅
+- [x] Sentiment tags with Romanian labels ✅
+
+---
+
+## Priority 14: Homepage UX Improvements ✅ COMPLETE
+
+### 14.1 Random Company Display ✅ COMPLETE
+- [x] Companies shuffle randomly on page load ✅
+- [x] Results randomize when search/filters change ✅
+- [x] Uses Fisher-Yates algorithm with `useMemo` for performance ✅
+
+### 14.2 Paginated Display ✅ COMPLETE
+- [x] Show only 6 companies initially (no filters) ✅
+- [x] "Arată mai multe companii" button to load more ✅
+- [x] When filters active, show all matching companies ✅
+
+### 14.3 Split View Fixes ✅ COMPLETE
+- [x] Fixed zoom persistence (map no longer resets zoom) ✅
+- [x] Added `disableAutoFit` prop to Map component ✅
+- [x] List shows all filtered companies regardless of zoom ✅
+
+---
+
+## Priority 15: Deployment ⏱️ ~2 hours
 
 - [ ] Deploy frontend to Vercel
 - [ ] Configure environment variables
@@ -211,6 +248,13 @@ Update Desktop Search Results to 'Split View' layout.
 
 - [ ] Final review and testing
 - [ ] Go live!
+
+---
+
+## Development Tools Used
+
+- **Cloudflare Tunnel**: For mobile testing (`npx cloudflared tunnel --url http://localhost:3000`)
+- **Chrome DevTools**: Device emulator for responsive testing
 
 ---
 

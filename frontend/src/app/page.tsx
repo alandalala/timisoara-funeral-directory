@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useMemo } from 'react';
 import dynamic from 'next/dynamic';
 import { supabase } from '@/lib/supabase';
 import { Company, County } from '@/types';
@@ -55,6 +55,7 @@ export default function Home() {
   const [showMobileFilters, setShowMobileFilters] = useState(false);
   const [mapBounds, setMapBounds] = useState<MapBounds | null>(null);
   const [userInteractedWithMap, setUserInteractedWithMap] = useState(false);
+  const [displayLimit, setDisplayLimit] = useState(6); // Initial number of companies to show
   const mapInitializedRef = useRef(false);
   const boundsChangeCountRef = useRef(0);
 
@@ -120,11 +121,18 @@ export default function Home() {
           contacts (*),
           services (*),
           locations (*)
-        `)
-        .order('name');
+        `);
 
       if (error) throw error;
-      setCompanies(data || []);
+      
+      // Shuffle companies randomly using Fisher-Yates algorithm
+      const shuffled = [...(data || [])];
+      for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+      }
+      
+      setCompanies(shuffled);
     } catch (error) {
       console.error('Error fetching companies:', error);
     } finally {
@@ -132,40 +140,68 @@ export default function Home() {
     }
   }
 
-  const filteredCompanies = companies.filter((company) => {
-    // Filter by name search (supports searching without diacritics)
-    const matchesSearch = normalizeRomanian(company.name)
-      .includes(normalizeRomanian(searchQuery));
+  // Memoized filtered and shuffled companies - only recalculates when dependencies change
+  const filteredCompanies = useMemo(() => {
+    // First filter
+    const filtered = companies.filter((company) => {
+      // Filter by name search (supports searching without diacritics)
+      const matchesSearch = normalizeRomanian(company.name)
+        .includes(normalizeRomanian(searchQuery));
+      
+      // Filter by verification status
+      const matchesVerified = showVerifiedOnly ? company.is_verified : true;
+      
+      // Filter by 24/7 availability
+      const matches24 = show24Only ? company.is_non_stop : true;
+      
+      // Filter by county (exact match if selected, or partial match if searching)
+      const matchesCounty = selectedCounty
+        ? company.locations?.some(loc => loc.county === selectedCounty)
+        : countySearchQuery
+          ? company.locations?.some(loc => 
+              normalizeRomanian(loc.county || '').includes(normalizeRomanian(countySearchQuery))
+            )
+          : true;
+      
+      // Filter by city (exact match if selected, or partial match if searching)
+      const matchesCity = selectedCity
+        ? company.locations?.some(loc => loc.city === selectedCity)
+        : citySearchQuery
+          ? company.locations?.some(loc => 
+              normalizeRomanian(loc.city || '').includes(normalizeRomanian(citySearchQuery))
+            )
+          : true;
+      return matchesSearch && matchesVerified && matches24 && matchesCounty && matchesCity;
+    });
     
-    // Filter by verification status
-    const matchesVerified = showVerifiedOnly ? company.is_verified : true;
-    
-    // Filter by 24/7 availability
-    const matches24 = show24Only ? company.is_non_stop : true;
-    
-    // Filter by county (exact match if selected, or partial match if searching)
-    const matchesCounty = selectedCounty
-      ? company.locations?.some(loc => loc.county === selectedCounty)
-      : countySearchQuery
-        ? company.locations?.some(loc => 
-            normalizeRomanian(loc.county || '').includes(normalizeRomanian(countySearchQuery))
-          )
-        : true;
-    
-    // Filter by city (exact match if selected, or partial match if searching)
-    const matchesCity = selectedCity
-      ? company.locations?.some(loc => loc.city === selectedCity)
-      : citySearchQuery
-        ? company.locations?.some(loc => 
-            normalizeRomanian(loc.city || '').includes(normalizeRomanian(citySearchQuery))
-          )
-        : true;
-    return matchesSearch && matchesVerified && matches24 && matchesCounty && matchesCity;
-  });
+    // Then shuffle using Fisher-Yates algorithm
+    const shuffled = [...filtered];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled;
+  }, [companies, searchQuery, selectedCounty, countySearchQuery, selectedCity, citySearchQuery, showVerifiedOnly, show24Only]);
 
-  // For split view - show all filtered companies (no bounds filtering)
-  // The map shows markers for context, but cards show all matching results
+  // For split view - always show all filtered companies
+  // The map bounds filtering was causing issues where companies appeared on map but not in list
   const splitViewCompanies = filteredCompanies;
+
+  // Check if any filters are active
+  const hasActiveFilters = searchQuery || selectedCounty || countySearchQuery || selectedCity || citySearchQuery || showVerifiedOnly || show24Only;
+
+  // Companies to display - limited if no filters, all if filters active
+  const displayedCompanies = hasActiveFilters 
+    ? filteredCompanies 
+    : filteredCompanies.slice(0, displayLimit);
+
+  // Check if there are more companies to show
+  const hasMoreCompanies = !hasActiveFilters && displayLimit < filteredCompanies.length;
+
+  // Reset display limit when filters change
+  useEffect(() => {
+    setDisplayLimit(6);
+  }, [searchQuery, selectedCounty, selectedCity, showVerifiedOnly, show24Only]);
 
   // Reset map interaction flag when filters change
   useEffect(() => {
@@ -736,7 +772,7 @@ export default function Home() {
                   ))
                 ) : (
                   <div className="col-span-full text-center py-16">
-                    <p className="text-slate">🔍 Nicio firmă nu corespunde criteriilor.</p>
+                    <p className="text-slate inline-flex items-center justify-center"><svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>Nicio firmă nu corespunde criteriilor.</p>
                     <p className="text-slate/60 text-sm mt-2">Încercați să modificați filtrele sau căutarea.</p>
                   </div>
                 )}
@@ -752,6 +788,7 @@ export default function Home() {
                 height="100%"
                 showAllMarkers={true}
                 onBoundsChange={handleBoundsChange}
+                disableAutoFit={userInteractedWithMap}
               />
             </div>
           </div>
@@ -774,7 +811,7 @@ export default function Home() {
                     <h3 className="font-heading text-xl text-charcoal">{selectedMapCompany.name}</h3>
                     {selectedMapCompany.locations?.[0] && (
                       <p className="text-slate text-sm mt-1">
-                        📍 {selectedMapCompany.locations[0].address}, {selectedMapCompany.locations[0].city}
+                        <span className="inline-flex items-center"><svg className="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>{selectedMapCompany.locations[0].address}, {selectedMapCompany.locations[0].city}</span>
                       </p>
                     )}
                     {selectedMapCompany.contacts?.[0] && (
@@ -782,7 +819,7 @@ export default function Home() {
                         href={`tel:${selectedMapCompany.contacts[0].value}`}
                         className="text-navy hover:text-navy-dark text-sm inline-block mt-1"
                       >
-                        📞 {selectedMapCompany.contacts[0].value}
+                        <span className="inline-flex items-center"><svg className="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>{selectedMapCompany.contacts[0].value}</span>
                       </a>
                     )}
                   </div>
@@ -808,27 +845,28 @@ export default function Home() {
 
         {/* Company Grid */}
         {viewMode === 'grid' && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-stagger">
-            {loading ? (
-              // Loading skeletons
-              <>
-                <CompanyCardSkeleton />
-                <CompanyCardSkeleton />
-                <CompanyCardSkeleton />
-                <CompanyCardSkeleton />
-                <CompanyCardSkeleton />
-                <CompanyCardSkeleton />
-              </>
-            ) : filteredCompanies.length > 0 ? (
-              filteredCompanies.map((company) => (
-                <CompanyCard key={company.id} company={company} />
-              ))
-            ) : (
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-stagger">
+              {loading ? (
+                // Loading skeletons
+                <>
+                  <CompanyCardSkeleton />
+                  <CompanyCardSkeleton />
+                  <CompanyCardSkeleton />
+                  <CompanyCardSkeleton />
+                  <CompanyCardSkeleton />
+                  <CompanyCardSkeleton />
+                </>
+              ) : displayedCompanies.length > 0 ? (
+                displayedCompanies.map((company) => (
+                  <CompanyCard key={company.id} company={company} />
+                ))
+              ) : (
               <div className="col-span-full text-center py-16 animate-fade-in">
                 <p className="text-slate text-lg">
                   {companies.length === 0
-                    ? '📭 Nu există încă firme în baza de date. Rulează scraper-ul pentru a adăuga date.'
-                    : '🔍 Nicio firmă nu corespunde criteriilor de căutare.'}
+                    ? <span className="inline-flex items-center"><svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>Nu există încă firme în baza de date.</span>
+                    : <span className="inline-flex items-center"><svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>Nicio firmă nu corespunde criteriilor de căutare.</span>}
                 </p>
                 {(selectedCounty || selectedCity) && companies.length > 0 && (
                   <button
@@ -843,7 +881,20 @@ export default function Home() {
                 )}
               </div>
             )}
-          </div>
+            </div>
+            
+            {/* Show More Button */}
+            {hasMoreCompanies && !loading && (
+              <div className="flex justify-center mt-8">
+                <button
+                  onClick={() => setDisplayLimit(prev => prev + 6)}
+                  className="px-8 py-3 bg-white border-2 border-navy text-navy rounded-xl hover:bg-navy hover:text-white transition-all duration-300 font-medium shadow-soft hover:shadow-tactile"
+                >
+                  Arată mai multe companii ({filteredCompanies.length - displayLimit} rămase)
+                </button>
+              </div>
+            )}
+          </>
         )}
         </div>
       </main>
@@ -861,6 +912,9 @@ export default function Home() {
             </a>
             <a href="/eliminare" className="text-slate link-animated">
               Solicită Ștergerea Datelor
+            </a>
+            <a href="/contact" className="text-slate link-animated">
+              Raportează o Problemă
             </a>
           </nav>
           

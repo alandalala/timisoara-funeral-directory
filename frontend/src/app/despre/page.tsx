@@ -98,15 +98,16 @@ export default function AboutPage() {
               <p className="text-slate leading-relaxed mb-4">
                 În directorul nostru puteți găsi firme care oferă o gamă completă de servicii funerare:
               </p>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-slate">
-                <div className="bg-white p-4 rounded-xl border border-warm-grey shadow-soft">🕯️ Transport funerar</div>
-                <div className="bg-white p-4 rounded-xl border border-warm-grey shadow-soft">⚰️ Sicrie și urne</div>
-                <div className="bg-white p-4 rounded-xl border border-warm-grey shadow-soft">💐 Aranjamente florale</div>
-                <div className="bg-white p-4 rounded-xl border border-warm-grey shadow-soft">🏛️ Capele și săli de priveghi</div>
-                <div className="bg-white p-4 rounded-xl border border-warm-grey shadow-soft">⛪ Servicii religioase</div>
-                <div className="bg-white p-4 rounded-xl border border-warm-grey shadow-soft">🔥 Crematoriu</div>
-                <div className="bg-white p-4 rounded-xl border border-warm-grey shadow-soft">📋 Acte și formalități</div>
-                <div className="bg-white p-4 rounded-xl border border-warm-grey shadow-soft">🌍 Repatriere internațională</div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 text-slate">
+                <div className="bg-white p-4 rounded-xl border border-warm-grey shadow-soft">Acte și Formalități</div>
+                <div className="bg-white p-4 rounded-xl border border-warm-grey shadow-soft">Transport Funerar</div>
+                <div className="bg-white p-4 rounded-xl border border-warm-grey shadow-soft">Sicrie și Urne</div>
+                <div className="bg-white p-4 rounded-xl border border-warm-grey shadow-soft">Capelă / Cameră Mortuară</div>
+                <div className="bg-white p-4 rounded-xl border border-warm-grey shadow-soft">Coroane și Aranjamente Florale</div>
+                <div className="bg-white p-4 rounded-xl border border-warm-grey shadow-soft">Servicii Religioase</div>
+                <div className="bg-white p-4 rounded-xl border border-warm-grey shadow-soft">Incinerare</div>
+                <div className="bg-white p-4 rounded-xl border border-warm-grey shadow-soft">Monumente Funerare</div>
+                <div className="bg-white p-4 rounded-xl border border-warm-grey shadow-soft">Repatriere Internațională</div>
               </div>
             </section>
 
@@ -137,10 +138,11 @@ export default function AboutPage() {
               </p>
               <div className="space-y-2">
                 <p className="text-slate">
-                  📧 Email: <a href="mailto:contact@cautarefunerare.ro" className="text-navy link-animated">contact@cautarefunerare.ro</a>
+                  <span className="inline-flex items-center"><svg className="w-4 h-4 mr-2 text-navy" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5"><path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"/></svg>Email:</span> <a href="mailto:contact@cautarefunerare.ro" className="text-navy link-animated">contact@cautarefunerare.ro</a>
                 </p>
-                <p className="text-slate">
-                  📝 <Link href="/contact" className="text-navy link-animated">Formular de contact</Link>
+                <p className="text-slate inline-flex items-center">
+                  <svg className="w-4 h-4 mr-2 text-navy" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5"><path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/></svg>
+                  <Link href="/contact" className="text-navy link-animated">Formular de contact</Link>
                 </p>
               </div>
             </section>
@@ -152,7 +154,7 @@ export default function AboutPage() {
       <footer className="bg-white border-t border-warm-grey py-10 mt-16">
         <div className="container mx-auto px-4 text-center">
           <p className="text-slate">
-            © 2025 Servicii Funerare România. Toate drepturile rezervate.
+            © 2025 CautareFunerare.ro. Toate drepturile rezervate.
           </p>
         </div>
       </footer>

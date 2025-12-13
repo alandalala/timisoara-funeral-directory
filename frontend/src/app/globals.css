@@ -461,7 +461,11 @@ a:hover {
 /* Link hover - subtle underline animation */
 .link-animated {
   position: relative;
+  text-decoration: none !important;
   transition: color 200ms ease;
+}
+.link-animated:hover {
+  text-decoration: none !important;
 }
 .link-animated::after {
   content: '';

@@ -60,7 +60,7 @@ export default function RemovalRequestPage() {
       <div className="min-h-screen bg-cream flex items-center justify-center">
         <Card className="max-w-md mx-4 bg-white border-warm-grey rounded-2xl shadow-soft animate-fade-in">
           <CardContent className="pt-8 text-center">
-            <div className="text-6xl mb-4" aria-hidden="true">✅</div>
+            <div className="mb-4" aria-hidden="true"><svg className="w-16 h-16 mx-auto text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div>
             <h2 className="text-2xl font-heading text-charcoal mb-2">
               Cerere Înregistrată
             </h2>
@@ -294,7 +294,7 @@ export default function RemovalRequestPage() {
                       Se procesează...
                     </>
                   ) : (
-                    '📝 Trimite Solicitarea'
+                    <><svg className="w-4 h-4 mr-2 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/></svg>Trimite Solicitarea</>
                   )}
                 </Button>
               </form>
@@ -317,7 +317,7 @@ export default function RemovalRequestPage() {
       <footer className="bg-white border-t border-warm-grey py-10 mt-16" role="contentinfo">
         <div className="container mx-auto px-4 text-center">
           <p className="text-slate">
-            © 2025 Servicii Funerare România. Toate drepturile rezervate.
+            © 2025 CautareFunerare.ro. Toate drepturile rezervate.
           </p>
         </div>
       </footer>
