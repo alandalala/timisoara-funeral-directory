@@ -29,8 +29,11 @@ export default function CompanyDetail({ company }: CompanyDetailProps) {
   const primaryPhone = company.contacts?.find(
     (c) => c.type === 'phone_mobile' && c.is_primary
   );
+  // Deduplicate phones by value
   const allPhones = company.contacts?.filter(
     (c) => c.type === 'phone_mobile' || c.type === 'phone_landline'
+  ).filter((phone, index, self) => 
+    index === self.findIndex(p => p.value === phone.value)
   );
   const emails = company.contacts?.filter((c) => c.type === 'email');
   const headquarters = company.locations?.find((l) => l.type === 'headquarters');

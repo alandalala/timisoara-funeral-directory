@@ -160,6 +160,12 @@ class FuneralDirectoryScraper:
                 self.stats['failed'] += 1
                 return False
             
+            # Validate location matches target city (Timișoara / Timiș)
+            if not self._validate_location(extracted, url):
+                logger.warning(f"[SKIP] Company location doesn't match target area (Timișoara/Timiș)")
+                self.stats['failed'] += 1
+                return False
+            
             # Fallback: Try to find email with regex if LLM missed it
             if not extracted.get('email'):
                 import re
@@ -197,30 +203,31 @@ class FuneralDirectoryScraper:
                 self.stats['failed'] += 1
                 return False
             
-            # Step 4: DSP Verification
-            logger.info("Step 4: Verifying against DSP list...")
-            # Get county from company locations if available
-            county = None
-            if company.locations and len(company.locations) > 0:
-                loc = company.locations[0]
-                if loc.county:
-                    county = loc.county
-                elif loc.city:
-                    # Try to map city to county
-                    county = CITY_TO_COUNTY.get(loc.city.lower())
-            
-            verification = self.dsp_tool.verify_company(
-                company.name,
-                county=county
-            )
-            
-            company.is_verified = verification['is_verified']
-            
-            if verification['is_verified']:
-                logger.info(f"[VERIFIED] (score: {verification.get('match_score', 0)}%)")
-                self.stats['verified'] += 1
-            else:
-                logger.info(f"[NOT VERIFIED] (best score: {verification.get('match_score', 0)}%)")
+            # Step 4: DSP Verification - DISABLED
+            # logger.info("Step 4: Verifying against DSP list...")
+            # # Get county from company locations if available
+            # county = None
+            # if company.locations and len(company.locations) > 0:
+            #     loc = company.locations[0]
+            #     if loc.county:
+            #         county = loc.county
+            #     elif loc.city:
+            #         # Try to map city to county
+            #         county = CITY_TO_COUNTY.get(loc.city.lower())
+            # 
+            # verification = self.dsp_tool.verify_company(
+            #     company.name,
+            #     county=county
+            # )
+            # 
+            # company.is_verified = verification['is_verified']
+            # 
+            # if verification['is_verified']:
+            #     logger.info(f"[VERIFIED] (score: {verification.get('match_score', 0)}%)")
+            #     self.stats['verified'] += 1
+            # else:
+            #     logger.info(f"[NOT VERIFIED] (best score: {verification.get('match_score', 0)}%)")
+            company.is_verified = False  # Default to not verified since DSP check is disabled
             
             # Step 5: Store in database
             logger.info("Step 5: Storing in database...")
@@ -240,6 +247,66 @@ class FuneralDirectoryScraper:
             self.stats['failed'] += 1
             return False
     
+    def _validate_location(self, extracted: dict, url: str) -> bool:
+        """
+        Validate that the extracted company location matches our target area (Timișoara/Timiș).
+        
+        This prevents including companies that have a page for Timișoara but are actually
+        located in a different city (like funero.ro showing Baia Mare address on their Timișoara page).
+        
+        Returns:
+            True if location is valid (in target area), False otherwise
+        """
+        # Target cities and county for our directory
+        target_cities = {
+            'timișoara', 'timisoara', 'timişoara',
+            'lugoj', 'sânnicolau mare', 'sannicolau mare',
+            'jimbolia', 'buziaș', 'buzias', 'deta', 'făget', 'faget',
+            'recaș', 'recas', 'gătaia', 'gataia'  # Major cities in Timiș county
+        }
+        target_counties = {'timiș', 'timis', 'timiş'}
+        
+        # Check locations array (new format)
+        locations = extracted.get('locations', [])
+        if locations and isinstance(locations, list):
+            for loc in locations:
+                city = (loc.get('city') or '').lower().strip()
+                county = (loc.get('county') or '').lower().strip()
+                address = (loc.get('address') or '').lower()
+                
+                # Check if city matches
+                if any(target in city for target in target_cities):
+                    return True
+                # Check if county matches
+                if any(target in county for target in target_counties):
+                    return True
+                # Check if address contains target city
+                if any(target in address for target in target_cities):
+                    return True
+        
+        # Check legacy format (single address/city/county)
+        city = (extracted.get('city') or '').lower().strip()
+        county = (extracted.get('county') or '').lower().strip()
+        address = (extracted.get('address') or '').lower()
+        
+        if any(target in city for target in target_cities):
+            return True
+        if any(target in county for target in target_counties):
+            return True
+        if any(target in address for target in target_cities):
+            return True
+        
+        # If no location info at all, we can't validate - allow it but log warning
+        if not locations and not city and not address:
+            logger.warning(f"No location info found for {url} - allowing by default")
+            return True
+        
+        # Location found but doesn't match target area
+        found_city = city or (locations[0].get('city') if locations else 'unknown')
+        found_county = county or (locations[0].get('county') if locations else 'unknown')
+        logger.info(f"  Location mismatch: found {found_city}, {found_county}")
+        return False
+    
     def _transform_to_company(self, extracted: dict) -> Company:
         """
         Transform extracted dict to Company model with validation.
@@ -247,17 +314,25 @@ class FuneralDirectoryScraper:
         try:
             # Process contacts
             contacts = []
+            seen_phones = set()  # Track seen phone numbers to avoid duplicates
             
             # Process phones
             for phone in extracted.get('phones', []):
                 try:
                     normalized, phone_type = normalize_phone_number(phone)
+                    
+                    # Skip duplicate phone numbers
+                    if normalized in seen_phones:
+                        logger.debug(f"Skipping duplicate phone: {normalized}")
+                        continue
+                    seen_phones.add(normalized)
+                    
                     contact_type = 'phone_mobile' if phone_type == 'mobile' else 'phone_landline'
                     
                     contacts.append(Contact(
                         type=contact_type,
                         value=normalized,
-                        is_primary=(len(contacts) == 0)  # First one is primary
+                        is_primary=(len([c for c in contacts if 'phone' in c.type]) == 0)  # First phone is primary
                     ))
                 except Exception as e:
                     logger.warning(f"Invalid phone number '{phone}': {e}")

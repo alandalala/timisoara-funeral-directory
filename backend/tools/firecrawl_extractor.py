@@ -33,10 +33,11 @@ class FirecrawlExtractorTool:
             print(f"Scraping {url} with Firecrawl...")
             
             # Scrape with Firecrawl v2 API
+            # Note: only_main_content=False to include footer/header where emails often are
             result = self.app.scrape(
                 url,
                 formats=['markdown', 'html'],
-                only_main_content=True,
+                only_main_content=False,
                 wait_for=2000,  # Wait 2 seconds for JS to load
             )
             

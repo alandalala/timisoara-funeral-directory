@@ -90,7 +90,8 @@ Important rules:
 7. Return valid JSON only, no additional text"""
 
         # Model has 32768 token context (~4 chars/token), leave room for prompt + response
-        max_content_chars = 50000
+        # Reduced to 30K to prevent timeouts with large pages
+        max_content_chars = 30000
         
         user_prompt = f"""Website URL: {url}
 
@@ -147,7 +148,7 @@ Extract the company information as JSON."""
                 "stream": False,
                 "format": "json"
             },
-            timeout=120
+            timeout=180  # Increased timeout for large content
         )
         response.raise_for_status()
         return response.json()["response"]

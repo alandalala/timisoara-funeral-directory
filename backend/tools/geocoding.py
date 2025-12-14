@@ -153,6 +153,10 @@ class GeocodingTool:
                     print(f"  Geocoded address '{query}' -> ({lat}, {lon})")
                     return (lat, lon)
                 else:
+                    # Try to extract and geocode just the street name
+                    street_result = self._geocode_street(address, city)
+                    if street_result:
+                        return street_result
                     print(f"  Address not found, trying city fallback...")
                     
             except Exception as e:
@@ -163,6 +167,70 @@ class GeocodingTool:
             return self._geocode_city(city, county)
         
         return None
+    
+    def _geocode_street(self, address: str, city: str) -> Optional[Tuple[float, float]]:
+        """
+        Try to extract and geocode just the street name from an address.
+        Useful when full address with extra info (like landmarks) fails.
+        """
+        import re
+        
+        # Clean the address - remove parenthetical info, landmarks, etc.
+        # "Calea Lugojului, Timisoara (fostul restaurant Trafic)" -> "Calea Lugojului"
+        cleaned = re.sub(r'\([^)]*\)', '', address)  # Remove (...)
+        cleaned = re.sub(r'\[[^\]]*\]', '', cleaned)  # Remove [...]
+        cleaned = cleaned.split(',')[0].strip()  # Take first part before comma
+        
+        # Common Romanian street prefixes
+        street_prefixes = [
+            'strada', 'str.', 'str ', 'calea', 'bulevardul', 'bd.', 'bd ', 'b-dul',
+            'aleea', 'piata', 'piața', 'splai', 'splaiul', 'drumul', 'intrarea'
+        ]
+        
+        # Check if it looks like a street name
+        has_street_prefix = any(cleaned.lower().startswith(p) for p in street_prefixes)
+        
+        if not has_street_prefix and not cleaned:
+            return None
+        
+        # If no city provided, can't do street search
+        if not city:
+            return None
+        
+        self._rate_limit()
+        
+        # Try geocoding the street in the city
+        query = f"{cleaned}, {city}, Romania"
+        
+        try:
+            params = {
+                'q': query,
+                'format': 'json',
+                'limit': 1,
+                'countrycodes': 'ro',
+                'addressdetails': 1
+            }
+            
+            headers = {
+                'User-Agent': USER_AGENT
+            }
+            
+            response = requests.get(self.BASE_URL, params=params, headers=headers, timeout=10)
+            response.raise_for_status()
+            
+            results = response.json()
+            
+            if results and len(results) > 0:
+                lat = float(results[0]['lat'])
+                lon = float(results[0]['lon'])
+                print(f"  Geocoded street '{cleaned}' in {city} -> ({lat}, {lon})")
+                return (lat, lon)
+            
+            return None
+            
+        except Exception as e:
+            print(f"  Street geocoding error: {e}")
+            return None
     
     def _geocode_business(self, company_name: str, city: str) -> Optional[Tuple[float, float]]:
         """Try to find a business by name in Nominatim."""
