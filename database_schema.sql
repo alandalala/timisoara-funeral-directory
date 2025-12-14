@@ -19,8 +19,11 @@ CREATE TABLE IF NOT EXISTS companies (
   description TEXT,
   fiscal_code TEXT UNIQUE,
   website TEXT,
+  facebook_url TEXT,
+  instagram_url TEXT,
   is_verified BOOLEAN DEFAULT FALSE,
   is_non_stop BOOLEAN DEFAULT FALSE,
+  founded_year INTEGER,
   metadata JSONB DEFAULT '{}',
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()

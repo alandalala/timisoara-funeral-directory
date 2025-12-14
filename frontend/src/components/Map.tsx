@@ -82,7 +82,12 @@ export const getCompanyCoords = (company: Company): [number, number] | null => {
   const location = company.locations?.[0];
   if (!location) return null;
 
-  // Check if we have geo_point
+  // Check if we have direct latitude/longitude columns (preferred)
+  if (location.latitude && location.longitude) {
+    return [location.latitude, location.longitude];
+  }
+
+  // Fallback: Check if we have geo_point in GeoJSON format
   if (location.geo_point?.coordinates) {
     return [location.geo_point.coordinates[1], location.geo_point.coordinates[0]];
   }
@@ -102,7 +107,10 @@ export const getCompanyCoordsWithOffset = (company: Company, index: number = 0):
   
   const location = company.locations?.[0];
   
-  // If we have exact geo_point, use it as-is
+  // If we have exact coordinates (lat/lng or geo_point), use it as-is
+  if (location?.latitude && location?.longitude) {
+    return baseCoords;
+  }
   if (location?.geo_point?.coordinates) {
     return baseCoords;
   }

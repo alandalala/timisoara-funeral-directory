@@ -1,0 +1,392 @@
+{
+  "description": "Romanian DSP (Direcția de Sănătate Publică) sources for funeral company authorizations",
+  "last_updated": "2025-12-14",
+  "sources": [
+    {
+      "county": "Timiș",
+      "county_code": "TM",
+      "dsp_name": "DSP Timiș",
+      "website": "https://www.dsptimis.ro",
+      "authorization_url": "https://www.dsptimis.ro/compartimente/compartimente-avize-autorizatii",
+      "direct_pdf_url": "https://www.dsptimis.ro/public/data_files/media/2025/202507280932-0128072025.pdf",
+      "format": "pdf",
+      "notes": "Section VI: PRESTATORI DE SERVICII FUNERARE AUTORIZAŢI"
+    },
+    {
+      "county": "București",
+      "county_code": "B",
+      "dsp_name": "DSPMB",
+      "website": "https://www.dspb.ro",
+      "authorization_url": "https://www.dspb.ro/index.php/avize-si-autorizatii",
+      "format": "html",
+      "notes": "HTML tables with authorized companies"
+    },
+    {
+      "county": "Cluj",
+      "county_code": "CJ",
+      "dsp_name": "DSP Cluj",
+      "website": "https://www.dspcluj.ro",
+      "authorization_url": "https://www.dspcluj.ro/avize-autorizatii/",
+      "format": "pdf",
+      "notes": "PDF lists"
+    },
+    {
+      "county": "Iași",
+      "county_code": "IS",
+      "dsp_name": "DSP Iași",
+      "website": "https://www.dspiasi.ro",
+      "authorization_url": "https://www.dspiasi.ro/avize-autorizatii",
+      "format": "pdf",
+      "notes": "PDF lists"
+    },
+    {
+      "county": "Constanța",
+      "county_code": "CT",
+      "dsp_name": "DSP Constanța",
+      "website": "https://www.dspconstanta.ro",
+      "authorization_url": "https://www.dspconstanta.ro/autorizatii/",
+      "format": "pdf",
+      "notes": "PDF lists"
+    },
+    {
+      "county": "Brașov",
+      "county_code": "BV",
+      "dsp_name": "DSP Brașov",
+      "website": "https://www.dspbv.ro",
+      "authorization_url": "https://www.dspbv.ro/avize-autorizatii/",
+      "format": "pdf",
+      "notes": "PDF lists"
+    },
+    {
+      "county": "Prahova",
+      "county_code": "PH",
+      "dsp_name": "DSP Prahova",
+      "website": "https://www.dspprahova.ro",
+      "authorization_url": "https://www.dspprahova.ro/autorizatii/",
+      "format": "pdf",
+      "notes": "PDF lists"
+    },
+    {
+      "county": "Dolj",
+      "county_code": "DJ",
+      "dsp_name": "DSP Dolj",
+      "website": "https://www.dspdolj.ro",
+      "authorization_url": "https://www.dspdolj.ro/avize-autorizatii/",
+      "format": "pdf",
+      "notes": "PDF lists"
+    },
+    {
+      "county": "Galați",
+      "county_code": "GL",
+      "dsp_name": "DSP Galați",
+      "website": "https://www.dspgalati.ro",
+      "authorization_url": "https://www.dspgalati.ro/autorizatii/",
+      "format": "pdf",
+      "notes": "PDF lists"
+    },
+    {
+      "county": "Argeș",
+      "county_code": "AG",
+      "dsp_name": "DSP Argeș",
+      "website": "https://www.dspag.ro",
+      "authorization_url": "https://www.dspag.ro/autorizatii/",
+      "format": "pdf",
+      "notes": "PDF lists"
+    },
+    {
+      "county": "Ilfov",
+      "county_code": "IF",
+      "dsp_name": "DSP Ilfov",
+      "website": "https://www.dspilfov.ro",
+      "authorization_url": "https://www.dspilfov.ro/autorizatii/",
+      "format": "pdf",
+      "notes": "PDF lists"
+    },
+    {
+      "county": "Hunedoara",
+      "county_code": "HD",
+      "dsp_name": "DSP Hunedoara",
+      "website": "https://www.dsphd.ro",
+      "authorization_url": "https://www.dsphd.ro/autorizatii/",
+      "format": "pdf",
+      "notes": "PDF lists"
+    },
+    {
+      "county": "Mureș",
+      "county_code": "MS",
+      "dsp_name": "DSP Mureș",
+      "website": "https://www.dspmures.ro",
+      "authorization_url": "https://www.dspmures.ro/autorizatii/",
+      "format": "pdf",
+      "notes": "PDF lists"
+    },
+    {
+      "county": "Bihor",
+      "county_code": "BH",
+      "dsp_name": "DSP Bihor",
+      "website": "https://www.dspbihor.ro",
+      "authorization_url": "https://www.dspbihor.ro/autorizatii/",
+      "format": "pdf",
+      "notes": "PDF lists"
+    },
+    {
+      "county": "Bacău",
+      "county_code": "BC",
+      "dsp_name": "DSP Bacău",
+      "website": "https://www.dspbacau.ro",
+      "authorization_url": "https://www.dspbacau.ro/autorizatii/",
+      "format": "pdf",
+      "notes": "PDF lists"
+    },
+    {
+      "county": "Arad",
+      "county_code": "AR",
+      "dsp_name": "DSP Arad",
+      "website": "https://www.dsparad.ro",
+      "authorization_url": "https://www.dsparad.ro/autorizatii/",
+      "format": "pdf",
+      "notes": "PDF lists"
+    },
+    {
+      "county": "Sibiu",
+      "county_code": "SB",
+      "dsp_name": "DSP Sibiu",
+      "website": "https://www.dspsibiu.ro",
+      "authorization_url": "https://www.dspsibiu.ro/autorizatii/",
+      "format": "pdf",
+      "notes": "PDF lists"
+    },
+    {
+      "county": "Buzău",
+      "county_code": "BZ",
+      "dsp_name": "DSP Buzău",
+      "website": "https://www.dspbuzau.ro",
+      "authorization_url": "https://www.dspbuzau.ro/autorizatii/",
+      "format": "pdf",
+      "notes": "PDF lists"
+    },
+    {
+      "county": "Botoșani",
+      "county_code": "BT",
+      "dsp_name": "DSP Botoșani",
+      "website": "https://www.dspbotosani.ro",
+      "authorization_url": "https://www.dspbotosani.ro/autorizatii/",
+      "format": "pdf",
+      "notes": "PDF lists"
+    },
+    {
+      "county": "Satu Mare",
+      "county_code": "SM",
+      "dsp_name": "DSP Satu Mare",
+      "website": "https://www.dspsm.ro",
+      "authorization_url": "https://www.dspsm.ro/autorizatii/",
+      "format": "pdf",
+      "notes": "PDF lists"
+    },
+    {
+      "county": "Maramureș",
+      "county_code": "MM",
+      "dsp_name": "DSP Maramureș",
+      "website": "https://www.dspmm.ro",
+      "authorization_url": "https://www.dspmm.ro/autorizatii/",
+      "format": "pdf",
+      "notes": "PDF lists"
+    },
+    {
+      "county": "Suceava",
+      "county_code": "SV",
+      "dsp_name": "DSP Suceava",
+      "website": "https://www.dspsuceava.ro",
+      "authorization_url": "https://www.dspsuceava.ro/autorizatii/",
+      "format": "pdf",
+      "notes": "PDF lists"
+    },
+    {
+      "county": "Neamț",
+      "county_code": "NT",
+      "dsp_name": "DSP Neamț",
+      "website": "https://www.dspneamt.ro",
+      "authorization_url": "https://www.dspneamt.ro/autorizatii/",
+      "format": "pdf",
+      "notes": "PDF lists"
+    },
+    {
+      "county": "Alba",
+      "county_code": "AB",
+      "dsp_name": "DSP Alba",
+      "website": "https://www.dspalba.ro",
+      "authorization_url": "https://www.dspalba.ro/autorizatii/",
+      "format": "pdf",
+      "notes": "PDF lists"
+    },
+    {
+      "county": "Vâlcea",
+      "county_code": "VL",
+      "dsp_name": "DSP Vâlcea",
+      "website": "https://www.dspvalcea.ro",
+      "authorization_url": "https://www.dspvalcea.ro/autorizatii/",
+      "format": "pdf",
+      "notes": "PDF lists"
+    },
+    {
+      "county": "Dâmbovița",
+      "county_code": "DB",
+      "dsp_name": "DSP Dâmbovița",
+      "website": "https://www.dspdambovita.ro",
+      "authorization_url": "https://www.dspdambovita.ro/autorizatii/",
+      "format": "pdf",
+      "notes": "PDF lists"
+    },
+    {
+      "county": "Gorj",
+      "county_code": "GJ",
+      "dsp_name": "DSP Gorj",
+      "website": "https://www.dspgorj.ro",
+      "authorization_url": "https://www.dspgorj.ro/autorizatii/",
+      "format": "pdf",
+      "notes": "PDF lists"
+    },
+    {
+      "county": "Olt",
+      "county_code": "OT",
+      "dsp_name": "DSP Olt",
+      "website": "https://www.dspolt.ro",
+      "authorization_url": "https://www.dspolt.ro/autorizatii/",
+      "format": "pdf",
+      "notes": "PDF lists"
+    },
+    {
+      "county": "Vrancea",
+      "county_code": "VN",
+      "dsp_name": "DSP Vrancea",
+      "website": "https://www.dspvrancea.ro",
+      "authorization_url": "https://www.dspvrancea.ro/autorizatii/",
+      "format": "pdf",
+      "notes": "PDF lists"
+    },
+    {
+      "county": "Brăila",
+      "county_code": "BR",
+      "dsp_name": "DSP Brăila",
+      "website": "https://www.dspbraila.ro",
+      "authorization_url": "https://www.dspbraila.ro/autorizatii/",
+      "format": "pdf",
+      "notes": "PDF lists"
+    },
+    {
+      "county": "Vaslui",
+      "county_code": "VS",
+      "dsp_name": "DSP Vaslui",
+      "website": "https://www.dspvaslui.ro",
+      "authorization_url": "https://www.dspvaslui.ro/autorizatii/",
+      "format": "pdf",
+      "notes": "PDF lists"
+    },
+    {
+      "county": "Tulcea",
+      "county_code": "TL",
+      "dsp_name": "DSP Tulcea",
+      "website": "https://www.dsptulcea.ro",
+      "authorization_url": "https://www.dsptulcea.ro/autorizatii/",
+      "format": "pdf",
+      "notes": "PDF lists"
+    },
+    {
+      "county": "Caraș-Severin",
+      "county_code": "CS",
+      "dsp_name": "DSP Caraș-Severin",
+      "website": "https://www.dspcs.ro",
+      "authorization_url": "https://www.dspcs.ro/autorizatii/",
+      "format": "pdf",
+      "notes": "PDF lists"
+    },
+    {
+      "county": "Bistrița-Năsăud",
+      "county_code": "BN",
+      "dsp_name": "DSP Bistrița-Năsăud",
+      "website": "https://www.dspbn.ro",
+      "authorization_url": "https://www.dspbn.ro/autorizatii/",
+      "format": "pdf",
+      "notes": "PDF lists"
+    },
+    {
+      "county": "Sălaj",
+      "county_code": "SJ",
+      "dsp_name": "DSP Sălaj",
+      "website": "https://www.dspsalaj.ro",
+      "authorization_url": "https://www.dspsalaj.ro/autorizatii/",
+      "format": "pdf",
+      "notes": "PDF lists"
+    },
+    {
+      "county": "Teleorman",
+      "county_code": "TR",
+      "dsp_name": "DSP Teleorman",
+      "website": "https://www.dspteleorman.ro",
+      "authorization_url": "https://www.dspteleorman.ro/autorizatii/",
+      "format": "pdf",
+      "notes": "PDF lists"
+    },
+    {
+      "county": "Mehedinți",
+      "county_code": "MH",
+      "dsp_name": "DSP Mehedinți",
+      "website": "https://www.dspmehedinti.ro",
+      "authorization_url": "https://www.dspmehedinti.ro/autorizatii/",
+      "format": "pdf",
+      "notes": "PDF lists"
+    },
+    {
+      "county": "Călărași",
+      "county_code": "CL",
+      "dsp_name": "DSP Călărași",
+      "website": "https://www.dspcalarasi.ro",
+      "authorization_url": "https://www.dspcalarasi.ro/autorizatii/",
+      "format": "pdf",
+      "notes": "PDF lists"
+    },
+    {
+      "county": "Ialomița",
+      "county_code": "IL",
+      "dsp_name": "DSP Ialomița",
+      "website": "https://www.dspialomita.ro",
+      "authorization_url": "https://www.dspialomita.ro/autorizatii/",
+      "format": "pdf",
+      "notes": "PDF lists"
+    },
+    {
+      "county": "Giurgiu",
+      "county_code": "GR",
+      "dsp_name": "DSP Giurgiu",
+      "website": "https://www.dspgiurgiu.ro",
+      "authorization_url": "https://www.dspgiurgiu.ro/autorizatii/",
+      "format": "pdf",
+      "notes": "PDF lists"
+    },
+    {
+      "county": "Covasna",
+      "county_code": "CV",
+      "dsp_name": "DSP Covasna",
+      "website": "https://www.dspcovasna.ro",
+      "authorization_url": "https://www.dspcovasna.ro/autorizatii/",
+      "format": "pdf",
+      "notes": "PDF lists"
+    },
+    {
+      "county": "Harghita",
+      "county_code": "HR",
+      "dsp_name": "DSP Harghita",
+      "website": "https://www.dspharghita.ro",
+      "authorization_url": "https://www.dspharghita.ro/autorizatii/",
+      "format": "pdf",
+      "notes": "PDF lists"
+    }
+  ],
+  "keywords_funeral": [
+    "servicii funerare",
+    "pompe funebre",
+    "servicii mortuare",
+    "transport funerar",
+    "camera mortuara"
+  ]
+}

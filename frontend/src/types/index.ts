@@ -10,8 +10,11 @@ export interface Company {
   description?: string | null;
   fiscal_code?: string | null;
   website?: string | null;
+  facebook_url?: string | null;
+  instagram_url?: string | null;
   is_verified: boolean;
   is_non_stop: boolean;
+  founded_year?: number | null;
   metadata?: Record<string, any>;
   created_at: string;
   updated_at: string;
@@ -40,6 +43,8 @@ export interface Location {
   city?: string | null;
   county?: string | null;
   county_id?: number | null;
+  latitude?: number | null;
+  longitude?: number | null;
   geo_point?: {
     type: 'Point';
     coordinates: [number, number]; // [longitude, latitude]

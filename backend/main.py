@@ -13,6 +13,7 @@ from tools.firecrawl_extractor import FirecrawlExtractorTool
 from tools.llm_extractor import LLMExtractorTool
 from tools.supabase_tool import SupabaseTool
 from tools.google_search import GoogleSearchTool
+from tools.geocoding import geocode_address
 from models import Company, Contact, Location
 from utils import normalize_phone_number, extract_cui_from_text, rate_limit_delay, check_robots_txt, HumanBehaviorSimulator
 from config.settings import SEED_URLS_PATH
@@ -28,6 +29,34 @@ logging.basicConfig(
     ]
 )
 logger = logging.getLogger(__name__)
+
+# City to county mapping for Romania
+CITY_TO_COUNTY = {
+    'timișoara': 'Timiș', 'timisoara': 'Timiș', 'lugoj': 'Timiș', 'buziaș': 'Timiș', 'sânnicolau mare': 'Timiș',
+    'bucurești': 'București', 'bucuresti': 'București', 'sector 1': 'București', 'sector 2': 'București', 
+    'sector 3': 'București', 'sector 4': 'București', 'sector 5': 'București', 'sector 6': 'București',
+    'cluj-napoca': 'Cluj', 'cluj': 'Cluj', 'turda': 'Cluj', 'dej': 'Cluj', 'câmpia turzii': 'Cluj',
+    'iași': 'Iași', 'iasi': 'Iași', 'pașcani': 'Iași',
+    'constanța': 'Constanța', 'constanta': 'Constanța', 'mangalia': 'Constanța', 'medgidia': 'Constanța',
+    'craiova': 'Dolj', 'brașov': 'Brașov', 'brasov': 'Brașov',
+    'galați': 'Galați', 'galati': 'Galați',
+    'ploiești': 'Prahova', 'ploiesti': 'Prahova', 'câmpina': 'Prahova',
+    'oradea': 'Bihor', 'arad': 'Arad', 'sibiu': 'Sibiu',
+    'târgu mureș': 'Mureș', 'târgu mures': 'Mureș', 'targu mures': 'Mureș',
+    'baia mare': 'Maramureș', 'satu mare': 'Satu Mare',
+    'suceava': 'Suceava', 'botoșani': 'Botoșani', 'botosani': 'Botoșani',
+    'bacău': 'Bacău', 'bacau': 'Bacău', 'piatra neamț': 'Neamț',
+    'focșani': 'Vrancea', 'focsani': 'Vrancea', 'buzău': 'Buzău', 'buzau': 'Buzău',
+    'pitești': 'Argeș', 'pitesti': 'Argeș', 'târgoviște': 'Dâmbovița',
+    'râmnicu vâlcea': 'Vâlcea', 'slatina': 'Olt', 'târgu jiu': 'Gorj',
+    'drobeta-turnu severin': 'Mehedinți', 'reșița': 'Caraș-Severin', 'resita': 'Caraș-Severin',
+    'alba iulia': 'Alba', 'deva': 'Hunedoara', 'hunedoara': 'Hunedoara',
+    'alexandria': 'Teleorman', 'giurgiu': 'Giurgiu', 'călărași': 'Călărași', 'slobozia': 'Ialomița',
+    'tulcea': 'Tulcea', 'brăila': 'Brăila', 'braila': 'Brăila',
+    'vaslui': 'Vaslui', 'bârlad': 'Vaslui',
+    'bistrița': 'Bistrița-Năsăud', 'bistrita': 'Bistrița-Năsăud',
+    'zalău': 'Sălaj', 'sfântu gheorghe': 'Covasna', 'miercurea ciuc': 'Harghita',
+}
 
 
 class FuneralDirectoryScraper:
@@ -100,7 +129,7 @@ class FuneralDirectoryScraper:
                 return False
             
             markdown_content = scrape_result['markdown']
-            logger.info(f"✓ Scraped {len(markdown_content)} characters")
+            logger.info(f"[OK] Scraped {len(markdown_content)} characters")
             
             # Step 2: Extract with LLM
             logger.info("Step 2: Extracting structured data with LLM...")
@@ -112,7 +141,25 @@ class FuneralDirectoryScraper:
                 return False
             
             extracted = extraction_result['data']
-            logger.info(f"✓ Extracted data for: {extracted.get('company_name', 'Unknown')}")
+            logger.info(f"[OK] Extracted data for: {extracted.get('company_name', 'Unknown')}")
+            
+            # Check if this looks like a directory (not a real company)
+            if self._is_directory_site(extracted, url):
+                logger.warning(f"[SKIP] Detected as directory site, not a funeral company")
+                self.stats['failed'] += 1
+                return False
+            
+            # Fallback: Try to find email with regex if LLM missed it
+            if not extracted.get('email'):
+                import re
+                email_pattern = r'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}'
+                emails_found = re.findall(email_pattern, markdown_content)
+                # Filter out common non-contact emails
+                excluded = ['example.com', 'domain.com', 'email.com', 'test.com']
+                valid_emails = [e for e in emails_found if not any(ex in e for ex in excluded)]
+                if valid_emails:
+                    extracted['email'] = valid_emails[0]
+                    logger.info(f"[OK] Found email via regex fallback: {extracted['email']}")
             
             # Step 3: Validate and transform data
             logger.info("Step 3: Validating and transforming data...")
@@ -125,18 +172,28 @@ class FuneralDirectoryScraper:
             
             # Step 4: DSP Verification
             logger.info("Step 4: Verifying against DSP list...")
+            # Get county from company locations if available
+            county = None
+            if company.locations and len(company.locations) > 0:
+                loc = company.locations[0]
+                if loc.county:
+                    county = loc.county
+                elif loc.city:
+                    # Try to map city to county
+                    county = CITY_TO_COUNTY.get(loc.city.lower())
+            
             verification = self.dsp_tool.verify_company(
                 company.name,
-                company.fiscal_code
+                county=county
             )
             
             company.is_verified = verification['is_verified']
             
             if verification['is_verified']:
-                logger.info(f"✓ VERIFIED (score: {verification.get('match_score', 0)})")
+                logger.info(f"[VERIFIED] (score: {verification.get('match_score', 0)}%)")
                 self.stats['verified'] += 1
             else:
-                logger.info("✗ Not verified")
+                logger.info(f"[NOT VERIFIED] (best score: {verification.get('match_score', 0)}%)")
             
             # Step 5: Store in database
             logger.info("Step 5: Storing in database...")
@@ -144,7 +201,7 @@ class FuneralDirectoryScraper:
             
             if result['success']:
                 self.stats['success'] += 1
-                logger.info(f"✓ SUCCESS - Company {result['action']}")
+                logger.info(f"[SUCCESS] Company {result['action']}")
                 return True
             else:
                 logger.error(f"Failed to store: {result.get('error')}")
@@ -155,6 +212,64 @@ class FuneralDirectoryScraper:
             logger.error(f"Unexpected error processing {url}: {e}", exc_info=True)
             self.stats['failed'] += 1
             return False
+    
+    def _is_directory_site(self, extracted: dict, url: str) -> bool:
+        """
+        Detect if the scraped site is a directory listing multiple companies
+        rather than an actual funeral company website.
+        
+        Signs of a directory:
+        - Too many phone numbers (>5 different ones)
+        - Company name looks like a domain/portal name
+        - URL contains directory patterns
+        - Description mentions listing/directory
+        """
+        from urllib.parse import urlparse
+        
+        # Check phone count - directories list many companies = many phones
+        phones = extracted.get('phones', [])
+        if len(phones) > 5:
+            logger.debug(f"Directory detected: too many phones ({len(phones)})")
+            return True
+        
+        # Check company name patterns
+        company_name = extracted.get('company_name', '').lower()
+        directory_name_patterns = [
+            '.ro', '.com', '.net',  # Domain-like names
+            'info', 'portal', 'online', 'lista', 'director',
+            'servicii funerare timisoara',  # Generic location-based names
+            'pompe funebre timisoara',
+            'firme', 'companies', 'ghid',
+        ]
+        if any(pattern in company_name for pattern in directory_name_patterns):
+            logger.debug(f"Directory detected: name pattern '{company_name}'")
+            return True
+        
+        # Check URL patterns
+        parsed_url = urlparse(url)
+        path = parsed_url.path.lower()
+        directory_url_patterns = [
+            '/info/', '/listings/', '/directory/', '/catalog/',
+            '/firme/', '/companies/', '/lista/', '/list/',
+            '/results/', '/search/', '/categorie/', '/category/',
+            '/pompe_funebre/', '/servicii_funerare/',
+        ]
+        if any(pattern in path for pattern in directory_url_patterns):
+            logger.debug(f"Directory detected: URL pattern '{path}'")
+            return True
+        
+        # Check domain - known directory sites
+        domain = parsed_url.netloc.lower().replace('www.', '')
+        directory_domains = [
+            'timisoreni.ro', 'oradeni.ro', 'clujeni.ro', 'bucuresteni.ro',
+            'ieseni.ro', 'brasoveni.ro', 'sibieni.ro',
+            'listafirme.ro', 'paginiaurii.ro', 'cylex.ro',
+        ]
+        if domain in directory_domains:
+            logger.debug(f"Directory detected: known domain '{domain}'")
+            return True
+        
+        return False
     
     def _transform_to_company(self, extracted: dict) -> Company:
         """
@@ -189,8 +304,38 @@ class FuneralDirectoryScraper:
             # Process locations
             locations = []
             if extracted.get('address'):
+                # Try to get city from extraction or parse from address
+                city = extracted.get('city')
+                if not city:
+                    address_lower = extracted['address'].lower()
+                    for c in CITY_TO_COUNTY.keys():
+                        if c in address_lower:
+                            city = c.title().replace('ș', 'ș').replace('ț', 'ț')
+                            if city.lower() in ['timisoara', 'timișoara']:
+                                city = 'Timișoara'
+                            elif city.lower() in ['bucuresti', 'bucurești']:
+                                city = 'București'
+                            break
+                
+                # Get county from extraction or infer from city
+                county = extracted.get('county')
+                if not county and city:
+                    county = CITY_TO_COUNTY.get(city.lower())
+                
+                # Geocode the address to get coordinates
+                lat, lon = None, None
+                company_name = extracted.get('company_name', '')
+                logger.info("  Geocoding address...")
+                coords = geocode_address(extracted['address'], city, county, company_name)
+                if coords:
+                    lat, lon = coords
+                
                 locations.append(Location(
                     address=extracted['address'],
+                    city=city,
+                    county=county,
+                    latitude=lat,
+                    longitude=lon,
                     type='headquarters'
                 ))
             
@@ -200,14 +345,27 @@ class FuneralDirectoryScraper:
                 # Try to extract from description
                 fiscal_code = extract_cui_from_text(extracted.get('description', ''))
             
+            # Handle motto (truncate if too long)
+            motto = extracted.get('motto')
+            if motto and len(motto) > 200:
+                motto = motto[:197] + '...'
+            
+            # Handle is_non_stop (default to False if None)
+            is_non_stop = extracted.get('is_non_stop')
+            if is_non_stop is None:
+                is_non_stop = False
+            
             # Create Company object
             company = Company(
                 name=extracted['company_name'],
-                motto=extracted.get('motto'),
+                motto=motto,
                 description=extracted.get('description'),
                 fiscal_code=fiscal_code,
                 website=extracted.get('url'),
-                is_non_stop=extracted.get('is_non_stop', False),
+                facebook_url=extracted.get('facebook_url'),
+                instagram_url=extracted.get('instagram_url'),
+                is_non_stop=is_non_stop,
+                founded_year=extracted.get('founded_year'),
                 services=extracted.get('services', []),
                 contacts=contacts,
                 locations=locations

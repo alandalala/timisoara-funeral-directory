@@ -84,17 +84,19 @@ export default function CompanyDetail({ company }: CompanyDetailProps) {
             </div>
           )}
           
-          <div className="flex items-center gap-2 text-navy">
-            <div className="w-10 h-10 rounded-full bg-navy/5 flex items-center justify-center">
-              <svg className="w-5 h-5 text-navy" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
-              </svg>
+          {company.founded_year && (
+            <div className="flex items-center gap-2 text-navy">
+              <div className="w-10 h-10 rounded-full bg-navy/5 flex items-center justify-center">
+                <svg className="w-5 h-5 text-navy" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <div>
+                <span className="text-sm font-semibold">Experiență</span>
+                <span className="block text-xs text-slate">Activă din {company.founded_year}</span>
+              </div>
             </div>
-            <div>
-              <span className="text-sm font-semibold">Experiență</span>
-              <span className="block text-xs text-slate">Activă din 2010</span>
-            </div>
-          </div>
+          )}
           
           {company.is_non_stop && (
             <div className="flex items-center gap-2 text-navy">
@@ -595,6 +597,11 @@ function ReviewSection({
   const hasReviews = reviews && reviews.length > 0;
   const hasSummary = reviewSummary && reviewSummary.total_reviews > 0;
   
+  // Only show section if there are actual reviews
+  if (!hasReviews && !hasSummary) {
+    return null;
+  }
+  
   // Get featured review or first review with content
   const featuredReview = reviews?.find(r => r.is_featured && r.content) || reviews?.find(r => r.content);
   
@@ -603,10 +610,8 @@ function ReviewSection({
     (reviews?.flatMap(r => r.sentiment_tags || []).filter((tag, index, self) => self.indexOf(tag) === index).slice(0, 5)) ||
     [];
 
-  // Default placeholder tags if no real data
-  const placeholderTags = ['profesionalism', 'raspuns_rapid', 'empatie', 'preturi_corecte'];
-  const isPlaceholder = sentimentTags.length === 0;
-  const displayTags = isPlaceholder ? placeholderTags : sentimentTags;
+  // Only show tags if we have real data
+  const displayTags = sentimentTags;
   
   return (
     <Card className="bg-white border-0 rounded-2xl shadow-tactile-deep">
@@ -631,28 +636,27 @@ function ReviewSection({
       </CardHeader>
       <CardContent className="space-y-4">
         {/* Sentiment Chips */}
-        <div className="flex flex-wrap gap-2">
-          {displayTags.map((tag) => {
-            const label = SENTIMENT_LABELS[tag];
-            return (
-              <span 
-                key={tag}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-sage/10 text-sage rounded-full text-sm font-medium"
-              >
-                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                </svg>
-                {label?.ro || tag}
-              </span>
-            );
-          })}
-          {isPlaceholder && (
-            <span className="text-xs text-slate/40">[SAMPLE]</span>
-          )}
-        </div>
+        {displayTags.length > 0 && (
+          <div className="flex flex-wrap gap-2">
+            {displayTags.map((tag) => {
+              const label = SENTIMENT_LABELS[tag];
+              return (
+                <span 
+                  key={tag}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-sage/10 text-sage rounded-full text-sm font-medium"
+                >
+                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                  </svg>
+                  {label?.ro || tag}
+                </span>
+              );
+            })}
+          </div>
+        )}
         
         {/* Featured Review Quote */}
-        {featuredReview?.content ? (
+        {featuredReview?.content && (
           <blockquote className="border-l-4 border-gold pl-4 py-2 mt-4">
             <p className="font-lora italic text-slate/80 text-sm">
               „{featuredReview.content}"
@@ -674,15 +678,6 @@ function ReviewSection({
                   ))}
                 </span>
               )}
-            </footer>
-          </blockquote>
-        ) : (
-          <blockquote className="border-l-4 border-gold pl-4 py-2 mt-4">
-            <p className="font-lora italic text-slate/80 text-sm">
-              „Într-un moment atât de greu, au fost alături de noi cu profesionalism și respect." <span className="text-slate/40 text-xs">[SAMPLE]</span>
-            </p>
-            <footer className="mt-2 text-xs text-slate">
-              — Familie din {companyCity || 'România'} <span className="text-slate/40">[SAMPLE]</span>
             </footer>
           </blockquote>
         )}

@@ -55,7 +55,14 @@ class SupabaseTool:
                 'website': company.website,
                 'is_verified': company.is_verified,
                 'is_non_stop': company.is_non_stop,
+                'founded_year': company.founded_year,
             }
+            
+            # Add social media URLs if available (requires DB columns)
+            if company.facebook_url:
+                company_data['facebook_url'] = company.facebook_url
+            if company.instagram_url:
+                company_data['instagram_url'] = company.instagram_url
             
             if existing_company:
                 # Update existing
@@ -98,11 +105,15 @@ class SupabaseTool:
                 location_data = {
                     'company_id': company_id,
                     'address': location.address,
+                    'city': location.city,
+                    'county': location.county,
                     'type': location.type
                 }
                 
-                # Add geo_point if coordinates are available
+                # Add coordinates if available (both as separate columns and geo_point)
                 if location.latitude and location.longitude:
+                    location_data['latitude'] = location.latitude
+                    location_data['longitude'] = location.longitude
                     location_data['geo_point'] = f'POINT({location.longitude} {location.latitude})'
                 
                 self.client.table('locations').insert(location_data).execute()

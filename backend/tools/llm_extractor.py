@@ -56,10 +56,15 @@ Extract the following JSON object:
            Must be under 200 characters.",
   "phones": ["Array of phone numbers found"],
   "email": "Primary contact email",
-  "address": "Physical address if mentioned",
+  "address": "Full physical address if mentioned",
+  "city": "City name (e.g., Timișoara, București, Cluj-Napoca). Extract from address or location info.",
+  "county": "Romanian county/județ (e.g., Timiș, București, Cluj, Arad, Bihor). Infer from city if not explicit.",
   "services": ["Array of service keywords. Valid values: transport, repatriation, cremation, embalming, wake_house, coffins, flowers, bureaucracy, religious, monuments"],
   "is_non_stop": "Boolean, true if '24/7', 'Non-Stop', '24 de ore', or similar mentioned",
+  "founded_year": "Year the company was founded (integer, e.g., 2010). Look for 'din anul', 'fondată în', 'activă din', 'experiență din'. Return null if not found.",
   "fiscal_code": "Romanian CUI/fiscal code if mentioned (format: CUI 12345678 or RO12345678)",
+  "facebook_url": "Facebook page URL if found (e.g., https://facebook.com/company)",
+  "instagram_url": "Instagram profile URL if found (e.g., https://instagram.com/company)",
   "description": "Brief description of the company (2-3 sentences)"
 }
 
@@ -69,10 +74,16 @@ Important rules:
 3. Only use service keywords from the valid list
 4. Return valid JSON only, no additional text"""
 
+        # Model has 32768 token context (~4 chars/token), leave room for prompt + response
+        max_content_chars = 50000
+        
         user_prompt = f"""Website URL: {url}
 
 Website Content (Markdown):
-{markdown_content[:8000]}
+{markdown_content[:max_content_chars]}
+
+IMPORTANT: Look carefully for email addresses - they often appear on Contact pages or in footer sections.
+Common patterns: name@domain.ro, contact@company.ro, office@company.ro
 
 Extract the company information as JSON."""
 

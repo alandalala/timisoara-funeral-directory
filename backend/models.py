@@ -34,6 +34,8 @@ class Contact(BaseModel):
 class Location(BaseModel):
     """Physical location of a funeral company"""
     address: str = Field(..., description="Full street address")
+    city: Optional[str] = Field(None, description="City name")
+    county: Optional[str] = Field(None, description="Romanian county/județ")
     latitude: Optional[float] = Field(None, description="Latitude coordinate")
     longitude: Optional[float] = Field(None, description="Longitude coordinate")
     type: str = Field(default="headquarters", description="Type: headquarters, wake_house, showroom")
@@ -55,8 +57,11 @@ class Company(BaseModel):
     description: Optional[str] = Field(None, description="Detailed company description")
     fiscal_code: Optional[str] = Field(None, description="Romanian fiscal code (CUI)")
     website: Optional[str] = Field(None, description="Company website URL")
+    facebook_url: Optional[str] = Field(None, description="Facebook page URL")
+    instagram_url: Optional[str] = Field(None, description="Instagram profile URL")
     is_verified: bool = Field(default=False, description="Whether company is DSP verified")
     is_non_stop: bool = Field(default=False, description="Whether company offers 24/7 service")
+    founded_year: Optional[int] = Field(None, description="Year the company was founded")
     services: List[str] = Field(default_factory=list, description="List of service tags")
     contacts: List[Contact] = Field(default_factory=list, description="Contact information")
     locations: List[Location] = Field(default_factory=list, description="Physical locations")
