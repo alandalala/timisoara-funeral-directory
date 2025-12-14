@@ -4,6 +4,7 @@ Main orchestration script for the funeral directory scraper.
 import sys
 import json
 from pathlib import Path
+from typing import Optional
 
 # Add backend to path
 sys.path.insert(0, str(Path(__file__).parent))
@@ -194,6 +195,16 @@ class FuneralDirectoryScraper:
                         logger.info(f"[OK] Found CUI via regex fallback: {extracted['fiscal_code']}")
                         break
             
+            # Fallback: Try to find address with regex if LLM missed it
+            if not extracted.get('locations') and not extracted.get('address'):
+                import re
+                address = self._extract_address_regex(markdown_content)
+                if address:
+                    extracted['address'] = address
+                    extracted['city'] = 'Timișoara'
+                    extracted['county'] = 'Timiș'
+                    logger.info(f"[OK] Found address via regex fallback: {address}")
+            
             # Step 3: Validate and transform data
             logger.info("Step 3: Validating and transforming data...")
             company = self._transform_to_company(extracted)
@@ -236,6 +247,23 @@ class FuneralDirectoryScraper:
             if result['success']:
                 self.stats['success'] += 1
                 logger.info(f"[SUCCESS] Company {result['action']}")
+                
+                # Log data completeness check
+                missing_fields = []
+                if not company.contacts or not any(c.type.startswith('phone') for c in company.contacts):
+                    missing_fields.append('phone')
+                if not company.contacts or not any(c.type == 'email' for c in company.contacts):
+                    missing_fields.append('email')
+                if not company.locations:
+                    missing_fields.append('address')
+                if not company.fiscal_code:
+                    missing_fields.append('fiscal_code')
+                
+                if missing_fields:
+                    logger.warning(f"[INCOMPLETE] Missing data: {', '.join(missing_fields)}")
+                else:
+                    logger.info(f"[COMPLETE] All key fields extracted")
+                
                 return True
             else:
                 logger.error(f"Failed to store: {result.get('error')}")
@@ -306,6 +334,51 @@ class FuneralDirectoryScraper:
         found_county = county or (locations[0].get('county') if locations else 'unknown')
         logger.info(f"  Location mismatch: found {found_city}, {found_county}")
         return False
+    
+    def _extract_address_regex(self, content: str) -> Optional[str]:
+        """
+        Extract address from content using regex patterns.
+        Fallback when LLM misses the address.
+        """
+        import re
+        
+        # Romanian street prefixes
+        street_prefixes = r'(?:Str(?:ada)?\.?|Calea|B(?:ulevardul|d)?\.?|Al(?:eea)?\.?|Piața|P-ța|Splaiul|Drumul|Intrarea)'
+        
+        # Pattern 1: Street + Number (e.g., "Str. Gheorghe Doja, Nr. 20" or "Iuliu Grozescu 16")
+        patterns = [
+            # "Str. Name Nr. 123" or "Strada Name, Nr. 123"
+            rf'{street_prefixes}\s+([A-ZĂÂÎȘȚ][a-zăâîșț\s]+?)[\s,]+(?:Nr\.?\s*)?(\d+[A-Za-z]?)',
+            # "Name Street 123" (without prefix)
+            r'([A-ZĂÂÎȘȚ][a-zăâîșț]+(?:\s+[A-ZĂÂÎȘȚ][a-zăâîșț]+)?)\s+(\d{1,4}[A-Za-z]?)\s*[,\n]',
+            # Address after "Adresă:" or "Locație:"
+            r'(?:Adres[aă]|Loca[țt]ie|Sediu)[:\s]+([A-ZĂÂÎȘȚ][^,\n]{5,50}?,?\s*(?:Nr\.?\s*)?\d+[A-Za-z]?)',
+            # With city name: "Street 123, Timișoara"
+            r'([A-ZĂÂÎȘȚ][a-zăâîșț\s]+\d+[A-Za-z]?)\s*[,\s]+Timi[șs]oara',
+        ]
+        
+        for pattern in patterns:
+            matches = re.findall(pattern, content, re.IGNORECASE | re.MULTILINE)
+            if matches:
+                if isinstance(matches[0], tuple):
+                    # Combine street name and number
+                    match = matches[0]
+                    if len(match) >= 2:
+                        address = f"{match[0].strip()} {match[1]}".strip()
+                    else:
+                        address = match[0].strip()
+                else:
+                    address = matches[0].strip()
+                
+                # Clean up the address
+                address = re.sub(r'\s+', ' ', address)
+                address = address.strip(' ,.')
+                
+                # Validate it looks like an address (has some length and structure)
+                if len(address) > 5 and any(c.isdigit() for c in address):
+                    return address
+        
+        return None
     
     def _transform_to_company(self, extracted: dict) -> Company:
         """

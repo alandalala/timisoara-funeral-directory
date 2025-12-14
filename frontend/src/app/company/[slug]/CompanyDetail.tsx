@@ -73,6 +73,7 @@ export default function CompanyDetail({ company }: CompanyDetailProps) {
       <main className="container mx-auto px-4 py-8">
         {/* Trust Cluster - Key trust indicators */}
         <div className="flex flex-wrap items-center gap-4 mb-8 pb-6 border-b border-warm-grey">
+          {/* DSP Verification badge - DISABLED
           {company.is_verified && (
             <div className="flex items-center gap-2 text-navy">
               <div className="w-10 h-10 rounded-full bg-gold/10 flex items-center justify-center">
@@ -86,6 +87,7 @@ export default function CompanyDetail({ company }: CompanyDetailProps) {
               </div>
             </div>
           )}
+          */}
           
           {company.founded_year && (
             <div className="flex items-center gap-2 text-navy">
@@ -226,12 +228,14 @@ export default function CompanyDetail({ company }: CompanyDetailProps) {
                     {company.is_non_stop ? 'Non-Stop (24/7)' : 'Program normal'}
                   </span>
                 </div>
+                {/* DSP Status - DISABLED
                 <div className="flex justify-between text-sm">
                   <span className="text-slate">Status:</span>
                   <span className={`font-bold ${company.is_verified ? 'text-sage' : 'text-slate'}`}>
                     {company.is_verified ? '✓ Verificat DSP' : 'Neverificat'}
                   </span>
                 </div>
+                */}
               </CardContent>
             </Card>
 
@@ -503,6 +507,7 @@ function HeroImage({ company }: { company: Company }) {
                 </p>
               )}
             </div>
+            {/* DSP Badge - DISABLED
             {company.is_verified && (
               <div 
                 className="flex items-center gap-2 px-4 py-2 rounded-full backdrop-blur-sm"
@@ -517,6 +522,7 @@ function HeroImage({ company }: { company: Company }) {
                 <span className="font-semibold text-white text-sm">Verificat DSP</span>
               </div>
             )}
+            */}
           </div>
         </div>
       </div>

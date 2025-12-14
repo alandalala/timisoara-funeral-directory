@@ -98,6 +98,40 @@ class GeocodingTool:
             time.sleep(self.min_delay - elapsed)
         self.last_request_time = time.time()
     
+    def _clean_address(self, address: str) -> str:
+        """
+        Clean address by removing postal codes, county info, and other noise
+        that confuses geocoding APIs.
+        """
+        import re
+        
+        cleaned = address
+        
+        # Remove postal codes (6 digits)
+        cleaned = re.sub(r'Cod\s*Postal\s*\d{6}', '', cleaned, flags=re.IGNORECASE)
+        cleaned = re.sub(r'\b\d{6}\b', '', cleaned)  # Standalone 6-digit codes
+        
+        # Remove county references
+        cleaned = re.sub(r',?\s*Jud\.?\s*\w+', '', cleaned, flags=re.IGNORECASE)
+        cleaned = re.sub(r',?\s*Jude[țt]ul?\s*\w+', '', cleaned, flags=re.IGNORECASE)
+        
+        # Remove country
+        cleaned = re.sub(r',?\s*Rom[aâ]nia', '', cleaned, flags=re.IGNORECASE)
+        
+        # Remove duplicate city names (often appears twice)
+        if 'Timi' in cleaned:
+            # Keep only first occurrence of Timisoara/Timișoara
+            parts = re.split(r'(Timi[șs]oara)', cleaned, flags=re.IGNORECASE)
+            if len(parts) > 2:
+                cleaned = parts[0] + parts[1]  # Keep street + first city mention
+        
+        # Clean up multiple commas and spaces
+        cleaned = re.sub(r'\s*,\s*,\s*', ', ', cleaned)
+        cleaned = re.sub(r'\s+', ' ', cleaned)
+        cleaned = cleaned.strip(' ,.')
+        
+        return cleaned
+    
     def geocode(self, address: str, city: str = None, county: str = None, company_name: str = None) -> Optional[Tuple[float, float]]:
         """
         Geocode an address to lat/lng coordinates.
@@ -121,8 +155,11 @@ class GeocodingTool:
         if address and address.strip():
             self._rate_limit()
             
+            # Clean the address - remove postal codes, "Jud", "Cod Postal", etc.
+            cleaned_address = self._clean_address(address)
+            
             # Build full address query
-            parts = [address]
+            parts = [cleaned_address]
             if city:
                 parts.append(city)
             parts.append("Romania")

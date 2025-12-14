@@ -453,6 +453,7 @@ export default function Home() {
                 className="w-full pl-10 pr-4 py-3 border-warm-grey rounded-xl bg-white/80 backdrop-blur-sm focus:border-sage focus:ring-2 focus:ring-sage/20 transition-all duration-200"
               />
             </div>
+            {/* DSP Filter - DISABLED
             <button
               onClick={() => setShowVerifiedOnly(!showVerifiedOnly)}
               aria-pressed={showVerifiedOnly}
@@ -474,6 +475,7 @@ export default function Home() {
               )}
               Verificate DSP
             </button>
+            */}
             <button
               onClick={() => setShow24Only(!show24Only)}
               aria-pressed={show24Only}
@@ -547,6 +549,7 @@ export default function Home() {
 
             {/* Horizontal Quick Filter Chips */}
             <div className="flex gap-2 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">
+              {/* DSP Quick Filter - DISABLED
               <button
                 onClick={() => setShowVerifiedOnly(!showVerifiedOnly)}
                 className={`flex-shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-full text-sm font-medium transition-all whitespace-nowrap ${
@@ -561,6 +564,7 @@ export default function Home() {
                 </svg>
                 Verificat DSP
               </button>
+              */}
               <button
                 onClick={() => setShow24Only(!show24Only)}
                 className={`flex-shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-full text-sm font-medium transition-all whitespace-nowrap ${
@@ -713,6 +717,7 @@ export default function Home() {
                   </div>
 
                   {/* Quick Filters */}
+                  {/* DSP Quick Filter - DISABLED
                   <button
                     onClick={() => setShowVerifiedOnly(!showVerifiedOnly)}
                     className={`px-3 py-2 text-sm rounded-lg transition-all ${
@@ -724,6 +729,7 @@ export default function Home() {
                   >
                     ✓ DSP
                   </button>
+                  */}
                   <button
                     onClick={() => setShow24Only(!show24Only)}
                     className={`px-3 py-2 text-sm rounded-lg transition-all ${
@@ -921,9 +927,11 @@ export default function Home() {
           {/* Copyright */}
           <div className="text-center text-slate">
             <p className="text-charcoal">© 2025 CăutareFunerare.ro</p>
+            {/* DSP text - DISABLED
             <p className="text-sm mt-2">
               Datele sunt verificate cu listele DSP din fiecare județ.
             </p>
+            */}
           </div>
         </div>
       </footer>
