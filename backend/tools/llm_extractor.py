@@ -62,7 +62,14 @@ Extract the following JSON object:
   "services": ["Array of service keywords. Valid values: transport, repatriation, cremation, embalming, wake_house, coffins, flowers, bureaucracy, religious, monuments"],
   "is_non_stop": "Boolean, true if '24/7', 'Non-Stop', '24 de ore', or similar mentioned",
   "founded_year": "Year the company was founded (integer, e.g., 2010). Look for 'din anul', 'fondată în', 'activă din', 'experiență din'. Return null if not found.",
-  "fiscal_code": "Romanian CUI/fiscal code if mentioned (format: CUI 12345678 or RO12345678)",
+  "fiscal_code": "Romanian CUI/CIF fiscal code. IMPORTANT: Look carefully for patterns like:
+                  - 'CUI: 12345678' or 'CUI 12345678'
+                  - 'CIF: 12345678' or 'CIF 12345678' 
+                  - 'Cod fiscal: 12345678'
+                  - 'RO12345678' (VAT format)
+                  - 'J35/1234/2010' (trade register number, extract just the CUI if nearby)
+                  Usually found in footer, contact page, or 'Despre noi' sections.
+                  Return just the number (6-10 digits) without 'RO' prefix.",
   "facebook_url": "Facebook page URL if found (e.g., https://facebook.com/company)",
   "instagram_url": "Instagram profile URL if found (e.g., https://instagram.com/company)",
   "description": "Brief description of the company (2-3 sentences)"
@@ -72,7 +79,8 @@ Important rules:
 1. A motto is philosophical/emotional, not descriptive
 2. Extract ALL phone numbers found
 3. Only use service keywords from the valid list
-4. Return valid JSON only, no additional text"""
+4. CUI/CIF is critical - search the entire content carefully for it
+5. Return valid JSON only, no additional text"""
 
         # Model has 32768 token context (~4 chars/token), leave room for prompt + response
         max_content_chars = 50000

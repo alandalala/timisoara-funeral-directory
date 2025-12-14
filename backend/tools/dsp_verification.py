@@ -8,6 +8,15 @@ from typing import List, Dict, Optional, Tuple
 from difflib import SequenceMatcher
 
 
+# Trade name → Legal name mapping
+# NOTE: This feature is currently disabled/paused
+# These mappings were found to be incorrect - keep empty for now
+TRADE_NAME_MAPPING = {
+    # Add verified mappings only after confirming with CUI lookup
+    # 'trade name': 'legal name in dsp',
+}
+
+
 class DSPVerificationTool:
     """
     Tool to verify funeral companies against DSP (Direcția de Sănătate Publică)
@@ -21,6 +30,7 @@ class DSPVerificationTool:
             'dsp_authorized_companies.json'
         )
         self.authorized_companies = self._load_dsp_data()
+        self.trade_name_mapping = TRADE_NAME_MAPPING
     
     def _load_dsp_data(self) -> List[Dict]:
         """Load DSP authorized companies from JSON file."""
@@ -33,6 +43,13 @@ class DSPVerificationTool:
         print(f"Warning: DSP data not found at {self.dsp_data_path}")
         print("Run DSP scraper first to populate the authorization list.")
         return []
+    
+    def _get_legal_name(self, trade_name: str) -> Optional[str]:
+        """Check if trade name maps to a known legal name."""
+        if not trade_name:
+            return None
+        normalized = trade_name.lower().strip()
+        return self.trade_name_mapping.get(normalized)
     
     def _normalize_company_name(self, name: str) -> str:
         """Normalize company name for comparison."""
@@ -121,6 +138,20 @@ class DSPVerificationTool:
                 "verification_source": "DSP_list_not_available",
                 "match_score": 0
             }
+        
+        # First check trade name mapping
+        legal_name = self._get_legal_name(company_name)
+        if legal_name:
+            # Direct match via trade name mapping
+            for auth_company in self.authorized_companies:
+                if self._normalize_company_name(auth_company.get('name', '')) == self._normalize_company_name(legal_name):
+                    return {
+                        "is_verified": True,
+                        "official_name": auth_company.get('name', ''),
+                        "verification_source": f"DSP_{auth_company.get('county_code', 'RO')}",
+                        "match_score": 100,
+                        "match_method": "trade_name_mapping"
+                    }
         
         best_match = None
         best_score = 0.0

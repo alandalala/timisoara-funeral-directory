@@ -23,10 +23,10 @@ class SupabaseTool:
     def upsert_company(self, company: Company) -> Dict:
         """
         Insert or update a company in the database.
-        Uses fiscal_code or website for matching existing records.
+        Uses fiscal_code, website, or phone numbers for matching existing records.
         
         Returns:
-            Dict with 'success', 'company_id', 'action' (inserted/updated)
+            Dict with 'success', 'company_id', 'action' (inserted/updated/duplicate)
         """
         try:
             # Generate slug from company name
@@ -35,15 +35,45 @@ class SupabaseTool:
             # Check if company already exists
             existing_company = None
             
+            # Check by fiscal_code
             if company.fiscal_code:
                 result = self.client.table('companies').select('*').eq('fiscal_code', company.fiscal_code).execute()
                 if result.data:
                     existing_company = result.data[0]
+                    print(f"Found existing company by fiscal_code: {company.fiscal_code}")
             
+            # Check by website
             if not existing_company and company.website:
                 result = self.client.table('companies').select('*').eq('website', company.website).execute()
                 if result.data:
                     existing_company = result.data[0]
+                    print(f"Found existing company by website: {company.website}")
+            
+            # Check by phone numbers (duplicate detection)
+            if not existing_company and company.contacts:
+                for contact in company.contacts:
+                    if contact.type in ('phone_mobile', 'phone_landline'):
+                        # Normalize phone for comparison
+                        phone_value = contact.value.replace(' ', '').replace('-', '').replace('.', '')
+                        
+                        # Search in contacts table
+                        result = self.client.table('contacts').select(
+                            'company_id, value'
+                        ).in_('type', ['phone_mobile', 'phone_landline']).execute()
+                        
+                        for existing_contact in result.data or []:
+                            existing_phone = existing_contact['value'].replace(' ', '').replace('-', '').replace('.', '')
+                            if phone_value == existing_phone:
+                                # Found matching phone - get the company
+                                comp_result = self.client.table('companies').select('*').eq(
+                                    'id', existing_contact['company_id']
+                                ).execute()
+                                if comp_result.data:
+                                    existing_company = comp_result.data[0]
+                                    print(f"Found existing company by phone: {contact.value} -> {existing_company['name']}")
+                                    break
+                    if existing_company:
+                        break
             
             # Prepare company data
             company_data = {

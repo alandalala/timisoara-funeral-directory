@@ -161,6 +161,22 @@ class FuneralDirectoryScraper:
                     extracted['email'] = valid_emails[0]
                     logger.info(f"[OK] Found email via regex fallback: {extracted['email']}")
             
+            # Fallback: Try to find CUI/CIF with regex if LLM missed it
+            if not extracted.get('fiscal_code'):
+                import re
+                # Pattern for Romanian CUI/CIF: 6-10 digits, optionally prefixed with RO
+                cui_patterns = [
+                    r'(?:CUI|CIF|Cod\s*fiscal)[:\s]*(?:RO)?(\d{6,10})',  # CUI: 12345678
+                    r'(?:RO)(\d{6,10})',  # RO12345678 (VAT format)
+                    r'(?:cod\s*unic)[:\s]*(\d{6,10})',  # Cod unic: 12345678
+                ]
+                for pattern in cui_patterns:
+                    match = re.search(pattern, markdown_content, re.IGNORECASE)
+                    if match:
+                        extracted['fiscal_code'] = match.group(1)
+                        logger.info(f"[OK] Found CUI via regex fallback: {extracted['fiscal_code']}")
+                        break
+            
             # Step 3: Validate and transform data
             logger.info("Step 3: Validating and transforming data...")
             company = self._transform_to_company(extracted)

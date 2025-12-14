@@ -73,8 +73,8 @@ export function CompanyCard({ company }: CompanyCardProps) {
     >
       {/* Trust Badges Container - Top Right */}
       <div className="absolute -top-2 -right-2 z-10 flex flex-col gap-1.5 items-end">
-        {/* Badge 1: DSP Verified (Identity/Licensed) - Matte Gold */}
-        {company.is_verified && (
+        {/* Badge 1: DSP Verified - HIDDEN (functionality paused) */}
+        {/* {company.is_verified && (
           <div 
             className="flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold shadow-md"
             style={{ 
@@ -89,7 +89,7 @@ export function CompanyCard({ company }: CompanyCardProps) {
             </svg>
             DSP
           </div>
-        )}
+        )} */}
         
         {/* Badge 2: Price Certified - Deep Navy */}
         {hasPricingInfo && (
