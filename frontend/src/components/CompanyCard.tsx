@@ -218,7 +218,7 @@ export function CompanyCard({ company }: CompanyCardProps) {
 
       <CardContent className="flex-1 flex flex-col pt-0">
         {/* Locations - show primary + count of additional */}
-        {headquarters && (
+        {headquarters && headquarters.address && (
           <div className="mb-3">
             <a
               href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(

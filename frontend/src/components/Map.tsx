@@ -362,40 +362,52 @@ function MapContent({
               }}
             >
               <Popup>
-                <div className="min-w-[200px]">
-                  <h3 className="font-semibold text-sm mb-1">{company.name}</h3>
-                  {location && (
-                    <p className="text-xs text-gray-600 mb-2">
-                      {location.address}, {location.city}
+                <div className="min-w-[220px] p-1">
+                  <h3 className="font-heading font-semibold text-navy text-sm mb-1.5">{company.name}</h3>
+                  {location && location.address && (
+                    <p className="text-xs text-slate mb-2 flex items-start gap-1.5">
+                      <svg className="w-3.5 h-3.5 mt-0.5 text-slate/50 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                      </svg>
+                      <span>{location.address}, {location.city}</span>
                     </p>
                   )}
                   {company.contacts?.[0] && (
                     <a 
                       href={`tel:${company.contacts[0].value}`}
-                      className="text-xs text-blue-600 hover:underline"
+                      className="text-xs text-charcoal hover:text-navy transition-colors flex items-center gap-1.5 mb-3"
                     >
-                      <span className="inline-flex items-center"><svg className="w-3 h-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>{company.contacts[0].value}</span>
+                      <svg className="w-3.5 h-3.5 text-sage" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
+                      </svg>
+                      <span className="font-medium">{company.contacts[0].value}</span>
                     </a>
                   )}
-                  <div className="mt-2 flex gap-2">
+                  <div className="flex gap-2">
                     <a
                       href={`/company/${company.slug}`}
-                      className="inline-block text-xs px-3 py-1.5 rounded hover:opacity-90"
-                      style={{ backgroundColor: '#2563eb', color: '#ffffff' }}
+                      className="inline-flex items-center gap-1 text-xs px-3 py-1.5 rounded-lg font-medium transition-all hover:opacity-90"
+                      style={{ backgroundColor: '#001D3D', color: '#ffffff' }}
                     >
-                      Vezi detalii →
+                      Vezi detalii
+                      <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                      </svg>
                     </a>
-                    {location && (
+                    {location && location.address && (
                       <a
                         href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
                           `${location.address}, ${location.city}, Romania`
                         )}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-block text-xs px-3 py-1.5 rounded hover:opacity-90"
-                        style={{ backgroundColor: '#16a34a', color: '#ffffff' }}
+                        className="inline-flex items-center gap-1 text-xs px-3 py-1.5 rounded-lg font-medium transition-all hover:opacity-90"
+                        style={{ backgroundColor: '#606C38', color: '#ffffff' }}
                       >
-                        <span className="inline-flex items-center"><svg className="w-3 h-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>Maps</span>
+                        <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                        </svg>
+                        Maps
                       </a>
                     )}
                   </div>
@@ -412,11 +424,14 @@ function MapContent({
             icon={createIcon(true)}
           >
             <Popup>
-              <div className="min-w-[200px]">
-                <h3 className="font-semibold text-sm mb-1">{selectedCompany.name}</h3>
-                {selectedCompany.locations?.[0] && (
-                  <p className="text-xs text-gray-600">
-                    {selectedCompany.locations[0].address}, {selectedCompany.locations[0].city}
+              <div className="min-w-[200px] p-1">
+                <h3 className="font-heading font-semibold text-navy text-sm mb-1.5">{selectedCompany.name}</h3>
+                {selectedCompany.locations?.[0]?.address && (
+                  <p className="text-xs text-slate flex items-start gap-1.5">
+                    <svg className="w-3.5 h-3.5 mt-0.5 text-slate/50 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                    </svg>
+                    <span>{selectedCompany.locations[0].address}, {selectedCompany.locations[0].city}</span>
                   </p>
                 )}
               </div>

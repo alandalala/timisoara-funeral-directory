@@ -38,6 +38,9 @@ export default function CompanyDetail({ company }: CompanyDetailProps) {
   const emails = company.contacts?.filter((c) => c.type === 'email');
   const headquarters = company.locations?.find((l) => l.type === 'headquarters');
   const otherLocations = company.locations?.filter((l) => l.type !== 'headquarters');
+  
+  // Check if there's any location with an address to display
+  const hasLocationWithAddress = company.locations?.some((l) => l.address);
 
   return (
     <div className="min-h-screen bg-cream">
@@ -154,7 +157,8 @@ export default function CompanyDetail({ company }: CompanyDetailProps) {
               </Card>
             )}
 
-            {/* Location Card */}
+            {/* Location Card - only show if there's an address */}
+            {hasLocationWithAddress && (
             <Card className="bg-white border-0 rounded-2xl shadow-tactile-deep">
               <CardHeader className="pb-4">
                 <CardTitle className="flex items-center gap-2 font-heading text-navy">
@@ -175,7 +179,7 @@ export default function CompanyDetail({ company }: CompanyDetailProps) {
                   />
                 </div>
 
-                {headquarters && (
+                {headquarters && headquarters.address && (
                   <div>
                     <h4 className="font-medium text-charcoal mb-1">Sediu Principal</h4>
                     <p className="text-slate">{headquarters.address}</p>
@@ -186,11 +190,11 @@ export default function CompanyDetail({ company }: CompanyDetailProps) {
                   </div>
                 )}
 
-                {otherLocations && otherLocations.length > 0 && (
+                {otherLocations && otherLocations.filter(l => l.address).length > 0 && (
                   <div className="border-t border-warm-grey pt-4">
                     <h4 className="font-medium text-charcoal mb-2">Alte Locații</h4>
                     <div className="space-y-3">
-                      {otherLocations.map((loc) => (
+                      {otherLocations.filter(l => l.address).map((loc) => (
                         <div key={loc.id} className="text-sm">
                           <Badge variant="outline" className="mb-1 border-warm-grey rounded-lg">
                             {loc.type === 'wake_house' ? 'Casă Funerară' : loc.type === 'showroom' ? 'Punct de Lucru' : 'Sediu'}
@@ -204,6 +208,7 @@ export default function CompanyDetail({ company }: CompanyDetailProps) {
                 )}
               </CardContent>
             </Card>
+            )}
 
             {/* Info Card */}
             <Card className="bg-white border-0 rounded-2xl shadow-tactile-deep">

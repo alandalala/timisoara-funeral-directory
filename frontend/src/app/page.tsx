@@ -183,9 +183,10 @@ export default function Home() {
     return shuffled;
   }, [companies, searchQuery, selectedCounty, countySearchQuery, selectedCity, citySearchQuery, showVerifiedOnly, show24Only]);
 
-  // For split view - always show all filtered companies
-  // The map bounds filtering was causing issues where companies appeared on map but not in list
-  const splitViewCompanies = filteredCompanies;
+  // For split view - filter companies by map bounds when user has zoomed/panned
+  const splitViewCompanies = mapBounds 
+    ? filteredCompanies.filter(company => isCompanyInBounds(company, mapBounds))
+    : filteredCompanies;
 
   // Check if any filters are active
   const hasActiveFilters = searchQuery || selectedCounty || countySearchQuery || selectedCity || citySearchQuery || showVerifiedOnly || show24Only;
