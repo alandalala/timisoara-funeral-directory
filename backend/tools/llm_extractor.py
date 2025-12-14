@@ -56,9 +56,14 @@ Extract the following JSON object:
            Must be under 200 characters.",
   "phones": ["Array of phone numbers found"],
   "email": "Primary contact email",
-  "address": "Full physical address if mentioned",
-  "city": "City name (e.g., Timișoara, București, Cluj-Napoca). Extract from address or location info.",
-  "county": "Romanian county/județ (e.g., Timiș, București, Cluj, Arad, Bihor). Infer from city if not explicit.",
+  "locations": [
+    {
+      "address": "Full street address",
+      "city": "City name (e.g., Timișoara, București)",
+      "county": "Romanian county/județ (e.g., Timiș, București)",
+      "type": "headquarters|wake_house|showroom - Use 'headquarters' for main office/sediu, 'wake_house' for casa funerară/capelă/salon funerar, 'showroom' for magazin/punct de lucru"
+    }
+  ],
   "services": ["Array of service keywords. Valid values: transport, repatriation, cremation, embalming, wake_house, coffins, flowers, bureaucracy, religious, monuments"],
   "is_non_stop": "Boolean, true if '24/7', 'Non-Stop', '24 de ore', or similar mentioned",
   "founded_year": "Year the company was founded (integer, e.g., 2010). Look for 'din anul', 'fondată în', 'activă din', 'experiență din'. Return null if not found.",
@@ -80,7 +85,9 @@ Important rules:
 2. Extract ALL phone numbers found
 3. Only use service keywords from the valid list
 4. CUI/CIF is critical - search the entire content carefully for it
-5. Return valid JSON only, no additional text"""
+5. Extract ALL locations/addresses found - companies often have multiple branches
+6. For location type: use 'headquarters' for sediu/birou principal, 'wake_house' for casă funerară/capelă, 'showroom' for magazin
+7. Return valid JSON only, no additional text"""
 
         # Model has 32768 token context (~4 chars/token), leave room for prompt + response
         max_content_chars = 50000
@@ -90,8 +97,12 @@ Important rules:
 Website Content (Markdown):
 {markdown_content[:max_content_chars]}
 
-IMPORTANT: Look carefully for email addresses - they often appear on Contact pages or in footer sections.
-Common patterns: name@domain.ro, contact@company.ro, office@company.ro
+IMPORTANT INSTRUCTIONS:
+1. Look carefully for email addresses - they often appear on Contact pages or in footer sections.
+   Common patterns: name@domain.ro, contact@company.ro, office@company.ro
+2. If the website mentions multiple locations, branches, or cities - extract ALL of them as separate location objects.
+   Look for: "punct de lucru", "filială", "locație", multiple map pins, multiple addresses listed.
+3. Each physical address should be a separate entry in the locations array.
 
 Extract the company information as JSON."""
 

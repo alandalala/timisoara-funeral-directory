@@ -77,14 +77,23 @@ class Company(BaseModel):
     @field_validator('fiscal_code')
     @classmethod
     def validate_fiscal_code(cls, v: Optional[str]) -> Optional[str]:
-        """Validate Romanian fiscal code format"""
-        if v:
-            # Remove 'RO' prefix if present
-            v = v.replace('RO', '').strip()
-            # Should be 2-10 digits
-            if not re.match(r'^\d{2,10}$', v):
-                raise ValueError("Invalid fiscal code format")
-        return v
+        """Validate Romanian fiscal code format - lenient validation"""
+        if not v:
+            return None
+        
+        # Handle LLM returning literal "null" string
+        if v.lower() in ('null', 'none', 'n/a', 'undefined', ''):
+            return None
+        
+        # Remove 'RO' prefix if present
+        v = v.replace('RO', '').replace('ro', '').strip()
+        
+        # If it looks like a valid CUI (2-10 digits), keep it
+        if re.match(r'^\d{2,10}$', v):
+            return v
+        
+        # Otherwise return None (don't raise error, just skip invalid)
+        return None
 
     @field_validator('services')
     @classmethod

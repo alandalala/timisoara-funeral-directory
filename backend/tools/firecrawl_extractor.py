@@ -79,7 +79,12 @@ class FirecrawlExtractorTool:
         """
         from urllib.parse import urljoin
         
-        subpages = ['/about', '/despre-noi', '/contact', '/contacte', '/servicii', '/services']
+        # Include multiple contact pages for companies with multiple locations
+        subpages = [
+            '/about', '/despre-noi', '/despre', 
+            '/contact', '/contacte', '/contact-2', '/contact-3', '/contact-4', '/contact-5',
+            '/servicii', '/services', '/locatii', '/locations'
+        ]
         combined_content = ""
         
         for subpage in subpages:

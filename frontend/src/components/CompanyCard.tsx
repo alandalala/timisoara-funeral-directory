@@ -217,28 +217,36 @@ export function CompanyCard({ company }: CompanyCardProps) {
       </CardHeader>
 
       <CardContent className="flex-1 flex flex-col pt-0">
-        {/* Location with city/county */}
+        {/* Locations - show primary + count of additional */}
         {headquarters && (
-          <a
-            href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-              `${headquarters.address}, ${headquarters.city}, Romania`
-            )}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label={`Vezi locația pe Google Maps: ${headquarters.address}, ${headquarters.city}`}
-            className="flex items-start gap-2.5 text-sm text-slate mb-3 hover:text-navy transition-colors group">
-            <svg className="w-4 h-4 mt-0.5 text-slate/50 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
-            </svg>
-            <div>
-              <span className="group-hover:text-navy">{headquarters.address}</span>
-              {(headquarters.city || headquarters.county) && (
-                <div className="text-xs text-slate/60 mt-0.5">
-                  {headquarters.city}{headquarters.city && headquarters.county && ', '}{headquarters.county}
-                </div>
-              )}
-            </div>
-          </a>
+          <div className="mb-3">
+            <a
+              href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+                `${headquarters.address}, ${headquarters.city}, Romania`
+              )}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={`Vezi locația pe Google Maps: ${headquarters.address}, ${headquarters.city}`}
+              className="flex items-start gap-2.5 text-sm text-slate hover:text-navy transition-colors group">
+              <svg className="w-4 h-4 mt-0.5 text-slate/50 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+              </svg>
+              <div>
+                <span className="group-hover:text-navy">{headquarters.address}</span>
+                {(headquarters.city || headquarters.county) && (
+                  <div className="text-xs text-slate/60 mt-0.5">
+                    {headquarters.city}{headquarters.city && headquarters.county && ', '}{headquarters.county}
+                  </div>
+                )}
+              </div>
+            </a>
+            {/* Show additional locations count */}
+            {company.locations && company.locations.length > 1 && (
+              <div className="ml-6.5 mt-1.5 text-xs text-sage font-medium">
+                +{company.locations.length - 1} {company.locations.length === 2 ? 'locație' : 'locații'}
+              </div>
+            )}
+          </div>
         )}
 
         {/* Phone */}

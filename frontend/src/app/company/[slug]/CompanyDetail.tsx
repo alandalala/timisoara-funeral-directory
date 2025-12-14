@@ -188,10 +188,10 @@ export default function CompanyDetail({ company }: CompanyDetailProps) {
                       {otherLocations.map((loc) => (
                         <div key={loc.id} className="text-sm">
                           <Badge variant="outline" className="mb-1 border-warm-grey rounded-lg">
-                            {loc.type === 'wake_house' ? 'Capelă' : 'Showroom'}
+                            {loc.type === 'wake_house' ? 'Casă Funerară' : loc.type === 'showroom' ? 'Punct de Lucru' : 'Sediu'}
                           </Badge>
                           <p className="text-slate">{loc.address}</p>
-                          <p className="text-slate">{loc.city}</p>
+                          <p className="text-slate">{loc.city}{loc.county && `, jud. ${loc.county}`}</p>
                         </div>
                       ))}
                     </div>

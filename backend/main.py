@@ -141,11 +141,22 @@ class FuneralDirectoryScraper:
                 return False
             
             extracted = extraction_result['data']
-            logger.info(f"[OK] Extracted data for: {extracted.get('company_name', 'Unknown')}")
             
-            # Check if this looks like a directory (not a real company)
-            if self._is_directory_site(extracted, url):
-                logger.warning(f"[SKIP] Detected as directory site, not a funeral company")
+            # Fallback: Use domain as company name if LLM missed it
+            if not extracted.get('company_name') or extracted.get('company_name', '').lower() in ('unknown', 'null', 'none', ''):
+                from urllib.parse import urlparse
+                domain = urlparse(url).netloc.replace('www.', '')
+                # Convert domain to title case: funero.ro -> Funero
+                company_name_from_domain = domain.split('.')[0].replace('-', ' ').title()
+                extracted['company_name'] = company_name_from_domain
+                logger.info(f"[OK] Using domain as company name: {company_name_from_domain}")
+            else:
+                logger.info(f"[OK] Extracted data for: {extracted.get('company_name', 'Unknown')}")
+            
+            # Check if this looks like a directory (multiple companies listed)
+            phones = extracted.get('phones', [])
+            if len(phones) > 5:
+                logger.warning(f"[SKIP] Detected as directory site (too many phones: {len(phones)})")
                 self.stats['failed'] += 1
                 return False
             
@@ -229,64 +240,6 @@ class FuneralDirectoryScraper:
             self.stats['failed'] += 1
             return False
     
-    def _is_directory_site(self, extracted: dict, url: str) -> bool:
-        """
-        Detect if the scraped site is a directory listing multiple companies
-        rather than an actual funeral company website.
-        
-        Signs of a directory:
-        - Too many phone numbers (>5 different ones)
-        - Company name looks like a domain/portal name
-        - URL contains directory patterns
-        - Description mentions listing/directory
-        """
-        from urllib.parse import urlparse
-        
-        # Check phone count - directories list many companies = many phones
-        phones = extracted.get('phones', [])
-        if len(phones) > 5:
-            logger.debug(f"Directory detected: too many phones ({len(phones)})")
-            return True
-        
-        # Check company name patterns
-        company_name = extracted.get('company_name', '').lower()
-        directory_name_patterns = [
-            '.ro', '.com', '.net',  # Domain-like names
-            'info', 'portal', 'online', 'lista', 'director',
-            'servicii funerare timisoara',  # Generic location-based names
-            'pompe funebre timisoara',
-            'firme', 'companies', 'ghid',
-        ]
-        if any(pattern in company_name for pattern in directory_name_patterns):
-            logger.debug(f"Directory detected: name pattern '{company_name}'")
-            return True
-        
-        # Check URL patterns
-        parsed_url = urlparse(url)
-        path = parsed_url.path.lower()
-        directory_url_patterns = [
-            '/info/', '/listings/', '/directory/', '/catalog/',
-            '/firme/', '/companies/', '/lista/', '/list/',
-            '/results/', '/search/', '/categorie/', '/category/',
-            '/pompe_funebre/', '/servicii_funerare/',
-        ]
-        if any(pattern in path for pattern in directory_url_patterns):
-            logger.debug(f"Directory detected: URL pattern '{path}'")
-            return True
-        
-        # Check domain - known directory sites
-        domain = parsed_url.netloc.lower().replace('www.', '')
-        directory_domains = [
-            'timisoreni.ro', 'oradeni.ro', 'clujeni.ro', 'bucuresteni.ro',
-            'ieseni.ro', 'brasoveni.ro', 'sibieni.ro',
-            'listafirme.ro', 'paginiaurii.ro', 'cylex.ro',
-        ]
-        if domain in directory_domains:
-            logger.debug(f"Directory detected: known domain '{domain}'")
-            return True
-        
-        return False
-    
     def _transform_to_company(self, extracted: dict) -> Company:
         """
         Transform extracted dict to Company model with validation.
@@ -317,10 +270,50 @@ class FuneralDirectoryScraper:
                     is_primary=False
                 ))
             
-            # Process locations
+            # Process locations - support multiple locations from LLM
             locations = []
-            if extracted.get('address'):
-                # Try to get city from extraction or parse from address
+            extracted_locations = extracted.get('locations', [])
+            
+            # Handle both new format (locations array) and legacy format (single address)
+            if extracted_locations and isinstance(extracted_locations, list):
+                # New format: array of location objects
+                for i, loc_data in enumerate(extracted_locations):
+                    if not loc_data.get('address'):
+                        continue
+                    
+                    city = loc_data.get('city')
+                    county = loc_data.get('county')
+                    loc_type = loc_data.get('type', 'headquarters' if i == 0 else 'wake_house')
+                    
+                    # Normalize location type
+                    if loc_type not in ['headquarters', 'wake_house', 'showroom']:
+                        loc_type = 'headquarters' if i == 0 else 'wake_house'
+                    
+                    # Infer county from city if not provided
+                    if not county and city:
+                        county = CITY_TO_COUNTY.get(city.lower())
+                    
+                    # Geocode the address
+                    lat, lon = None, None
+                    company_name = extracted.get('company_name', '')
+                    logger.info(f"  Geocoding location {i+1}: {loc_data['address'][:50]}...")
+                    coords = geocode_address(loc_data['address'], city, county, company_name)
+                    if coords:
+                        lat, lon = coords
+                    
+                    locations.append(Location(
+                        address=loc_data['address'],
+                        city=city,
+                        county=county,
+                        latitude=lat,
+                        longitude=lon,
+                        type=loc_type
+                    ))
+                
+                logger.info(f"  Extracted {len(locations)} location(s)")
+            
+            elif extracted.get('address'):
+                # Legacy format: single address field
                 city = extracted.get('city')
                 if not city:
                     address_lower = extracted['address'].lower()
@@ -333,12 +326,10 @@ class FuneralDirectoryScraper:
                                 city = 'București'
                             break
                 
-                # Get county from extraction or infer from city
                 county = extracted.get('county')
                 if not county and city:
                     county = CITY_TO_COUNTY.get(city.lower())
                 
-                # Geocode the address to get coordinates
                 lat, lon = None, None
                 company_name = extracted.get('company_name', '')
                 logger.info("  Geocoding address...")
@@ -355,8 +346,13 @@ class FuneralDirectoryScraper:
                     type='headquarters'
                 ))
             
-            # Extract fiscal code
+            # Extract fiscal code and clean it
             fiscal_code = extracted.get('fiscal_code')
+            
+            # Handle LLM returning literal "null" string
+            if fiscal_code and str(fiscal_code).lower() in ('null', 'none', 'n/a', 'undefined', ''):
+                fiscal_code = None
+            
             if not fiscal_code and extracted.get('description'):
                 # Try to extract from description
                 fiscal_code = extract_cui_from_text(extracted.get('description', ''))

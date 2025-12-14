@@ -21,7 +21,7 @@ class GoogleSearchTool:
         self.found_urls: Set[str] = set()
         self.behavior = HumanBehaviorSimulator()
         
-        # Domains to exclude (not actual funeral home websites)
+        # Domains to exclude
         self.excluded_domains = {
             # Social media
             'facebook.com', 'instagram.com', 'twitter.com', 'linkedin.com',
@@ -32,27 +32,13 @@ class GoogleSearchTool:
             'wikipedia.org', 'wikidata.org',
             # Government
             'anaf.ro', 'gov.ro',
-            # Business directories (list multiple companies)
+            # Business directories
             'listafirme.ro', 'risco.ro', 'termene.ro',
             'paginiaurii.ro', 'firme.info', 'cylex.ro',
-            'yellowpages.ro', 'europages.ro', 'kompass.com',
-            'hotfrog.ro', 'infobel.com', 'bizoo.ro',
-            # Local directories & portals
-            'timisoreni.ro', 'timisoara.ro', 'timis.ro',
-            'oradeni.ro', 'clujeni.ro', 'bucuresteni.ro',
-            'ieseni.ro', 'brasoveni.ro', 'sibieni.ro',
-            '118.ro', 'info-bihor.ro', 'informatii-firme.ro',
-            # Generic listing sites
-            'serviciifunerare.ro', 'funerareonline.ro',  # if these are directories
-            'pompe-funebre.ro', 'inmemoriam.ro',
+            # Funeral directories (list multiple companies)
+            'condoleante.ro', 'sefuro.ro', 'alo-deces.ro',
+            'funebris.ro', 'funero.ro', 'serviciifunerare.ro',
         }
-        
-        # URL path patterns that indicate directory/listing pages
-        self.excluded_url_patterns = [
-            '/info/', '/listings/', '/directory/', '/catalog/',
-            '/firme/', '/companies/', '/lista/', '/list/',
-            '/results/', '/search/', '/categorie/', '/category/',
-        ]
     
     def search_duckduckgo(self, query: str, max_results: int = 10) -> List[str]:
         """
@@ -101,22 +87,17 @@ class GoogleSearchTool:
                             # Filter out excluded domains
                             parsed_url = urlparse(actual_url)
                             domain = parsed_url.netloc.lower().replace('www.', '')
-                            path = parsed_url.path.lower()
                             
-                            # Check excluded domains
+                            # Check excluded domains (only social media, search engines, etc.)
                             if any(excl in domain for excl in self.excluded_domains):
-                                continue
-                            
-                            # Check excluded URL patterns (directory pages)
-                            if any(pattern in path for pattern in self.excluded_url_patterns):
                                 continue
                             
                             if actual_url not in self.found_urls:
                                 urls.append(actual_url)
                                 self.found_urls.add(actual_url)
-                                    
-                                    if len(urls) >= max_results:
-                                        break
+                                
+                            if len(urls) >= max_results:
+                                break
                 except Exception:
                     continue
             
