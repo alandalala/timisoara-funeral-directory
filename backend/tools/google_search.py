@@ -1,25 +1,25 @@
 """
 Google Search Tool - Finds funeral home websites via search.
-Uses human-like behavior to avoid detection.
+Uses Bing for more reliable results with Romanian queries.
 """
 import requests
 from typing import List, Set
 from urllib.parse import urlparse, quote_plus
 from bs4 import BeautifulSoup
+import time
 
 from config.settings import SEARCH_QUERIES
-from utils import get_human_headers, human_delay, HumanBehaviorSimulator
+from utils import human_delay
 
 
 class GoogleSearchTool:
     """
-    Search for funeral home websites using DuckDuckGo.
-    DuckDuckGo HTML is more scraping-friendly than Google.
+    Search for funeral home websites using Bing.
+    Bing provides better results for Romanian language queries.
     """
     
     def __init__(self):
         self.found_urls: Set[str] = set()
-        self.behavior = HumanBehaviorSimulator()
         
         # Domains to exclude
         self.excluded_domains = {
@@ -40,85 +40,98 @@ class GoogleSearchTool:
             'funebris.ro', 'funero.ro', 'serviciifunerare.ro',
         }
     
-    def search_duckduckgo(self, query: str, max_results: int = 10) -> List[str]:
+    def search_bing(self, query: str, max_results: int = None) -> List[str]:
         """
-        Search DuckDuckGo HTML version.
+        Search Bing for Romanian funeral services.
         
         Args:
             query: Search query string
-            max_results: Maximum number of URLs to return
+            max_results: Maximum number of URLs to return (None = no limit, defaults to 30)
         
         Returns:
             List of URLs found
         """
         urls = []
+        max_pages = 5 if not max_results else (max_results // 10) + 1
         
-        try:
-            search_url = f"https://html.duckduckgo.com/html/?q={quote_plus(query)}"
-            
-            # Simple headers without the complex behavior simulator
-            headers = {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-                'Accept-Language': 'ro-RO,ro;q=0.9,en;q=0.8',
-            }
-            
-            response = requests.get(search_url, headers=headers, timeout=30)
-            response.raise_for_status()
-            
-            soup = BeautifulSoup(response.text, 'html.parser')
-            
-            # Find all links that contain uddg parameter (DuckDuckGo redirect URLs)
-            for link in soup.find_all('a', href=True):
-                href = link.get('href', '')
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+            'Accept-Language': 'ro-RO,ro;q=0.9,en;q=0.8',
+        }
+        
+        for page in range(max_pages):
+            try:
+                first = page * 10 + 1
+                search_url = f"https://www.bing.com/search?q={quote_plus(query)}&first={first}&setlang=ro"
                 
-                # Only process DuckDuckGo redirect links
-                if '//duckduckgo.com/l/?uddg=' not in href:
-                    continue
+                response = requests.get(search_url, headers=headers, timeout=30)
                 
-                # Extract actual URL from DuckDuckGo redirect
-                try:
-                    import urllib.parse
-                    parsed = urllib.parse.parse_qs(urllib.parse.urlparse(href).query)
-                    if 'uddg' in parsed:
-                        actual_url = urllib.parse.unquote(parsed['uddg'][0])
+                if response.status_code != 200:
+                    print(f"  Bing returned status {response.status_code}")
+                    break
+                
+                soup = BeautifulSoup(response.text, 'html.parser')
+                
+                # Find all search result links
+                found_on_page = 0
+                for result in soup.find_all('li', class_='b_algo'):
+                    link = result.find('a', href=True)
+                    if link:
+                        url = link.get('href', '')
                         
-                        if actual_url and actual_url.startswith('http'):
+                        if url and url.startswith('http'):
                             # Filter out excluded domains
-                            parsed_url = urlparse(actual_url)
+                            parsed_url = urlparse(url)
                             domain = parsed_url.netloc.lower().replace('www.', '')
                             
-                            # Check excluded domains (only social media, search engines, etc.)
+                            # Check excluded domains
                             if any(excl in domain for excl in self.excluded_domains):
                                 continue
                             
-                            if actual_url not in self.found_urls:
-                                urls.append(actual_url)
-                                self.found_urls.add(actual_url)
+                            if url not in self.found_urls:
+                                urls.append(url)
+                                self.found_urls.add(url)
+                                found_on_page += 1
                                 
-                            if len(urls) >= max_results:
-                                break
-                except Exception:
-                    continue
-            
-            print(f"  Found {len(urls)} URLs for: {query[:50]}...")
-            return urls
-            
-        except Exception as e:
-            print(f"  Error searching: {e}")
-            return urls
+                                if max_results and len(urls) >= max_results:
+                                    break
+                
+                if found_on_page == 0:
+                    break  # No more results
+                    
+                if max_results and len(urls) >= max_results:
+                    break
+                    
+                # Delay between pages
+                if page < max_pages - 1:
+                    time.sleep(2)
+                    
+            except Exception as e:
+                print(f"  Error searching Bing page {page+1}: {e}")
+                break
+        
+        print(f"  Found {len(urls)} URLs for: {query[:50]}...")
+        return urls
+    
+    def search_duckduckgo(self, query: str, max_results: int = None) -> List[str]:
+        """
+        Search using Bing (DuckDuckGo's backend).
+        This is an alias for backward compatibility.
+        """
+        return self.search_bing(query, max_results)
     
     def find_funeral_homes(self, 
                            queries: List[str] = None, 
-                           max_per_query: int = 5,
+                           max_per_query: int = None,
                            total_limit: int = None) -> List[str]:
         """
         Search for funeral home websites using predefined queries.
         
         Args:
             queries: List of search queries (uses SEARCH_QUERIES if None)
-            max_per_query: Maximum results per query
-            total_limit: Total maximum URLs to return
+            max_per_query: Maximum results per query (None = no limit)
+            total_limit: Total maximum URLs to return (None = no limit)
         
         Returns:
             List of unique funeral home website URLs
@@ -130,7 +143,7 @@ class GoogleSearchTool:
         
         print(f"\n{'='*50}")
         print(f"Searching for funeral home websites...")
-        print(f"Queries: {len(queries)}, Max per query: {max_per_query}")
+        print(f"Queries: {len(queries)}, Max per query: {max_per_query or 'unlimited'}")
         print(f"{'='*50}")
         
         for i, query in enumerate(queries):

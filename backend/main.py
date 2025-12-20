@@ -88,7 +88,18 @@ class FuneralDirectoryScraper:
         """
         try:
             with open(SEED_URLS_PATH, 'r', encoding='utf-8') as f:
-                urls = json.load(f)
+                data = json.load(f)
+                
+                # Handle both formats:
+                # 1. Simple list of strings: ["url1", "url2"]
+                # 2. List of objects: [{"url": "...", ...}, ...]
+                urls = []
+                for item in data:
+                    if isinstance(item, str):
+                        urls.append(item)
+                    elif isinstance(item, dict) and 'url' in item:
+                        urls.append(item['url'])
+                
                 logger.info(f"Loaded {len(urls)} seed URLs")
                 return urls
         except FileNotFoundError:

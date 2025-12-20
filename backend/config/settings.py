@@ -46,12 +46,28 @@ BATCH_SIZE = 10
 DSP_PDF_PATH = os.path.join(os.path.dirname(__file__), "..", "data", "dsp_authorized_list.pdf")
 SEED_URLS_PATH = os.path.join(os.path.dirname(__file__), "..", "data", "seed_urls.json")
 
-# Search Queries
+# Search Queries - expanded for better coverage
 SEARCH_QUERIES = [
-    "Servicii funerare Timisoara",
-    "Pompe funebre Timis",
-    "Repatrieri decedati Timisoara",
-    "Casa funerara Timisoara",
+    # Core funeral terms
+    "funerare timisoara",
+    "servicii funerare timisoara",
+    "pompe funebre timisoara",
+    "firma pompe funebre timisoara",
+    "casa funerara timisoara",
+    "agentie funerara timisoara",
+    # County-level searches
+    "servicii funerare timis",
+    "pompe funebre judetul timis",
+    # Service-specific
+    "repatriere decedat timisoara",
+    "transport funerar timisoara",
+    "sicrie timisoara",
+    "coroane funerare timisoara",
+    "inmormantare timisoara",
+    # Alternative spellings/terms
+    "servicii mortuare timisoara",
+    "capela mortuara timisoara",
+    "firma funerara timisoara",
 ]
 
 # Service Taxonomy

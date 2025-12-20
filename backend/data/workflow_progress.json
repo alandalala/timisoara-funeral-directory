@@ -1,0 +1,68 @@
+{
+  "started_at": "2025-12-20T18:40:39.973703",
+  "imported_counties": [
+    "Alba",
+    "Arad",
+    "Argeș",
+    "Bacău",
+    "Bihor",
+    "Botoșani",
+    "Brașov",
+    "Brăila",
+    "Buzău",
+    "Călărași"
+  ],
+  "import_stats": {
+    "Alba": {
+      "success": 12,
+      "failed": 0,
+      "skipped": 0
+    },
+    "Arad": {
+      "success": 22,
+      "failed": 1,
+      "skipped": 0
+    },
+    "Argeș": {
+      "success": 16,
+      "failed": 0,
+      "skipped": 1
+    },
+    "Bacău": {
+      "success": 24,
+      "failed": 0,
+      "skipped": 2
+    },
+    "Bihor": {
+      "success": 8,
+      "failed": 0,
+      "skipped": 1
+    },
+    "Botoșani": {
+      "success": 19,
+      "failed": 0,
+      "skipped": 1
+    },
+    "Brașov": {
+      "success": 17,
+      "failed": 0,
+      "skipped": 2
+    },
+    "Brăila": {
+      "success": 8,
+      "failed": 0,
+      "skipped": 0
+    },
+    "Buzău": {
+      "success": 6,
+      "failed": 0,
+      "skipped": 0
+    },
+    "Călărași": {
+      "success": 10,
+      "failed": 0,
+      "skipped": 1
+    }
+  },
+  "last_updated": "2025-12-20T20:15:41.120882"
+}

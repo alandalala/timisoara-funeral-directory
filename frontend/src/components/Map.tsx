@@ -4,15 +4,18 @@ import { useEffect, useState } from 'react';
 import { Company } from '@/types';
 
 // Romanian city coordinates (approximate centers)
+// Include both diacritic and non-diacritic versions
 const CITY_COORDINATES: Record<string, [number, number]> = {
   // Timiș
   'Timișoara': [45.7489, 21.2087],
+  'Timisoara': [45.7489, 21.2087], // alias without diacritics
   'Lugoj': [45.6867, 21.9033],
   'Buziaș': [45.6500, 21.6000],
   'Jimbolia': [45.7933, 20.7167],
   'Sânnicolau Mare': [46.0667, 20.6333],
   'Giroc': [45.7333, 21.2500],
   'Dumbrăvița': [45.7833, 21.2333],
+  'Dumbravita': [45.7833, 21.2333], // alias without diacritics
   'Ghiroda': [45.7667, 21.2833],
   // Arad
   'Arad': [46.1667, 21.3167],

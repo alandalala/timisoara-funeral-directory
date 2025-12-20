@@ -105,6 +105,23 @@ export default function CompanyDetail({ company }: CompanyDetailProps) {
               </div>
             </div>
           )}
+
+          {/* Google Maps Rating */}
+          {company.metadata?.rating && (
+            <div className="flex items-center gap-2 text-navy">
+              <div className="w-10 h-10 rounded-full bg-amber-50 flex items-center justify-center">
+                <svg className="w-5 h-5 text-amber-400" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                </svg>
+              </div>
+              <div>
+                <span className="text-sm font-semibold">{company.metadata.rating} stele</span>
+                <span className="block text-xs text-slate">
+                  {company.metadata.review_count ? `${company.metadata.review_count} recenzii Google` : 'Google Reviews'}
+                </span>
+              </div>
+            </div>
+          )}
           
           {company.is_non_stop && (
             <div className="flex items-center gap-2 text-navy">
@@ -143,6 +160,9 @@ export default function CompanyDetail({ company }: CompanyDetailProps) {
               reviews={company.reviews} 
               reviewSummary={company.review_summary}
               companyCity={headquarters?.city}
+              companyName={company.name}
+              googleRating={company.metadata?.rating}
+              googleReviewCount={company.metadata?.review_count}
             />
 
             {/* Description Card */}
@@ -602,17 +622,24 @@ function ServicesAccordion({ services }: { services: { id: string; service_tag: 
 function ReviewSection({ 
   reviews, 
   reviewSummary,
-  companyCity 
+  companyCity,
+  companyName,
+  googleRating,
+  googleReviewCount
 }: { 
   reviews?: Review[] | null;
   reviewSummary?: ReviewSummary | null;
   companyCity?: string | null;
+  companyName?: string;
+  googleRating?: number | null;
+  googleReviewCount?: number | null;
 }) {
   const hasReviews = reviews && reviews.length > 0;
   const hasSummary = reviewSummary && reviewSummary.total_reviews > 0;
+  const hasGoogleRating = googleRating && googleRating > 0;
   
-  // Only show section if there are actual reviews
-  if (!hasReviews && !hasSummary) {
+  // Show section if there are reviews, summary, or Google rating
+  if (!hasReviews && !hasSummary && !hasGoogleRating) {
     return null;
   }
   
@@ -635,20 +662,78 @@ function ReviewSection({
             <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-7 12h-2v-2h2v2zm0-4h-2V6h2v4z"/>
           </svg>
           Ce Spun Familiile
-          {hasSummary && (
+          {/* Show review count and rating from summary or Google Maps */}
+          {(hasSummary || hasGoogleRating) && (
             <span className="ml-auto text-sm font-normal text-slate">
-              {reviewSummary.total_reviews} recenzii
-              {reviewSummary.average_rating && (
-                <span className="ml-2 inline-flex items-center">
-                  <svg className="w-4 h-4 text-gold mr-0.5" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
-                  {reviewSummary.average_rating.toFixed(1)}
-                </span>
+              {hasSummary ? (
+                <>
+                  {reviewSummary.total_reviews} recenzii
+                  {reviewSummary.average_rating && (
+                    <span className="ml-2 inline-flex items-center">
+                      <svg className="w-4 h-4 text-amber-400 mr-0.5" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                      {reviewSummary.average_rating.toFixed(1)}
+                    </span>
+                  )}
+                </>
+              ) : hasGoogleRating && (
+                <>
+                  {googleReviewCount ? `${googleReviewCount} recenzii` : 'Google'}
+                  <span className="ml-2 inline-flex items-center">
+                    <svg className="w-4 h-4 text-amber-400 mr-0.5" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                    {googleRating.toFixed(1)}
+                  </span>
+                </>
               )}
             </span>
           )}
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
+        {/* Google Maps Rating Display (when no detailed reviews) */}
+        {hasGoogleRating && !hasReviews && !hasSummary && (
+          <div className="flex flex-col gap-4">
+            <div className="flex items-center gap-4 p-4 bg-amber-50 rounded-xl">
+              <div className="flex items-center gap-1">
+                {/* 5 stars, filled based on rating */}
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <svg 
+                    key={star} 
+                    className={`w-6 h-6 ${star <= Math.round(googleRating) ? 'text-amber-400' : 'text-gray-300'}`} 
+                    fill="currentColor" 
+                    viewBox="0 0 20 20"
+                  >
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                  </svg>
+                ))}
+              </div>
+              <div>
+                <span className="text-lg font-semibold text-charcoal">{googleRating.toFixed(1)}</span>
+                <span className="text-sm text-slate ml-1">din 5</span>
+                {googleReviewCount && googleReviewCount > 0 && (
+                  <p className="text-sm text-slate">
+                    Bazat pe {googleReviewCount} {googleReviewCount === 1 ? 'recenzie' : 'recenzii'} Google
+                  </p>
+                )}
+              </div>
+            </div>
+            
+            {/* Link to Google Maps reviews */}
+            {companyCity && (
+              <a
+                href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(companyName + ' ' + companyCity)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 text-sm text-navy hover:text-navy-dark transition-colors"
+              >
+                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                </svg>
+                Vezi toate recenziile pe Google Maps →
+              </a>
+            )}
+          </div>
+        )}
+
         {/* Sentiment Chips */}
         {displayTags.length > 0 && (
           <div className="flex flex-wrap gap-2">

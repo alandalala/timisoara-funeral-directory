@@ -148,7 +148,7 @@ class SupabaseTool:
                 
                 self.client.table('locations').insert(location_data).execute()
             
-            print(f"✓ Company '{company.name}' {action} successfully (ID: {company_id})")
+            print(f"[OK] Company '{company.name}' {action} successfully (ID: {company_id})")
             
             return {
                 'success': True,
@@ -157,7 +157,7 @@ class SupabaseTool:
             }
             
         except Exception as e:
-            print(f"✗ Error upserting company '{company.name}': {e}")
+            print(f"[ERROR] Error upserting company '{company.name}': {e}")
             return {
                 'success': False,
                 'error': str(e)

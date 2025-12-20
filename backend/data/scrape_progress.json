@@ -1,0 +1,153 @@
+{
+  "started_at": "2025-12-20T18:22:27.772338",
+  "last_updated": "2025-12-20T20:22:10.367431",
+  "completed_counties": [
+    "Arad",
+    "Alba",
+    "Argeș",
+    "Bacău",
+    "Bihor",
+    "Bistrița-Năsăud",
+    "Botoșani",
+    "Brașov",
+    "Brăila",
+    "București",
+    "Buzău",
+    "Caraș-Severin",
+    "Călărași"
+  ],
+  "completed_cities": {
+    "Arad": [
+      "Arad",
+      "Ineu",
+      "Lipova",
+      "Pecica",
+      "Sântana",
+      "Chișineu-Criș",
+      "Curtici",
+      "Pâncota"
+    ],
+    "Alba": [
+      "Alba Iulia",
+      "Sebeș",
+      "Aiud",
+      "Blaj",
+      "Cugir",
+      "Ocna Mureș"
+    ],
+    "Argeș": [
+      "Pitești",
+      "Câmpulung",
+      "Curtea de Argeș",
+      "Mioveni",
+      "Costești",
+      "Topoloveni"
+    ],
+    "Bacău": [
+      "Bacău",
+      "Onești",
+      "Moinești",
+      "Comănești",
+      "Buhuși",
+      "Dărmănești",
+      "Târgu Ocna"
+    ],
+    "Bihor": [
+      "Oradea",
+      "Salonta",
+      "Marghita",
+      "Beiuș",
+      "Aleșd",
+      "Ștei",
+      "Valea lui Mihai",
+      "Săcueni"
+    ],
+    "Bistrița-Năsăud": [
+      "Bistrița",
+      "Năsăud",
+      "Beclean",
+      "Sângeorz-Băi"
+    ],
+    "Botoșani": [
+      "Botoșani",
+      "Dorohoi",
+      "Darabani",
+      "Săveni",
+      "Flămânzi"
+    ],
+    "Brașov": [
+      "Brașov",
+      "Făgăraș",
+      "Săcele",
+      "Codlea",
+      "Zărnești",
+      "Râșnov",
+      "Rupea",
+      "Victoria"
+    ],
+    "Brăila": [
+      "Brăila",
+      "Ianca",
+      "Însurăței",
+      "Făurei"
+    ],
+    "București": [
+      "București Sector 1",
+      "București Sector 2",
+      "București Sector 3",
+      "București Sector 4",
+      "București Sector 5",
+      "București Sector 6"
+    ],
+    "Buzău": [
+      "Buzău",
+      "Râmnicu Sărat",
+      "Nehoiu",
+      "Pogoanele",
+      "Pătârlagele"
+    ],
+    "Caraș-Severin": [
+      "Reșița",
+      "Caransebeș",
+      "Oravița",
+      "Bocșa",
+      "Moldova Nouă",
+      "Oțelu Roșu",
+      "Anina"
+    ],
+    "Călărași": [
+      "Călărași",
+      "Oltenița",
+      "Budești",
+      "Fundulea",
+      "Lehliu Gară"
+    ],
+    "Cluj": [
+      "Cluj-Napoca",
+      "Turda",
+      "Dej",
+      "Câmpia Turzii",
+      "Gherla",
+      "Huedin"
+    ]
+  },
+  "current_county": "Cluj",
+  "current_city": "Huedin",
+  "failed": [],
+  "total_businesses": 182,
+  "stats": {
+    "Arad": 16,
+    "Alba": 12,
+    "Argeș": 17,
+    "Bacău": 26,
+    "Bihor": 9,
+    "Bistrița-Năsăud": 12,
+    "Botoșani": 20,
+    "Brașov": 20,
+    "Brăila": 8,
+    "București": 0,
+    "Buzău": 6,
+    "Caraș-Severin": 4,
+    "Călărași": 11
+  }
+}

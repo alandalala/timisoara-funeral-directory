@@ -1,0 +1,219 @@
+{
+  "metadata": {
+    "description": "Romanian counties with major cities for funeral company scraping",
+    "total_counties": 42,
+    "last_updated": "2024-12-20"
+  },
+  "counties": [
+    {
+      "name": "Alba",
+      "capital": "Alba Iulia",
+      "cities": ["Alba Iulia", "Sebeș", "Aiud", "Blaj", "Cugir", "Ocna Mureș"]
+    },
+    {
+      "name": "Arad",
+      "capital": "Arad",
+      "cities": ["Arad", "Ineu", "Lipova", "Pecica", "Sântana", "Chișineu-Criș", "Curtici", "Pâncota"]
+    },
+    {
+      "name": "Argeș",
+      "capital": "Pitești",
+      "cities": ["Pitești", "Câmpulung", "Curtea de Argeș", "Mioveni", "Costești", "Topoloveni"]
+    },
+    {
+      "name": "Bacău",
+      "capital": "Bacău",
+      "cities": ["Bacău", "Onești", "Moinești", "Comănești", "Buhuși", "Dărmănești", "Târgu Ocna"]
+    },
+    {
+      "name": "Bihor",
+      "capital": "Oradea",
+      "cities": ["Oradea", "Salonta", "Marghita", "Beiuș", "Aleșd", "Ștei", "Valea lui Mihai", "Săcueni"]
+    },
+    {
+      "name": "Bistrița-Năsăud",
+      "capital": "Bistrița",
+      "cities": ["Bistrița", "Năsăud", "Beclean", "Sângeorz-Băi"]
+    },
+    {
+      "name": "Botoșani",
+      "capital": "Botoșani",
+      "cities": ["Botoșani", "Dorohoi", "Darabani", "Săveni", "Flămânzi"]
+    },
+    {
+      "name": "Brașov",
+      "capital": "Brașov",
+      "cities": ["Brașov", "Făgăraș", "Săcele", "Codlea", "Zărnești", "Râșnov", "Rupea", "Victoria"]
+    },
+    {
+      "name": "Brăila",
+      "capital": "Brăila",
+      "cities": ["Brăila", "Ianca", "Însurăței", "Făurei"]
+    },
+    {
+      "name": "București",
+      "capital": "București",
+      "cities": ["București Sector 1", "București Sector 2", "București Sector 3", "București Sector 4", "București Sector 5", "București Sector 6"]
+    },
+    {
+      "name": "Buzău",
+      "capital": "Buzău",
+      "cities": ["Buzău", "Râmnicu Sărat", "Nehoiu", "Pogoanele", "Pătârlagele"]
+    },
+    {
+      "name": "Caraș-Severin",
+      "capital": "Reșița",
+      "cities": ["Reșița", "Caransebeș", "Oravița", "Bocșa", "Moldova Nouă", "Oțelu Roșu", "Anina"]
+    },
+    {
+      "name": "Călărași",
+      "capital": "Călărași",
+      "cities": ["Călărași", "Oltenița", "Budești", "Fundulea", "Lehliu Gară"]
+    },
+    {
+      "name": "Cluj",
+      "capital": "Cluj-Napoca",
+      "cities": ["Cluj-Napoca", "Turda", "Dej", "Câmpia Turzii", "Gherla", "Huedin"]
+    },
+    {
+      "name": "Constanța",
+      "capital": "Constanța",
+      "cities": ["Constanța", "Mangalia", "Medgidia", "Năvodari", "Cernavodă", "Eforie", "Techirghiol", "Murfatlar", "Hârșova", "Ovidiu"]
+    },
+    {
+      "name": "Covasna",
+      "capital": "Sfântu Gheorghe",
+      "cities": ["Sfântu Gheorghe", "Târgu Secuiesc", "Covasna", "Întorsura Buzăului", "Baraolt"]
+    },
+    {
+      "name": "Dâmbovița",
+      "capital": "Târgoviște",
+      "cities": ["Târgoviște", "Moreni", "Pucioasa", "Găești", "Titu", "Fieni"]
+    },
+    {
+      "name": "Dolj",
+      "capital": "Craiova",
+      "cities": ["Craiova", "Băilești", "Calafat", "Filiași", "Segarcea", "Bechet", "Dăbuleni"]
+    },
+    {
+      "name": "Galați",
+      "capital": "Galați",
+      "cities": ["Galați", "Tecuci", "Târgu Bujor", "Berești"]
+    },
+    {
+      "name": "Giurgiu",
+      "capital": "Giurgiu",
+      "cities": ["Giurgiu", "Bolintin-Vale", "Mihăilești"]
+    },
+    {
+      "name": "Gorj",
+      "capital": "Târgu Jiu",
+      "cities": ["Târgu Jiu", "Motru", "Rovinari", "Bumbești-Jiu", "Târgu Cărbunești", "Turceni", "Novaci", "Tismana"]
+    },
+    {
+      "name": "Harghita",
+      "capital": "Miercurea Ciuc",
+      "cities": ["Miercurea Ciuc", "Odorheiu Secuiesc", "Gheorgheni", "Toplița", "Cristuru Secuiesc", "Bălan", "Borsec"]
+    },
+    {
+      "name": "Hunedoara",
+      "capital": "Deva",
+      "cities": ["Deva", "Hunedoara", "Petroșani", "Lupeni", "Vulcan", "Brad", "Orăștie", "Petrila", "Simeria", "Hațeg"]
+    },
+    {
+      "name": "Ialomița",
+      "capital": "Slobozia",
+      "cities": ["Slobozia", "Fetești", "Urziceni", "Țăndărei", "Amara", "Căzănești"]
+    },
+    {
+      "name": "Iași",
+      "capital": "Iași",
+      "cities": ["Iași", "Pașcani", "Târgu Frumos", "Hârlău"]
+    },
+    {
+      "name": "Ilfov",
+      "capital": "București",
+      "cities": ["Voluntari", "Pantelimon", "Buftea", "Popești-Leordeni", "Bragadiru", "Chitila", "Otopeni", "Măgurele"]
+    },
+    {
+      "name": "Maramureș",
+      "capital": "Baia Mare",
+      "cities": ["Baia Mare", "Sighetu Marmației", "Baia Sprie", "Borșa", "Vișeu de Sus", "Târgu Lăpuș", "Seini", "Cavnic", "Șomcuta Mare"]
+    },
+    {
+      "name": "Mehedinți",
+      "capital": "Drobeta-Turnu Severin",
+      "cities": ["Drobeta-Turnu Severin", "Orșova", "Strehaia", "Vânju Mare", "Baia de Aramă"]
+    },
+    {
+      "name": "Mureș",
+      "capital": "Târgu Mureș",
+      "cities": ["Târgu Mureș", "Reghin", "Sighișoara", "Luduș", "Târnăveni", "Sovata", "Iernut", "Sângeorgiu de Pădure"]
+    },
+    {
+      "name": "Neamț",
+      "capital": "Piatra Neamț",
+      "cities": ["Piatra Neamț", "Roman", "Târgu Neamț", "Bicaz", "Roznov"]
+    },
+    {
+      "name": "Olt",
+      "capital": "Slatina",
+      "cities": ["Slatina", "Caracal", "Balș", "Corabia", "Scornicești", "Drăgănești-Olt", "Piatra-Olt"]
+    },
+    {
+      "name": "Prahova",
+      "capital": "Ploiești",
+      "cities": ["Ploiești", "Câmpina", "Băicoi", "Breaza", "Comarnic", "Sinaia", "Bușteni", "Azuga", "Vălenii de Munte", "Urlați", "Mizil", "Slănic"]
+    },
+    {
+      "name": "Satu Mare",
+      "capital": "Satu Mare",
+      "cities": ["Satu Mare", "Carei", "Negrești-Oaș", "Tășnad", "Livada"]
+    },
+    {
+      "name": "Sălaj",
+      "capital": "Zalău",
+      "cities": ["Zalău", "Șimleu Silvaniei", "Jibou", "Cehu Silvaniei"]
+    },
+    {
+      "name": "Sibiu",
+      "capital": "Sibiu",
+      "cities": ["Sibiu", "Mediaș", "Cisnădie", "Avrig", "Agnita", "Tălmaciu", "Copșa Mică", "Dumbrăveni", "Ocna Sibiului"]
+    },
+    {
+      "name": "Suceava",
+      "capital": "Suceava",
+      "cities": ["Suceava", "Fălticeni", "Rădăuți", "Câmpulung Moldovenesc", "Vatra Dornei", "Gura Humorului", "Siret", "Solca", "Vicovu de Sus"]
+    },
+    {
+      "name": "Teleorman",
+      "capital": "Alexandria",
+      "cities": ["Alexandria", "Turnu Măgurele", "Roșiori de Vede", "Zimnicea", "Videle"]
+    },
+    {
+      "name": "Timiș",
+      "capital": "Timișoara",
+      "cities": ["Timișoara", "Lugoj", "Sânnicolau Mare", "Jimbolia", "Buziaș", "Făget", "Recaș", "Deta", "Gătaia"]
+    },
+    {
+      "name": "Tulcea",
+      "capital": "Tulcea",
+      "cities": ["Tulcea", "Măcin", "Babadag", "Isaccea", "Sulina"]
+    },
+    {
+      "name": "Vaslui",
+      "capital": "Vaslui",
+      "cities": ["Vaslui", "Bârlad", "Huși", "Negrești", "Murgeni"]
+    },
+    {
+      "name": "Vâlcea",
+      "capital": "Râmnicu Vâlcea",
+      "cities": ["Râmnicu Vâlcea", "Drăgășani", "Călimănești", "Brezoi", "Băbeni", "Horezu", "Băile Olănești", "Ocnele Mari", "Berbești"]
+    },
+    {
+      "name": "Vrancea",
+      "capital": "Focșani",
+      "cities": ["Focșani", "Adjud", "Panciu", "Mărășești", "Odobești"]
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+2025-12-14 19:47:22,175 - INFO - Starting scrape for: https://serviciifunerare-timisoara.ro
+2025-12-14 19:47:22,179 - INFO - Log file: scrape_20251214_194722.log
+2025-12-14 19:47:22,181 - INFO - ============================================================
+2025-12-14 19:47:22,184 - INFO - Processing: https://serviciifunerare-timisoara.ro
+2025-12-14 19:47:22,186 - INFO - ============================================================
+2025-12-14 19:47:22,898 - INFO - Initializing Funeral Directory Scraper...
+2025-12-14 19:47:23,296 - INFO - Scraper initialized
+2025-12-14 19:47:23,302 - INFO - Step 1: Scraping with Firecrawl...
+2025-12-14 19:47:37,558 - WARNING - Interrupted by user - exiting gracefully

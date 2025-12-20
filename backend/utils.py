@@ -86,20 +86,17 @@ def human_delay(action_type: str = "page_load"):
         action_type: Type of action - 'page_load', 'click', 'scroll', 'read', 'between_sites'
     """
     delays = {
-        'page_load': (2, 5),       # Time to wait for page to load
-        'click': (0.5, 1.5),       # Time between clicks
-        'scroll': (1, 3),          # Time to scroll and scan content
-        'read': (3, 8),            # Time to read content
-        'between_sites': (5, 15),  # Longer pause between different websites
-        'form_fill': (1, 3),       # Time to fill a form field
+        'page_load': (1, 2),       # Time to wait for page to load
+        'click': (0.3, 0.8),       # Time between clicks
+        'scroll': (0.5, 1),        # Time to scroll and scan content
+        'read': (1, 2),            # Time to read content
+        'between_sites': (2, 4),   # Shorter pause between different websites
+        'form_fill': (0.5, 1),     # Time to fill a form field
     }
     
-    min_delay, max_delay = delays.get(action_type, (2, 5))
+    min_delay, max_delay = delays.get(action_type, (1, 2))
     
-    # Add occasional longer pauses (10% chance) to simulate distraction
-    if random.random() < 0.1:
-        max_delay *= 2
-    
+    # Removed random longer pauses to speed up scraping
     delay = random.uniform(min_delay, max_delay)
     time.sleep(delay)
 
