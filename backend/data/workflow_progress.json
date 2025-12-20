@@ -10,7 +10,9 @@
     "Brașov",
     "Brăila",
     "Buzău",
-    "Călărași"
+    "Călărași",
+    "Cluj",
+    "Constanța"
   ],
   "import_stats": {
     "Alba": {
@@ -62,7 +64,17 @@
       "success": 10,
       "failed": 0,
       "skipped": 1
+    },
+    "Cluj": {
+      "success": 18,
+      "failed": 1,
+      "skipped": 2
+    },
+    "Constanța": {
+      "success": 22,
+      "failed": 0,
+      "skipped": 0
     }
   },
-  "last_updated": "2025-12-20T20:15:41.120882"
+  "last_updated": "2025-12-20T20:56:01.320633"
 }

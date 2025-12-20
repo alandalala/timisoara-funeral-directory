@@ -1,6 +1,6 @@
 {
   "started_at": "2025-12-20T18:22:27.772338",
-  "last_updated": "2025-12-20T20:22:10.367431",
+  "last_updated": "2025-12-20T21:09:56.255849",
   "completed_counties": [
     "Arad",
     "Alba",
@@ -14,7 +14,9 @@
     "București",
     "Buzău",
     "Caraș-Severin",
-    "Călărași"
+    "Călărași",
+    "Constanța",
+    "Covasna"
   ],
   "completed_cities": {
     "Arad": [
@@ -129,12 +131,37 @@
       "Câmpia Turzii",
       "Gherla",
       "Huedin"
+    ],
+    "Constanța": [
+      "Constanța",
+      "Mangalia",
+      "Medgidia",
+      "Năvodari",
+      "Cernavodă",
+      "Eforie",
+      "Techirghiol",
+      "Murfatlar",
+      "Hârșova",
+      "Ovidiu"
+    ],
+    "Covasna": [
+      "Sfântu Gheorghe",
+      "Târgu Secuiesc",
+      "Covasna",
+      "Întorsura Buzăului",
+      "Baraolt"
+    ],
+    "Dâmbovița": [
+      "Târgoviște",
+      "Moreni",
+      "Pucioasa",
+      "Găești"
     ]
   },
-  "current_county": "Cluj",
-  "current_city": "Huedin",
+  "current_county": "Dâmbovița",
+  "current_city": "Titu",
   "failed": [],
-  "total_businesses": 182,
+  "total_businesses": 215,
   "stats": {
     "Arad": 16,
     "Alba": 12,
@@ -148,6 +175,8 @@
     "București": 0,
     "Buzău": 6,
     "Caraș-Severin": 4,
-    "Călărași": 11
+    "Călărași": 11,
+    "Constanța": 22,
+    "Covasna": 2
   }
 }

@@ -149,38 +149,65 @@ class RomaniaScraper:
         normalized = ''.join(c for c in normalized if unicodedata.category(c) != 'Mn')
         return normalized.lower().strip()
     
-    def _business_matches_city(self, business: MapsBusinessData, city: str, county: str) -> bool:
+    def _business_matches_city(self, business: MapsBusinessData, city: str, county: str, verify_county: bool = False) -> bool:
         """
-        Check if a business actually belongs to the searched city.
+        Check if a business actually belongs to the searched city and county.
         
         Args:
             business: Business data to check
             city: Expected city name
             county: Expected county name
+            verify_county: If True, be stricter about verifying location (for retry searches)
             
         Returns:
-            True if business appears to be in the target city
+            True if business appears to be in the target city (and county if verify_county=True)
         """
         city_normalized = self._normalize_city_name(city)
         county_normalized = self._normalize_city_name(county)
         
-        # Check address field
+        address_normalized = ""
         if business.address:
             address_normalized = self._normalize_city_name(business.address)
-            
-            # Check if city name appears in address
-            if city_normalized in address_normalized:
-                return True
-            
-            # For county capitals (city name = county name), just verify county
-            if city_normalized == county_normalized and county_normalized in address_normalized:
-                return True
         
-        # Check the city field if set
+        business_city_normalized = ""
         if business.city:
             business_city_normalized = self._normalize_city_name(business.city)
-            if city_normalized in business_city_normalized or business_city_normalized in city_normalized:
-                return True
+        
+        # Check if city name appears in address - this is the primary check
+        city_in_address = city_normalized in address_normalized
+        city_in_field = city_normalized in business_city_normalized or business_city_normalized in city_normalized
+        
+        # If city is found in address, that's strong evidence - accept it
+        if city_in_address:
+            return True
+        
+        # If city matches the city field, also strong evidence
+        if business.city and city_in_field:
+            return True
+        
+        # For county capitals where city name = county name, check if county appears
+        if city_normalized == county_normalized and county_normalized in address_normalized:
+            return True
+        
+        # If verify_county is True and we haven't matched yet, we need EITHER:
+        # - The county to appear somewhere (address or county field), OR
+        # - Strong city match
+        # This prevents accepting businesses from same-named cities in other counties
+        if verify_county:
+            # Check if county appears anywhere
+            county_in_address = county_normalized in address_normalized
+            county_in_field = False
+            if business.county:
+                business_county_normalized = self._normalize_city_name(business.county)
+                county_in_field = county_normalized in business_county_normalized or business_county_normalized in county_normalized
+            
+            # If neither city nor county found, reject
+            if not county_in_address and not county_in_field:
+                return False
+            
+            # County found but city not found - still accept if county matches
+            # (business is in the right county, just different city formatting)
+            return True
         
         return False
     
@@ -196,8 +223,9 @@ class RomaniaScraper:
         Returns:
             List of business data
         """
-        query = "servicii funerare"
+        query = "funerare"
         location = f"{city}, {county}, Romania"
+        used_simple_search = False
         
         logger.info(f"🔍 Scraping: {city}, {county}")
         
@@ -218,18 +246,32 @@ class RomaniaScraper:
                     location=location_simple,
                     enrich_websites=self.enrich
                 )
+                used_simple_search = True
+            
+            # If still no results, try with shorter query "funerare" 
+            # Some small towns only return results with simpler search terms
+            if len(businesses) == 0:
+                logger.info(f"  🔄 Retrying with shorter query: funerare {city}")
+                businesses = scraper.search_and_enrich(
+                    query="funerare",
+                    location=city,
+                    enrich_websites=self.enrich
+                )
+                used_simple_search = True
             
             # Filter businesses to only those actually in the target city
+            # When using simple search (without county), also verify county to avoid
+            # getting businesses from cities with the same name in other counties
             filtered_businesses = []
             for biz in businesses:
-                if self._business_matches_city(biz, city, county):
+                if self._business_matches_city(biz, city, county, verify_county=used_simple_search):
                     if not biz.county:
                         biz.county = county
                     if not biz.city:
                         biz.city = city
                     filtered_businesses.append(biz)
                 else:
-                    logger.debug(f"  ⚠️ Filtered out '{biz.name}' - address '{biz.address}' doesn't match {city}")
+                    logger.debug(f"  ⚠️ Filtered out '{biz.name}' - address '{biz.address}' doesn't match {city}, {county}")
             
             filtered_count = len(businesses) - len(filtered_businesses)
             if filtered_count > 0:
@@ -237,7 +279,6 @@ class RomaniaScraper:
             
             logger.info(f"  ✅ Found {len(filtered_businesses)} businesses in {city}")
             return filtered_businesses
-            return businesses
             
         except Exception as e:
             logger.error(f"  ❌ Error scraping {city}: {e}")
