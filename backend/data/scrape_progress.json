@@ -1,35 +1,6 @@
 {
-  "started_at": "2025-12-21T09:42:58.327416",
-  "last_updated": "2025-12-21T11:33:59.886988",
-  "completed_counties": [
-    "București",
-    "Caraș-Severin"
-  ],
-  "completed_cities": {
-    "București": [
-      "București Sector 1",
-      "București Sector 2",
-      "București Sector 3",
-      "București Sector 4",
-      "București Sector 5",
-      "București Sector 6"
-    ],
-    "Caraș-Severin": [
-      "Reșița",
-      "Caransebeș",
-      "Oravița",
-      "Bocșa",
-      "Moldova Nouă",
-      "Oțelu Roșu",
-      "Anina"
-    ]
-  },
-  "current_county": "Caraș-Severin",
-  "current_city": "Anina",
-  "failed": [],
-  "total_businesses": 18,
-  "stats": {
-    "București": 0,
-    "Caraș-Severin": 7
-  }
+  "started_at": "2025-12-21T12:49:10.881079",
+  "current_county": "București",
+  "current_city": "București",
+  "last_updated": "2025-12-21T12:49:11.481922"
 }

@@ -1,0 +1,437 @@
+
+=== TABLE 1 ===
+City | Status | Administrative & Economic Profile
+Bacău | Municipality | The county seat and largest economic hub. It hosts the George Enescu International Airport and serves as a center for the aviation industry (Aerostar). Historically, it has been a center for paper production and commerce due to its strategic location at the confluence of the Siret and Bistrița rivers.5
+Onești | Municipality | Formerly known as Gheorghe Gheorghiu-Dej, this city was built essentially from scratch in the 1950s to support a massive petrochemical platform. Today, it faces the challenges of industrial restructuring but remains the second most important urban center in the county.
+Moinești | Municipality | A city with a long history of oil extraction. It serves as the gateway to the oil-rich foothills of the Carpathians and has recently invested in balneological tourism (mineral springs).
+Comănești | Town | Located in the Trotuș Valley, its history is tied to coal mining (brown coal). With the mines closed, the town has transitioned towards forestry and wood processing industries.8
+Buhuși | Town | Historically dominated by the textile industry (wool factory). The collapse of this industry has led to significant economic contraction, turning it into a commuter town for Bacău.
+Dărmănești | Town | Situated near the Uz Valley dam, its economy was historically linked to oil refining. It now focuses on small-scale manufacturing and tourism potential from the nearby mountains.
+Târgu Ocna | Town | Famous for its operational salt mine, which doubles as a treatment center for respiratory diseases. It is a historic spa town with a significant sanatorium infrastructure.
+Slănic-Moldova | Town | Known as the "Pearl of Moldavia," this is a premier spa resort located in a narrow valley of the Nemira Mountains. It is renowned for its carbonated mineral waters used in treating digestive and metabolic disorders.
+
+=== TABLE 2 ===
+City | Status | Administrative & Economic Profile
+Botoșani | Municipality | The administrative and cultural capital. It boasts a well-preserved historic center with 19th-century architecture, reflecting its past as a wealthy trading post on the grain routes. Modern industries include textiles and food processing.1
+Dorohoi | Municipality | A historic market town and railway hub in the north of the county. It has a significant Jewish heritage and serves as the economic center for the northern rural hinterland.
+Darabani | Town | The northernmost town in Romania. It is a small urban center serving a largely agricultural population in a remote border region.
+Săveni | Town | A local service center for the expansive agricultural plains of the Jijia river basin.
+Flămânzi | Town | Famous historically as the starting point of the 1907 Romanian Peasant Revolt. It was elevated to town status in 2004 but retains a distinctly rural character.
+Bucecea | Town | Situated on the Siret river, formerly known for its sugar factory. It serves as a satellite town between Botoșani and Suceava.
+Ștefănești | Town | Located near the Prut river border. It is a center for viticulture and agriculture, notably hosting the birthplace of musician Dinu Lipatti nearby.
+
+=== TABLE 3 ===
+City | Status | Administrative & Economic Profile
+Iași | Municipality | The undisputed regional capital. Home to the oldest university in Romania (Alexandru Ioan Cuza), it has evolved into a major IT and outsourcing hub (Amazon, Continental). Its population dynamics are positive, fueled by student migration and residents from the Republic of Moldova.9
+Pașcani | Municipality | The second-largest city, located in the west of the county. It is a critical railway junction (the "railway gate of Moldavia") with a history of rolling stock repair and textile manufacturing.
+Hârlău | Town | A former medieval princely residence known for its vineyards (Cotnari wine region is nearby). It preserves significant historical ruins and acts as a local market town.
+Târgu Frumos | Town | An intersection of major roads, known for its vegetable markets and history as a trading post.
+Podu Iloaiei | Town | A small town located on the European road connecting Iași and Pașcani. It functions mainly as a transit and agricultural service point.
+
+=== TABLE 4 ===
+City | Status | Administrative & Economic Profile
+Piatra Neamț | Municipality | Often termed the "Pearl of Moldavia" for its scenic location surrounded by mountains. It has a diversified economy (chemicals, fertilizers, wood processing) and tourism infrastructure (ski slope, gondola).1
+Roman | Municipality | Located at the confluence of the Siret and Moldova rivers. It is a historic fortress town and a significant industrial center for pipe manufacturing and food processing.
+Târgu Neamț | Town | Strategically located near the Neamț Citadel. Its economy is heavily driven by tourism related to the surrounding monastic landscape and the Humulești memorial house of storyteller Ion Creangă.
+Bicaz | Town | Situated at the foot of the Bicaz hydroelectric dam (Lake Izvorul Muntelui). It is the gateway to the Bicaz Gorges and serves as a center for cement production.
+Roznov | Town | A relatively new town (declared in 2003), essentially an industrial satellite of Piatra Neamț, centered on a chemical plant.
+
+=== TABLE 5 ===
+City | Status | Administrative & Economic Profile
+Suceava | Municipality | The county seat and former capital of Stephen the Great. It is a transport node with an international airport and acts as the gateway to the UNESCO Painted Monasteries.9
+Fălticeni | Municipality | A city with a rich literary history, formerly a county seat itself. It is known for fruit growing and wood processing.
+Rădăuți | Municipality | Located in the north, it retains an Austrian architectural character. Key industries include wood processing and tourism.
+Câmpulung Moldovenesc | Municipality | A mountain resort and forestry center situated in the Moldova River valley.
+Vatra Dornei | Municipality | A famous spa and winter sports resort located in the Dornelor Depression, surrounded by the Eastern Carpathians.
+Gura Humorului | Town | A central hub for tourism, located near the Voroneț and Humor monasteries.
+Siret | Town | A medieval capital of Moldavia, now a border town with Ukraine (major customs point).
+Vicovu de Sus | Town | A large settlement near the border, known for shoe manufacturing and trade.
+Solca | Town | Once a brewery town, now one of the smallest towns in the country.
+Dolhasca, Liteni, Salcea | Towns | Railway and agricultural towns that gained urban status recently to access EU funds for rural development.
+Cajvana, Milișăuți, Frasin, Broșteni | Towns | Smaller urban centers serving distinct valleys and rural hinterlands; Broșteni is known for its vast forested territory.
+
+=== TABLE 6 ===
+City | Status | Administrative & Economic Profile
+Vaslui | Municipality | The administrative center. Its modern development was spurred by its status as a county seat since 1968. It has a developing retail sector but limited industrial base.1
+Bârlad | Municipality | Historically a rival to Vaslui in importance, Bârlad is an industrial center (bearings manufacturing) and a cultural hub with a strong theatrical tradition.
+Huși | Municipality | Located in the eastern hills, Huși is synonymous with viticulture. It was a former episcopal see and retains a distinct architectural heritage.
+Negrești | Town | A small town in the north of the county, serving the upper Bârlad river basin.
+Murgeni | Town | A small agricultural town located in the Prut valley.
+
+=== TABLE 7 ===
+City | Status | Administrative & Economic Profile
+Brăila | Municipality | One of the most important Danube ports. Historically a cosmopolitan grain-trading center, its Old Town features distinct 19th-century architecture. Current industries include shipbuilding and agriculture.1
+Ianca | Town | An agricultural town located in the center of the county.
+Însurăței | Town | A local service center for the surrounding farming communities.
+Făurei | Town | A critical railway junction; known for hosting the national railway testing center due to the long, straight tracks in the area.
+
+=== TABLE 8 ===
+City | Status | Administrative & Economic Profile
+Buzău | Municipality | A major railway node and industrial center (metallurgy, plastics). It is also a key military command center.1
+Râmnicu Sărat | Municipality | A historic city located on the main route to Moldavia. It functions as a market town for the northern part of the county.9
+Nehoiu | Town | Located in the mountains, its economy is based on forestry and wood processing.
+Pătârlagele | Town | A service center for the villages of the Buzău river valley.
+Pogoanele | Town | A small town situated in the flat Bărăgan plain, entirely reliant on agriculture.
+
+=== TABLE 9 ===
+City | Status | Administrative & Economic Profile
+Constanța | Municipality | The largest port on the Black Sea and a major economic hub. It has a diverse economy including logistics, shipbuilding, and energy. It serves as the naval headquarters.9
+Medgidia | Municipality | Located on the Danube-Black Sea Canal, it is an industrial center (cement production) and transport hub.
+Mangalia | Municipality | The southernmost port, hosting a naval shipyard. It also administers a string of seaside resorts (Saturn, Venus, Cap Aurora, Jupiter, Neptun, Olimp).
+Năvodari | Town | Host to the Petromidia Refinery, the largest in Romania. It has recently developed a significant tourism sector in the northern Mamaia area.
+Cernavodă | Town | Strategically critical as the site of Romania's only Nuclear Power Plant and the entrance to the Danube-Black Sea Canal.
+Eforie | Town | Composed of Eforie Nord and Eforie Sud, exclusively dedicated to seaside tourism and balneotherapy.
+Techirghiol | Town | A spa town located on the saline Lake Techirghiol, famous for its therapeutic mud.
+Ovidiu | Town | A satellite town of Constanța, integrated into the metropolitan area.
+Murfatlar | Town | Synonymous with viticulture; home to one of Romania's most famous vineyards.
+Hârșova | Town | A historic crossing point over the Danube, with ruins of an ancient fortress.
+Negru Vodă | Town | A border town with Bulgaria.
+Băneasa | Town | An agricultural town in the Dobrujan plateau.
+
+=== TABLE 10 ===
+City | Status | Administrative & Economic Profile
+Galați | Municipality | A major industrial city hosting the Liberty Steel plant (formerly Sidex). It is also a university center and a river-maritime port.6
+Tecuci | Municipality | Located in the north, famous for its vegetable canning industry (mustard) and as a commercial hub.
+Târgu Bujor | Town | A center for viticulture and agricultural research.
+Berești | Town | A small agricultural town in the hilly north of the county.
+
+=== TABLE 11 ===
+City | Status | Administrative & Economic Profile
+Tulcea | Municipality | The "Gateway to the Delta." Its economy is based on fishing, shipbuilding (Vard shipyard), and alumina production. It is the administrative authority for the Delta.1
+Babadag | Town | A historic town with a significant Turkish minority and a nearby military training range.
+Măcin | Town | Located near the ancient Măcin Mountains. It has a textile industry and is a granite quarrying center.
+Isaccea | Town | An ancient settlement and current border crossing (ferry) to Ukraine.
+Sulina | Town | The easternmost point of Romania. Located at the mouth of the Danube, it is accessible only by water and was historically the seat of the European Danube Commission. Today, it relies on tourism.
+
+=== TABLE 12 ===
+City | Status | Administrative & Economic Profile
+Focșani | Municipality | Known as the "City of the Union" (1859). It has a strong textile industry (garment manufacturing) and wine production.9
+Adjud | Municipality | A significant railway junction in the Siret valley.
+Mărășești | Town | The site of a major WWI battle; hosts the Mausoleum of Mărășești.
+Panciu | Town | Surrounded by vineyards, famous for sparkling wine production.
+Odobești | Town | Another historic winemaking center, home to royal cellars.
+
+=== TABLE 13 ===
+City | Status | Administrative & Economic Profile
+Pitești | Municipality | An industrial center known for petrochemicals (Arpechim, now reduced) and its proximity to the auto industry. It is known as the "Tulip City".5
+Câmpulung | Municipality | The first capital of Wallachia. It has a distinct historical architecture and was formerly the home of the ARO off-road vehicle factory.
+Curtea de Argeș | Municipality | A city of immense historical and religious significance, housing the Curtea de Argeș Cathedral (burial place of Romanian monarchs).
+Mioveni | Town | The industrial heart of the county, hosting the Dacia-Renault manufacturing plant. It also houses a nuclear research institute.
+Costești | Town | An agricultural town on the Cotmeana plain.
+Topoloveni | Town | Famous for its plum jam (Magiun de Topoloveni), a PGI-protected product.
+Ștefănești | Town | Effectively a suburb of Pitești; known for the Brătianu family estate and viticulture research.
+
+=== TABLE 14 ===
+City | Status | Administrative & Economic Profile
+Călărași | Municipality | A Danube port. It was the site of a massive steel combine under communism; today, parts of it (steel pipes, glass, paper) remain operational.1
+Oltenița | Municipality | A port city at the confluence of the Argeș and Danube rivers. Traditionally a shipbuilding center.
+Lehliu Gară | Town | Located on the A2 Sun Motorway, becoming a logistics and biodiesel production hub.
+Fundulea | Town | Renowned for its National Agricultural Research and Development Institute.
+Budești | Town | A small local center in the Argeș river basin.
+
+=== TABLE 15 ===
+City | Status | Administrative & Economic Profile
+Târgoviște | Municipality | The former medieval capital of Wallachia (Chindiei Tower). Modern industry includes special steel production and appliance manufacturing.9
+Moreni | Municipality | A town with a long history of oil extraction and defense industry equipment.
+Găești | Town | Hosts a major appliance factory (Arctic), serving as a key employer for the region.
+Pucioasa | Town | A balneoclimateric resort situated in the Ialomița valley.
+Titu | Town | Hosts the Renault Technical Centre, a major automotive testing facility.
+Fieni | Town | Dominated by the cement and limestone industry.
+Răcari | Town | A recently declared town serving the southern agricultural plain.
+
+=== TABLE 16 ===
+City | Status | Administrative & Economic Profile
+Giurgiu | Municipality | A major port and border crossing (Friendship Bridge). It has a Free Zone attracting light industry and logistics.7
+Bolintin-Vale | Town | Due to its proximity to Bucharest and the A1 highway, it has developed significant logistics parks and warehousing.
+Mihăilești | Town | A satellite town west of Bucharest, heavily affected by the capital's suburban sprawl.
+
+=== TABLE 17 ===
+City | Status | Administrative & Economic Profile
+Slobozia | Municipality | An agricultural processing center and administrative hub. It houses the National Museum of Agriculture.1
+Fetești | Municipality | A strategic transport node where the railway crosses the Danube. It also hosts an air base.
+Urziceni | Municipality | A commercial town and road junction closer to Bucharest.
+Țăndărei | Town | An agricultural town located on the Ialomița river.
+Amara | Town | A spa resort located on the shores of Lake Amara, known for therapeutic mud.
+Fierbinți-Târg | Town | A local market town, popularized by a TV series filmed there.
+Căzănești | Town | A small agricultural town.
+
+=== TABLE 18 ===
+City | Status | Administrative & Economic Profile
+Ploiești | Municipality | The "Capital of Black Gold," surrounded by refineries (Brazi, Petrotel, Vega). It is a major logistical hub and industrial park destination.1
+Câmpina | Municipality | A sunny, sub-Carpathian city known for the castle of Bogdan Petriceicu Hasdeu and former oil refineries.
+Sinaia | Town | The "Pearl of the Carpathians," former summer residence of the Royal Family (Peleș Castle). A premier ski and mountain resort.
+Bușteni | Town | Mountain resort at the foot of the Bucegi Massif; gateway to the Sphinx and Babele rock formations.
+Azuga | Town | Known for ski slopes and, historically, for sparkling wine and beer production.
+Breaza | Town | A climatic resort known for its air quality and traditional embroidery.
+Comarnic | Town | A transit town in the Prahova Valley, historically known for cement production.
+Vălenii de Munte | Town | A cultural center in the Teleajen valley, home to the Nicolae Iorga museum.
+Mizil | Town | An industrial and agricultural town in the east, facing economic challenges.
+Băicoi | Town | Situated near Ploiești, heavily involved in the oil services industry.
+Boldești-Scăeni | Town | Another town built around oil extraction and glass manufacturing.
+Urlați | Town | The center of the Dealu Mare vineyard region.
+Plopeni | Town | Originally developed around a mechanical plant for the defense industry.
+Slănic | Town | Famous for the Unirea Salt Mine, the largest in Europe, used for tourism and treatment.
+
+=== TABLE 19 ===
+City | Status | Administrative & Economic Profile
+Alexandria | Municipality | A city with a grid layout planned in the 19th century. It is the primary grain trading center of the county.1
+Roșiorii de Vede | Municipality | An old market town and railway hub with a history dating back to the medieval period.
+Turnu Măgurele | Municipality | A port on the Danube. Its economy was dominated by a large chemical fertilizer plant, which has faced insolvency issues.
+Zimnicea | Town | The southernmost point of Romania. It was heavily reconstructed after the 1977 earthquake.
+Videle | Town | An oil extraction town, serving as a railway junction for lines towards Bulgaria.
+
+=== TABLE 20 ===
+City | Status | Administrative & Economic Profile
+Craiova | Municipality | A major university and industrial city. It hosts the Ford Otosan automobile factory and maintains a strong aerospace and locomotive repair industry.9
+Băilești | Municipality | An agricultural town in the Oltenian Plain, famous for its distinct dialect and humor.
+Calafat | Municipality | A Danube port connected to Vidin (Bulgaria) by the New Europe Bridge.
+Filiași | Town | A transport node where the Jiu valley opens into the plain.
+Dăbuleni | Town | Located in an area with sandy soils (the "Sahara of Oltenia"), famous nationwide for watermelon cultivation.
+Segarcea | Town | Known for its Royal Domain vineyards and wine production.
+Bechet | Town | A small port town with a ferry connection to Bulgaria.
+
+=== TABLE 21 ===
+City | Status | Administrative & Economic Profile
+Târgu Jiu | Municipality | Internationally known for the Constantin Brâncuși sculptural ensemble (Endless Column, Gate of the Kiss). Administrative center for the mining region.9
+Motru | Municipality | A city created specifically to serve the lignite mines in the surrounding area.
+Rovinari | Town | Located adjacent to a massive thermal power plant and open-pit mines.
+Turceni | Town | Host to Romania's largest thermal power plant. The town's economy is entirely dependent on energy production.12
+Bumbești-Jiu | Town | Located at the entrance to the Jiu Defile; home to a mechanical plant (defense industry).
+Târgu Cărbunești | Town | An old market town with a historic hospital.
+Novaci | Town | A pastoral town that serves as the gateway to the Transalpina high-altitude road and Rânca ski resort.
+Tismana | Town | Famous for the Tismana Monastery, the oldest in Wallachia.
+Țicleni | Town | Specialized in oil and natural gas extraction rather than coal.
+
+=== TABLE 22 ===
+City | Status | Administrative & Economic Profile
+Drobeta-Turnu Severin | Municipality | A city with Roman origins (Trajan's Bridge). It is a shipbuilding center and manages the Iron Gates hydropower hub.1
+Orșova | Municipality | A port city located on the Cerna bay of the Iron Gates reservoir. The old city lies submerged underwater.
+Strehaia | Town | A historic town, formerly a princely residence.
+Vânju Mare | Town | An agricultural center known for red wines.
+Baia de Aramă | Town | Historically a copper mining center, now relying on tourism (Ponoarele bridge).
+
+=== TABLE 23 ===
+City | Status | Administrative & Economic Profile
+Slatina | Municipality | Home to ALRO, one of the largest aluminum smelters in Eastern Europe, and a Pirelli tire factory. It is a major industrial exporter.1
+Caracal | Municipality | A city with rich 19th-century architecture (National Theatre). Nearby is the Deveselu military base housing the NATO Aegis Ashore missile defense system.
+Balș | Town | An industrial town (locomotives/axles) on the Craiova-Slatina road.
+Corabia | Town | A port on the Danube, formerly a major grain export hub.
+Scornicești | Town | The birthplace of dictator Nicolae Ceaușescu; it was heavily industrialized during his regime but has since declined.
+Drăgănești-Olt | Town | A local agricultural center.
+Piatra-Olt | Town | A major railway junction connecting lines from Oltenia and Muntenia.
+Potcoava | Town | Developed around oil and gas extraction.
+
+=== TABLE 24 ===
+City | Status | Administrative & Economic Profile
+Râmnicu Vâlcea | Municipality | Situated on the Olt river. Its economy has been historically tied to the Oltchim chemical plant. It was once jokingly called "Vâlcea Valley" due to a high density of hackers in the 2000s, but is now normalized.7
+Drăgășani | Municipality | The center of an important viticultural region.
+Călimănești | Town | A spa resort (Căciulata) used since Roman times, situated in the Olt Defile.
+Băile Olănești | Town | A premium spa resort known for mineral waters (gold medal at Vienna 1873).
+Băile Govora | Town | Famous for treating respiratory conditions.
+Horezu | Town | Famous for Horezu ceramics (UNESCO Intangible Cultural Heritage) and Horezu Monastery.
+Brezoi | Town | A forestry town at the mouth of the Lotru river.
+Bălcești | Town | An agricultural town in the south-west of the county.
+Berbești | Town | A coal mining town supplying the Govora power plant.
+Ocnele Mari | Town | Built over massive salt deposits, now a tourist attraction (salt mine).
+Băbeni | Town | A center for wood processing and logistics.
+
+=== TABLE 25 ===
+City | Status | Administrative & Economic Profile
+Arad | Municipality | A city with impressive Secession architecture. It is a major industrial hub (railway cars, automotive components) and transport node.5
+Lipova | Town | A historic town guarding the Mureș valley; known for Lipova mineral water.
+Ineu | Town | A former district capital with a fortress; serves the Crișul Alb valley.
+Curtici | Town | A critical rail border crossing with a large Free Trade Zone.
+Nădlac | Town | The main road border crossing into Hungary (on the A1 motorway). Home to a large Slovak minority.
+Pecica | Town | An ancient settlement famous for its bread ("Pita de Pecica") and nearby archaeological sites.
+Sântana | Town | An agricultural and light industrial center near Arad.
+Chișineu-Criș | Town | An industrial town (aluminum processing) near the border.
+Pâncota | Town | A viticultural center (Miniș-Măderat vineyard).
+Sebiș | Town | A town in the upper Crișul Alb valley, known for leather, wood, and textile industries.16
+
+=== TABLE 26 ===
+City | Status | Administrative & Economic Profile
+Reșița | Municipality | One of Europe's oldest industrial centers (steam locomotives were built here). It preserves a vast industrial heritage.1
+Caransebeș | Municipality | A strategic railway node and historic border regiment garrison.
+Bocșa | Town | A town with a metallurgical history, extended along the Bârzava river.
+Moldova Nouă | Town | A Danube port located near the Iron Gates gorge; formerly a copper mining center.
+Oravița | Town | Home to the oldest theatre in Romania (1817) and the first mountain railway (Oravița-Anina).
+Oțelu Roșu | Town | Named "Red Steel" for its metalworks; sits in the Bistra valley.
+Anina | Town | A mountain town with a history of hard coal mining.
+Băile Herculane | Town | A world-famous spa resort founded by the Romans, located in the Cerna Valley.
+
+=== TABLE 27 ===
+City | Status | Administrative & Economic Profile
+Deva | Municipality | Dominated by the medieval Deva Citadel. It acts as the administrative and service center.1
+Hunedoara | Municipality | Home to Corvin Castle (Hunyadi Castle), one of the largest in Europe. The city was heavily reliant on a massive steelworks, now partially operational (ArcelorMittal).
+Petroșani | Municipality | The capital of the Jiu Valley coal basin; home to the University of Mining.
+Brad | Municipality | The historic center of gold mining in the Apuseni Mountains (Gold Museum).
+Orăștie | Municipality | A fortified Saxon settlement; gateway to the Dacian Fortresses in the Orăștie Mountains.
+Lupeni | Municipality | A mining city in the Jiu Valley.
+Vulcan | Municipality | Another key mining city in the Jiu Valley.
+Petrila | Town | A mining town known for cultural initiatives to repurpose industrial heritage.
+Uricani | Town | The westernmost mining town in the Jiu Valley.
+Simeria | Town | A major railway marshaling yard and arboretum park.
+Călan | Town | Former steel town known for its thermal waters (Aquae).
+Hațeg | Town | The center of Țara Hațegului (UNESCO Geopark); bison reserve nearby.
+Geoagiu | Town | Agricultural town administering the Geoagiu-Băi spa resort.
+Aninoasa | Town | A small mining town, the first in Romania to declare bankruptcy in the 2000s.
+
+=== TABLE 28 ===
+City | Status | Administrative & Economic Profile
+Timișoara | Municipality | The revolutionary city of 1989. A major IT, automotive, and cultural hub (European Capital of Culture 2023). It has a Baroque center and diverse economy.1
+Lugoj | Municipality | A significant cultural center on the Timiș river.
+Sânnicolau Mare | Town | The westernmost town in Romania; birthplace of Béla Bartók.
+Jimbolia | Town | A border town with a history of brick manufacturing.
+Buziaș | Town | A spa resort known for carbonated mineral water used in treating cardiovascular diseases.
+Făget | Town | A market town serving the eastern rural zone.
+Deta | Town | A town in the south, historically known for wood processing.
+Gătaia | Town | An agricultural town.
+Recaș | Town | Famous internationally for the Recaș Wineries.
+Ciacova | Town | A town with a medieval defensive tower (Cula).
+
+=== TABLE 29 ===
+City | Status | Administrative & Economic Profile
+Oradea | Municipality | Famous for its Art Nouveau architecture and thermal energy use. It has thriving industrial parks and a refurbished citadel.5
+Beiuș | Municipality | The economic center of the Beiuș Depression.
+Marghita | Municipality | A town with geothermal resources.
+Salonta | Municipality | Hometown of Hungarian poet János Arany; food industry.
+Aleșd | Town | Located on the main road to Cluj; hosts a cement factory.
+Ștei | Town | Built by the Soviets for uranium mining (formerly named Dr. Petru Groza).
+Valea lui Mihai | Town | A border town with a Hungarian majority population.
+Săcueni | Town | Another border town known for the Stubenberg Castle.
+Vașcău | Town | A small town in the Apuseni Mountains.
+Nucet | Town | The gateway to the Vârtop ski area.
+
+=== TABLE 30 ===
+City | Status | Administrative & Economic Profile
+Bistrița | Municipality | A former Saxon citadel with a preserved medieval center. Industries include car batteries and cables.9
+Năsăud | Town | The "City of Academicians," famous for its high number of literate inhabitants in the 19th century due to the Border Regiment schools.
+Beclean | Town | A railway junction and emerging tourist destination (Băile Figa).
+Sângeorz-Băi | Town | A spa resort known for mineral waters ("Hebe").
+
+=== TABLE 31 ===
+City | Status | Administrative & Economic Profile
+Cluj-Napoca | Municipality | The second-largest city in Romania. It is the Silicon Valley of the country, a major university center (UBB), and a cultural capital (TIFF, Untold).9
+Turda | Municipality | Home to the spectacular Turda Salt Mine, a major tourist attraction.
+Dej | Municipality | A railway hub and salt mining center (Ocna Dej).
+Câmpia Turzii | Municipality | Historically a metallurgical town; hosts a strategic NATO air base.
+Gherla | Municipality | A baroque city built by Armenian merchants; site of a notorious communist political prison.
+Huedin | Town | A market town at the entrance to the Apuseni Mountains, known for distinct "gypsy palace" architecture in some neighborhoods.
+
+=== TABLE 32 ===
+City | Status | Administrative & Economic Profile
+Baia Mare | Municipality | A historic mining center (gold, non-ferrous metals). It serves as the commercial hub for the region.7
+Sighetu Marmației | Municipality | The historic capital of Maramureș land, bordering Ukraine. Site of the Memorial of the Victims of Communism.
+Borșa | Town | A mountain town near the Rodna Mountains, developing its ski infrastructure.
+Vișeu de Sus | Town | The terminus of the Mocănița steam train (Vaser Valley).
+Baia Sprie | Town | A mining town adjacent to Baia Mare.
+Târgu Lăpuș | Town | The center of the Lăpuș ethnographical zone.
+Seini | Town | An agricultural town.
+Șomcuta Mare | Town | A local market town.
+Ulmeni | Town | A small town on the Someș river.
+Tăuții-Măgherăuș | Town | Hosts the Baia Mare International Airport.
+Cavnic | Town | A former mining town turned ski resort.
+Săliștea de Sus | Town | Known for its wooden churches (UNESCO).
+Dragomirești | Town | A center of rural traditions.
+
+=== TABLE 33 ===
+City | Status | Administrative & Economic Profile
+Satu Mare | Municipality | An industrial city (Electrolux) and commercial center with Secessionist architecture.7
+Carei | Municipality | Home to the Károlyi Castle and a large Hungarian community.
+Negrești-Oaș | Town | The "capital" of Oaș Land, known for its unique folklore and wealthy migrant workers.
+Tășnad | Town | A booming thermal spa resort.
+Livada | Town | An agricultural town.
+Ardud | Town | A historic town with fortress ruins.
+
+=== TABLE 34 ===
+City | Status | Administrative & Economic Profile
+Zalău | Municipality | An industrial center known for tire manufacturing (Michelin) and pipe production.5
+Șimleu Silvaniei | Town | A center for sparkling wine production; site of the Northern Transylvania Holocaust Memorial Museum.
+Jibou | Town | A railway node and home to a large botanical garden.
+Cehu Silvaniei | Town | A small market town.
+
+=== TABLE 35 ===
+City | Status | Administrative & Economic Profile
+Alba Iulia | Municipality | Features the Alba Carolina Citadel, the largest Vauban fortress in Romania. It is a major tourist destination.1
+Sebeș | Municipality | An economic powerhouse with huge foreign investment in wood processing and gearbox manufacturing (Mercedes-Benz).4
+Aiud | Municipality | A historic city with a fortress and a notorious former political prison.
+Blaj | Municipality | The center of the Greek-Catholic church in Romania; "Field of Liberty" site.
+Cugir | Town | A town with a long tradition of manufacturing arms and ammunition.
+Ocna Mureș | Town | Historically a salt mining and chemical town.
+Zlatna | Town | A former copper smelting center in the Apuseni Mountains.
+Câmpeni | Town | The unofficial capital of the Moți people in the Apuseni Mountains.
+Abrud | Town | A historic gold mining center dating back to Roman times.
+Teiuș | Town | A major railway junction.
+Baia de Arieș | Town | A former mining town.
+
+=== TABLE 36 ===
+City | Status | Administrative & Economic Profile
+Brașov | Municipality | A major tourist destination with a medieval center. Historically an industrial giant, now diversified into aviation, automotive, and IT.1
+Făgăraș | Municipality | Home to the Făgăraș Citadel; center of the Țara Făgărașului region.
+Săcele | Municipality | A large settlement adjacent to Brașov, gateway to the mountains.
+Codlea | Municipality | Known for its greenhouses and historical color industry.
+Râșnov | Town | Famous for Râșnov Citadel and Dino Park.
+Zărnești | Town | Gateway to Piatra Craiului National Park; bears sanctuary.
+Predeal | Town | The highest town in Romania, a major ski resort.
+Victoria | Town | A planned city built for the chemical industry under communism.
+Rupea | Town | Dominated by the Rupea Citadel.
+Ghimbav | Town | Home to the Brașov-Ghimbav International Airport and aviation industry (IAR).
+
+=== TABLE 37 ===
+City | Status | Administrative & Economic Profile
+Sfântu Gheorghe | Municipality | A cultural center for the Hungarian community; textile and automotive industries.5
+Târgu Secuiesc | Municipality | A town with a unique urban layout of courtyards (udvarter), reflecting its guild history.
+Covasna | Town | The "City of 1,000 Springs," famous for cardiovascular treatments (mofettes).
+Baraolt | Town | The center of a former mining region.
+Întorsura Buzăului | Town | Located across the mountains, known for recording the lowest temperatures in Romania.
+
+=== TABLE 38 ===
+City | Status | Administrative & Economic Profile
+Miercurea Ciuc | Municipality | One of the coldest cities in Romania. Known for beer production (Ciuc) and the Csíksomlyó pilgrimage.5
+Odorheiu Secuiesc | Municipality | A historic cultural and educational center.
+Gheorgheni | Municipality | A town with a significant Armenian heritage.
+Toplița | Municipality | Situated in the north, bridging towards Bucovina.
+Cristuru Secuiesc | Town | An agricultural market town.
+Băile Tușnad | Town | The smallest town in Romania by population, a spa resort.
+Borsec | Town | Famous since the 19th century for its mineral water ("Queen of Mineral Waters").
+Vlăhița | Town | The highest altitude town in the county.
+Bălan | Town | A former copper mining town located at the source of the Olt river.
+
+=== TABLE 39 ===
+City | Status | Administrative & Economic Profile
+Târgu Mureș | Municipality | A major medical center (University of Medicine). Home to Azomureș (fertilizers) and rich Art Nouveau heritage.7
+Sighișoara | Municipality | Its medieval citadel is a UNESCO World Heritage site and one of the few inhabited citadels in Europe.
+Reghin | Municipality | Known as the "City of Violins" for its musical instrument factories.
+Târnăveni | Municipality | A city recovering from the collapse of its chemical industry.
+Luduș | Town | An agro-industrial town (sugar production).
+Sovata | Town | Famous for Lake Ursu, a heliothermal saltwater lake.
+Iernut | Town | Site of a major thermal power plant.
+Sărmașu | Town | Center of the Transylvanian Plain gas fields.
+Ungheni | Town | Hosts the Transylvania Airport; satellite of Târgu Mureș.
+Miercurea Nirajului | Town | Center of the Niraj Valley.
+Sângeorgiu de Pădure | Town | Home to the Rhédey Castle (ancestors of the British Royal Family).
+
+=== TABLE 40 ===
+City | Status | Administrative & Economic Profile
+Sibiu | Municipality | European Capital of Culture (2007). A major automotive hub and tourist destination with a preserved medieval center.7
+Mediaș | Municipality | The "Capital of Natural Gas" (Romgaz/Transgaz HQs). It has a historic walled center.
+Cisnădie | Town | Historically a textile center, now a residential satellite of Sibiu.
+Avrig | Town | Location of the Brukenthal Summer Palace.
+Agnita | Town | The center of the Hârtibaciu Valley; known for the Lolelor festival.
+Dumbrăveni | Town | A former Armenian center with a massive cathedral.
+Tălmaciu | Town | Situated at the entrance to the Olt Defile.
+Copșa Mică | Town | Formerly known for extreme pollution (carbon black), now largely deindustrialized.
+Săliște | Town | The cultural capital of the Mărginimea Sibiului pastoral region.
+Miercurea Sibiului | Town | A small historic Saxon town.
+Ocna Sibiului | Town | A resort town with saline lakes.
+
+=== TABLE 41 ===
+City | Status | Administrative & Economic Profile
+Buftea | Town | The historical county seat. It hosts the MediaPro film studios and the Știrbey Palace.
+Voluntari | Town | The largest town in Ilfov. It includes the Pipera business district, effectively a corporate extension of Bucharest.
+Otopeni | Town | Hosts the Henri Coandă International Airport, the country's main gateway.
+Pantelimon | Town | An industrial and residential suburb to the east.
+Bragadiru | Town | A rapidly expanding residential dormitory town in the southwest.9
+Popești-Leordeni | Town | A high-density residential area in the south.
+Chitila | Town | A logistics and residential hub in the northwest.
+Măgurele | Town | A scientific hub hosting the ELI-NP (Extreme Light Infrastructure - Nuclear Physics) laser facility, the most powerful in the world.

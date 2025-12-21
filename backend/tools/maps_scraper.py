@@ -284,10 +284,85 @@ class GoogleMapsScraper:
         
         logger.info(f"Found {len(businesses)} businesses")
         
-        # Extract detailed info for each business
+        # Major Romanian city names and neighborhoods for early filtering
+        # If searching in one city but business name/card mentions another, likely wrong location
+        MAJOR_CITIES = [
+            'timișoara', 'timisoara', 'cluj', 'iași', 'iasi', 'constanța', 'constanta',
+            'craiova', 'brașov', 'brasov', 'galați', 'galati', 'ploiești', 'ploiesti',
+            'oradea', 'brăila', 'braila', 'arad', 'pitești', 'pitesti', 'sibiu',
+            'bacău', 'bacau', 'târgu mureș', 'targu mures', 'baia mare', 'buzău', 'buzau',
+            'botoșani', 'botosani', 'satu mare', 'suceava', 'piatra neamț', 'piatra neamt',
+            'drobeta', 'focșani', 'focsani', 'tulcea', 'hunedoara', 'deva', 'alba iulia',
+            'vaslui', 'giurgiu', 'slobozia', 'călărași', 'calarasi', 'alexandria',
+            'mehala',  # Timișoara neighborhood
+        ]
+        
+        # County-to-city mapping for address-based filtering
+        # If we see "Timiș" county in address but searching in București, skip it
+        COUNTY_INDICATORS = {
+            'timiș': 'timișoara', 'timis': 'timișoara',
+            'cluj': 'cluj',
+            'iași': 'iași', 'iasi': 'iași',
+            'brașov': 'brașov', 'brasov': 'brașov',
+            'sibiu': 'sibiu',
+            'constanța': 'constanța', 'constanta': 'constanța',
+            'bihor': 'oradea',
+            'arad': 'arad',
+            'dolj': 'craiova',
+            'prahova': 'ploiești',
+            'galați': 'galați', 'galati': 'galați',
+            'argeș': 'pitești', 'arges': 'pitești',
+            'bacău': 'bacău', 'bacau': 'bacău',
+            'mureș': 'târgu mureș', 'mures': 'târgu mureș',
+            'maramureș': 'baia mare', 'maramures': 'baia mare',
+            'suceava': 'suceava',
+            'neamț': 'piatra neamț', 'neamt': 'piatra neamț',
+            'hunedoara': 'hunedoara',
+            'alba': 'alba iulia',
+        }
+        
+        # Extract target city from query for filtering
+        query_lower = query.lower()
+        location_lower = location.lower()
+        
+        # Extract detailed info for each business, with early filtering
         detailed_businesses = []
         for i, basic_info in enumerate(businesses):
-            logger.info(f"Extracting details for [{i+1}/{len(businesses)}]: {basic_info.get('name', 'Unknown')}")
+            name = basic_info.get('name', 'Unknown')
+            name_lower = name.lower()
+            card_snippet = basic_info.get('card_snippet', '').lower()
+            
+            # Early filter: skip if name mentions a different major city
+            skip_reason = None
+            for city_name in MAJOR_CITIES:
+                if city_name in name_lower:
+                    # Check if this city is in our search location
+                    if city_name not in location_lower and city_name not in query_lower:
+                        skip_reason = f"name mentions {city_name}"
+                        break
+            
+            # Also check card snippet (contains address info visible in search results)
+            if not skip_reason and card_snippet:
+                # Check for city names in snippet
+                for city_name in MAJOR_CITIES:
+                    if city_name in card_snippet:
+                        if city_name not in location_lower and city_name not in query_lower:
+                            skip_reason = f"card shows {city_name}"
+                            break
+                
+                # Check for county indicators
+                if not skip_reason:
+                    for county, city in COUNTY_INDICATORS.items():
+                        if county in card_snippet:
+                            if city not in location_lower and city not in query_lower:
+                                skip_reason = f"card shows {county} county"
+                                break
+            
+            if skip_reason:
+                logger.info(f"  [SKIP] Wrong location ({skip_reason}): {name}")
+                continue
+            
+            logger.info(f"Extracting details for [{i+1}/{len(businesses)}]: {name}")
             try:
                 detailed = self._extract_business_details(basic_info)
                 if detailed:
@@ -316,7 +391,7 @@ class GoogleMapsScraper:
             results_selector = '.Nv2PK'
         
         scroll_attempts = 0
-        max_scrolls = 30  # Increased from 20
+        max_scrolls = 50  # Increased for big cities like București, Cluj
         no_new_count = 0
         last_height = 0
         
@@ -333,9 +408,21 @@ class GoogleMapsScraper:
                     if name and name not in seen_names:
                         seen_names.add(name)
                         
-                        # Try to get category early for filtering
+                        # Try to get category and card snippet (contains address info) early for filtering
                         category = None
+                        card_snippet = ""
                         try:
+                            # Get all text from the card info area (contains category, address, etc.)
+                            info_elems = card.locator('.W4Efsd').all()
+                            for info_elem in info_elems:
+                                try:
+                                    text = info_elem.text_content()
+                                    if text:
+                                        card_snippet += " " + text
+                                except:
+                                    pass
+                            
+                            # Get category specifically
                             category_elem = card.locator('.W4Efsd .W4Efsd span span').first
                             if category_elem.count() > 0:
                                 category = category_elem.text_content()
@@ -351,7 +438,7 @@ class GoogleMapsScraper:
                         new_found += 1
                         
                         # Extract basic info from card
-                        basic_info = {'name': name, 'element': card, 'category': category}
+                        basic_info = {'name': name, 'element': card, 'category': category, 'card_snippet': card_snippet}
                         
                         # Try to get rating
                         try:
@@ -556,30 +643,71 @@ class GoogleMapsScraper:
     
     def _parse_address(self, data: MapsBusinessData, full_address: str):
         """Parse Romanian address to extract city and county."""
-        # Romanian address format often: "Street, Number, City, County PostalCode"
-        # Or: "Street, Number, City PostalCode"
-        
-        # Common Timiș county cities
-        timis_cities = ['timișoara', 'timisoara', 'lugoj', 'sânnicolau mare', 'jimbolia', 
-                        'buziaș', 'făget', 'recaș', 'deta', 'gătaia']
+        # Romanian address format: "Street, Number, City, County PostalCode" or "Street, City PostalCode"
         
         address_lower = full_address.lower()
         
-        # Check for Timiș county indicators
-        if 'timiș' in address_lower or 'timis' in address_lower:
-            data.county = 'Timiș'
+        # All Romanian counties with their common name variations
+        ROMANIAN_COUNTIES = {
+            'alba': 'Alba',
+            'arad': 'Arad', 
+            'argeș': 'Argeș', 'arges': 'Argeș',
+            'bacău': 'Bacău', 'bacau': 'Bacău',
+            'bihor': 'Bihor',
+            'bistrița-năsăud': 'Bistrița-Năsăud', 'bistrita-nasaud': 'Bistrița-Năsăud', 'bistrița': 'Bistrița-Năsăud', 'bistrita': 'Bistrița-Năsăud',
+            'botoșani': 'Botoșani', 'botosani': 'Botoșani',
+            'brăila': 'Brăila', 'braila': 'Brăila',
+            'brașov': 'Brașov', 'brasov': 'Brașov',
+            'bucurești': 'București', 'bucuresti': 'București', 'bucharest': 'București',
+            'buzău': 'Buzău', 'buzau': 'Buzău',
+            'călărași': 'Călărași', 'calarasi': 'Călărași',
+            'caraș-severin': 'Caraș-Severin', 'caras-severin': 'Caraș-Severin',
+            'cluj': 'Cluj',
+            'constanța': 'Constanța', 'constanta': 'Constanța',
+            'covasna': 'Covasna',
+            'dâmbovița': 'Dâmbovița', 'dambovita': 'Dâmbovița',
+            'dolj': 'Dolj',
+            'galați': 'Galați', 'galati': 'Galați',
+            'giurgiu': 'Giurgiu',
+            'gorj': 'Gorj',
+            'harghita': 'Harghita',
+            'hunedoara': 'Hunedoara',
+            'ialomița': 'Ialomița', 'ialomita': 'Ialomița',
+            'iași': 'Iași', 'iasi': 'Iași',
+            'ilfov': 'Ilfov',
+            'maramureș': 'Maramureș', 'maramures': 'Maramureș',
+            'mehedinți': 'Mehedinți', 'mehedinti': 'Mehedinți',
+            'mureș': 'Mureș', 'mures': 'Mureș',
+            'neamț': 'Neamț', 'neamt': 'Neamț',
+            'olt': 'Olt',
+            'prahova': 'Prahova',
+            'sălaj': 'Sălaj', 'salaj': 'Sălaj',
+            'satu mare': 'Satu Mare',
+            'sibiu': 'Sibiu',
+            'suceava': 'Suceava',
+            'teleorman': 'Teleorman',
+            'timiș': 'Timiș', 'timis': 'Timiș',
+            'tulcea': 'Tulcea',
+            'vâlcea': 'Vâlcea', 'valcea': 'Vâlcea',
+            'vaslui': 'Vaslui',
+            'vrancea': 'Vrancea',
+        }
         
-        # Check for city
-        for city in timis_cities:
-            if city in address_lower:
-                data.city = city.title()
-                data.county = 'Timiș'
+        # Detect county from address
+        for county_variant, county_name in ROMANIAN_COUNTIES.items():
+            if county_variant in address_lower:
+                data.county = county_name
                 break
         
-        # If still no city, try to extract from address parts
+        # Special handling for București (often just has "București" or "Sector X")
+        if 'sector' in address_lower and not data.county:
+            data.county = 'București'
+            data.city = 'București'
+        
+        # Try to extract city from address parts
         if not data.city:
             parts = full_address.split(',')
-            if len(parts) >= 3:
+            if len(parts) >= 2:
                 # Street indicators that should NOT be in city names
                 street_indicators = [
                     'str.', 'strada', 'calea', 'bulevardul', 'b-dul', 'bd.', 
@@ -598,6 +726,9 @@ class GoogleMapsScraper:
                         continue
                     # Skip if it starts with a number (likely a street number or address)
                     if re.match(r'^\d', part):
+                        continue
+                    # Skip county names (already captured)
+                    if part_lower in ROMANIAN_COUNTIES:
                         continue
                     data.city = part
                     break

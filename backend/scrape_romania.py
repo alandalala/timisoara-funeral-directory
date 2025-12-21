@@ -132,6 +132,18 @@ class RomaniaScraper:
         self._save_county_data(county_name, existing)
         return len(existing)
     
+    def _append_single_business(self, county_name: str, business: MapsBusinessData) -> bool:
+        """Append a single business to county data (avoiding duplicates). Returns True if added."""
+        existing = self._load_county_data(county_name)
+        existing_names = {b['name'].lower() for b in existing}
+        
+        if business.name.lower() not in existing_names:
+            biz_dict = {k: v for k, v in business.__dict__.items() if not k.startswith('_')}
+            existing.append(biz_dict)
+            self._save_county_data(county_name, existing)
+            return True
+        return False
+    
     def get_counties_to_scrape(self, county_filter: List[str] = None) -> List[Dict]:
         """Get list of counties to scrape."""
         counties = self.counties_data['counties']
@@ -213,7 +225,9 @@ class RomaniaScraper:
     
     def scrape_city(self, city: str, county: str, scraper: GoogleMapsScraper) -> List[MapsBusinessData]:
         """
-        Scrape a single city.
+        Scrape a single city with INCREMENTAL SAVING.
+        Saves each business immediately after extraction to prevent data loss.
+        Uses multiple search terms to find more businesses.
         
         Args:
             city: City name
@@ -223,62 +237,92 @@ class RomaniaScraper:
         Returns:
             List of business data
         """
-        query = "funerare"
         location = f"{city}, {county}, Romania"
         used_simple_search = False
         
         logger.info(f"🔍 Scraping: {city}, {county}")
         
         try:
-            businesses = scraper.search_and_enrich(
-                query=query,
-                location=location,
-                enrich_websites=self.enrich
-            )
+            # Use multiple search terms to find more businesses
+            search_queries = [
+                ("funerare", location),
+                ("pompe funebre", location),
+                ("servicii funerare", location),
+            ]
             
-            # If no results, retry with simpler location (city, Romania) 
-            # Some cities don't return results when county is included
-            if len(businesses) == 0:
-                logger.info(f"  🔄 Retrying with simpler location: {city}, Romania")
-                location_simple = f"{city}, Romania"
-                businesses = scraper.search_and_enrich(
-                    query=query,
-                    location=location_simple,
-                    enrich_websites=self.enrich
-                )
-                used_simple_search = True
+            # For capital or county seat, also try without county
+            if city == county or city == county.replace('-', ' '):
+                search_queries.append(("funerare", f"{city}, Romania"))
             
-            # If still no results, try with shorter query "funerare" 
-            # Some small towns only return results with simpler search terms
-            if len(businesses) == 0:
-                logger.info(f"  🔄 Retrying with shorter query: funerare {city}")
-                businesses = scraper.search_and_enrich(
-                    query="funerare",
-                    location=city,
-                    enrich_websites=self.enrich
-                )
-                used_simple_search = True
+            all_businesses = []
+            seen_names = set()
             
-            # Filter businesses to only those actually in the target city
-            # When using simple search (without county), also verify county to avoid
-            # getting businesses from cities with the same name in other counties
-            filtered_businesses = []
-            for biz in businesses:
-                if self._business_matches_city(biz, city, county, verify_county=used_simple_search):
-                    if not biz.county:
-                        biz.county = county
-                    if not biz.city:
-                        biz.city = city
-                    filtered_businesses.append(biz)
+            for query, loc in search_queries:
+                if self.stop_requested:
+                    break
+                    
+                logger.info(f"  🔎 Searching: {query} {loc}")
+                businesses = scraper.search(query, loc)
+                
+                # Merge results, avoiding duplicates
+                for biz in businesses:
+                    if biz.name not in seen_names:
+                        seen_names.add(biz.name)
+                        all_businesses.append(biz)
+                        
+                if len(all_businesses) > 0:
+                    logger.info(f"     Found {len(businesses)} results, total unique: {len(all_businesses)}")
+            
+            basic_businesses = all_businesses
+            
+            if len(basic_businesses) == 0:
+                logger.info(f"  ℹ️ No businesses found in {city}")
+                return []
+            
+            logger.info(f"  📋 Found {len(basic_businesses)} unique businesses total, extracting details...")
+            
+            # PHASE 2: Filter and save incrementally
+            saved_businesses = []
+            filtered_count = 0
+            
+            for i, biz in enumerate(basic_businesses):
+                if self.stop_requested:
+                    logger.warning(f"  ⏹️ Stop requested during extraction")
+                    break
+                
+                # Filter by location - always verify county to avoid cross-county pollution
+                if not self._business_matches_city(biz, city, county, verify_county=True):
+                    filtered_count += 1
+                    logger.info(f"  ⚠️ [{i+1}/{len(basic_businesses)}] Filtered '{biz.name}' - not in {city}, {county}")
+                    continue
+                
+                # Set county/city if missing
+                if not biz.county:
+                    biz.county = county
+                if not biz.city:
+                    biz.city = city
+                
+                # INCREMENTAL SAVE: Save immediately after processing
+                if self._append_single_business(county, biz):
+                    saved_businesses.append(biz)
+                    logger.info(f"  💾 [{i+1}/{len(basic_businesses)}] Saved: {biz.name}")
                 else:
-                    logger.debug(f"  ⚠️ Filtered out '{biz.name}' - address '{biz.address}' doesn't match {city}, {county}")
+                    logger.info(f"  ⏭️ [{i+1}/{len(basic_businesses)}] Duplicate: {biz.name}")
+                
+                # Optional: Enrich from website
+                if self.enrich and biz.website:
+                    try:
+                        scraper.enrich_from_website(biz)
+                        # Re-save with enriched data
+                        self._append_single_business(county, biz)
+                    except Exception as e:
+                        logger.debug(f"  ⚠️ Could not enrich {biz.name}: {e}")
             
-            filtered_count = len(businesses) - len(filtered_businesses)
             if filtered_count > 0:
                 logger.info(f"  📍 Filtered {filtered_count} businesses not in {city}")
             
-            logger.info(f"  ✅ Found {len(filtered_businesses)} businesses in {city}")
-            return filtered_businesses
+            logger.info(f"  ✅ {city}: {len(saved_businesses)} businesses saved")
+            return saved_businesses
             
         except Exception as e:
             logger.error(f"  ❌ Error scraping {city}: {e}")
@@ -313,6 +357,8 @@ class RomaniaScraper:
         
         progress['current_county'] = county_name
         
+        # Track per-city stats for summary
+        city_stats = {}
         total_found = 0
         
         with GoogleMapsScraper(headless=self.headless) as scraper:
@@ -324,12 +370,13 @@ class RomaniaScraper:
                 progress['current_city'] = city
                 self._save_progress(progress)
                 
+                # Scrape city (now saves incrementally)
                 businesses = self.scrape_city(city, county_name, scraper)
                 
-                if businesses:
-                    total_found += len(businesses)
-                    county_total = self._append_businesses(county_name, businesses)
-                    progress['total_businesses'] = progress.get('total_businesses', 0) + len(businesses)
+                city_count = len(businesses)
+                city_stats[city] = city_count
+                total_found += city_count
+                progress['total_businesses'] = progress.get('total_businesses', 0) + city_count
                 
                 # Mark city as completed
                 if county_name not in progress['completed_cities']:
@@ -340,6 +387,14 @@ class RomaniaScraper:
                 # Random delay between cities (2-5 seconds)
                 delay = 2 + (hash(city) % 30) / 10  # 2-5 seconds
                 time.sleep(delay)
+        
+        # County summary
+        logger.info(f"\n{'-'*40}")
+        logger.info(f"📊 {county_name} SUMMARY:")
+        for city, count in city_stats.items():
+            logger.info(f"   • {city}: {count} businesses")
+        logger.info(f"   TOTAL: {total_found} businesses")
+        logger.info(f"{'-'*40}")
         
         # Mark county as completed if all cities done
         if not self.stop_requested:
