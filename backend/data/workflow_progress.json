@@ -12,7 +12,35 @@
     "Buzău",
     "Călărași",
     "Cluj",
-    "Constanța"
+    "Constanța",
+    "Dâmbovița",
+    "Dolj",
+    "Galați",
+    "Giurgiu",
+    "Gorj",
+    "Harghita",
+    "Hunedoara",
+    "Ialomița",
+    "Iași",
+    "Ilfov",
+    "Maramureș",
+    "Mehedinți",
+    "Mureș",
+    "Neamț",
+    "Olt",
+    "Prahova",
+    "Satu Mare",
+    "Sălaj",
+    "Sibiu",
+    "Suceava",
+    "Teleorman",
+    "Timiș",
+    "Tulcea",
+    "Vaslui",
+    "Vâlcea",
+    "Vrancea",
+    "Covasna",
+    "Caraș-Severin"
   ],
   "import_stats": {
     "Alba": {
@@ -74,7 +102,142 @@
       "success": 22,
       "failed": 0,
       "skipped": 0
+    },
+    "Dâmbovița": {
+      "success": 2,
+      "failed": 0,
+      "skipped": 0
+    },
+    "Dolj": {
+      "success": 39,
+      "failed": 0,
+      "skipped": 0
+    },
+    "Galați": {
+      "success": 20,
+      "failed": 0,
+      "skipped": 2
+    },
+    "Giurgiu": {
+      "success": 4,
+      "failed": 0,
+      "skipped": 2
+    },
+    "Gorj": {
+      "success": 12,
+      "failed": 0,
+      "skipped": 0
+    },
+    "Harghita": {
+      "success": 10,
+      "failed": 0,
+      "skipped": 4
+    },
+    "Hunedoara": {
+      "success": 5,
+      "failed": 0,
+      "skipped": 0
+    },
+    "Ialomița": {
+      "success": 7,
+      "failed": 0,
+      "skipped": 1
+    },
+    "Iași": {
+      "success": 25,
+      "failed": 0,
+      "skipped": 0
+    },
+    "Ilfov": {
+      "success": 4,
+      "failed": 2,
+      "skipped": 0
+    },
+    "Maramureș": {
+      "success": 17,
+      "failed": 0,
+      "skipped": 1
+    },
+    "Mehedinți": {
+      "success": 7,
+      "failed": 0,
+      "skipped": 0
+    },
+    "Mureș": {
+      "success": 14,
+      "failed": 0,
+      "skipped": 3
+    },
+    "Neamț": {
+      "success": 11,
+      "failed": 1,
+      "skipped": 2
+    },
+    "Olt": {
+      "success": 13,
+      "failed": 0,
+      "skipped": 1
+    },
+    "Prahova": {
+      "success": 29,
+      "failed": 0,
+      "skipped": 3
+    },
+    "Satu Mare": {
+      "success": 4,
+      "failed": 1,
+      "skipped": 0
+    },
+    "Sălaj": {
+      "success": 9,
+      "failed": 0,
+      "skipped": 1
+    },
+    "Sibiu": {
+      "success": 26,
+      "failed": 0,
+      "skipped": 2
+    },
+    "Suceava": {
+      "success": 3,
+      "failed": 0,
+      "skipped": 0
+    },
+    "Teleorman": {
+      "success": 16,
+      "failed": 0,
+      "skipped": 0
+    },
+    "Timiș": {
+      "success": 39,
+      "failed": 2,
+      "skipped": 0
+    },
+    "Tulcea": {
+      "success": 3,
+      "failed": 0,
+      "skipped": 0
+    },
+    "Vaslui": {
+      "success": 6,
+      "failed": 0,
+      "skipped": 0
+    },
+    "Vâlcea": {
+      "success": 21,
+      "failed": 0,
+      "skipped": 1
+    },
+    "Vrancea": {
+      "success": 4,
+      "failed": 1,
+      "skipped": 0
+    },
+    "Covasna": {
+      "success": 5,
+      "failed": 1,
+      "skipped": 0
     }
   },
-  "last_updated": "2025-12-20T20:56:01.320633"
+  "last_updated": "2025-12-21T09:28:11.193814"
 }

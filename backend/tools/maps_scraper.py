@@ -186,6 +186,43 @@ class GoogleMapsScraper:
             self.playwright.stop()
         logger.info("Browser stopped")
     
+    def _check_for_single_result(self) -> Optional[Dict]:
+        """
+        Check if Google Maps opened a single business panel directly.
+        This happens when searching for a specific business name or
+        when there's only one result in a small town.
+        
+        Returns:
+            Basic info dict if single business found, None otherwise
+        """
+        try:
+            # Check for business title in the detail panel (not in search results)
+            # This selector matches the title when a business page is open directly
+            title_selectors = [
+                'h1.DUwDvf',  # Business name header
+                'h1.fontHeadlineLarge',  # Alternative header
+            ]
+            
+            for selector in title_selectors:
+                try:
+                    title_elem = self.page.locator(selector).first
+                    if title_elem.is_visible(timeout=2000):
+                        name = title_elem.text_content()
+                        if name:
+                            # Verify this is a single business view, not a list
+                            # by checking if there's NO results feed
+                            feed = self.page.locator('[role="feed"]')
+                            if feed.count() == 0:
+                                logger.info(f"Detected single business result: {name}")
+                                return {'name': name.strip(), 'element': None, 'is_single_result': True}
+                except:
+                    continue
+            
+            return None
+        except Exception as e:
+            logger.debug(f"Single result check failed: {e}")
+            return None
+    
     def _handle_consent(self):
         """Handle Google cookie consent popup."""
         try:
@@ -236,8 +273,14 @@ class GoogleMapsScraper:
         # Wait for results to load (give Maps time to render)
         time.sleep(4)
         
-        # Scroll results to load all businesses
-        businesses = self._scroll_and_collect_results()
+        # Check if Google Maps opened a single business directly (no list)
+        single_business = self._check_for_single_result()
+        if single_business:
+            logger.info("Google Maps showed single business directly")
+            businesses = [single_business]
+        else:
+            # Scroll results to load all businesses
+            businesses = self._scroll_and_collect_results()
         
         logger.info(f"Found {len(businesses)} businesses")
         
@@ -273,7 +316,9 @@ class GoogleMapsScraper:
             results_selector = '.Nv2PK'
         
         scroll_attempts = 0
-        max_scrolls = 20
+        max_scrolls = 30  # Increased from 20
+        no_new_count = 0
+        last_height = 0
         
         while scroll_attempts < max_scrolls:
             # Get current business cards
@@ -321,25 +366,44 @@ class GoogleMapsScraper:
                 except Exception as e:
                     continue
             
-            logger.info(f"Scroll {scroll_attempts + 1}: Found {new_found} new funeral businesses (total: {len(businesses)}, skipped: {skipped_count})")
+            scroll_attempts += 1
+            logger.info(f"Scroll {scroll_attempts}: Found {new_found} new funeral businesses (total: {len(businesses)}, skipped: {skipped_count})")
             
             if new_found == 0:
-                scroll_attempts += 1
-                if scroll_attempts >= 3:
-                    # No new results after 3 scrolls, we're done
+                no_new_count += 1
+                if no_new_count >= 5:  # Increased from 3 - give more chances to load
+                    # Check if we've hit the "end of results" marker
+                    try:
+                        end_marker = self.page.locator('span.HlvSq').first
+                        if end_marker.count() > 0:
+                            logger.info("Reached end of results")
+                            break
+                    except:
+                        pass
+                    # No new results after 5 scrolls and no end marker, we're done
                     break
             else:
-                scroll_attempts = 0
+                no_new_count = 0
             
-            # Scroll down in the results panel
+            # Scroll down in the results panel - try multiple methods
             try:
                 feed = self.page.locator(results_selector).first
-                feed.evaluate('el => el.scrollTop = el.scrollTop + 800')
+                # Get current scroll position
+                current_height = feed.evaluate('el => el.scrollTop')
+                # Scroll by a larger amount
+                feed.evaluate('el => el.scrollTop = el.scrollTop + 1000')
+                # Also try scrolling to the last card to ensure it loads
+                if len(cards) > 0:
+                    try:
+                        cards[-1].scroll_into_view_if_needed()
+                    except:
+                        pass
             except:
                 # Alternative scroll method
                 self.page.keyboard.press('End')
             
-            time.sleep(1.5)
+            # Wait longer for results to load (Google Maps can be slow)
+            time.sleep(2.0)  # Increased from 1.5
         
         logger.info(f"Collection complete: {len(businesses)} funeral businesses, {skipped_count} non-funeral skipped")
         return businesses
@@ -347,9 +411,10 @@ class GoogleMapsScraper:
     def _extract_business_details(self, basic_info: Dict) -> Optional[MapsBusinessData]:
         """Click on a business card and extract all details from the panel."""
         try:
-            # Click the business card to open details panel
+            # Click the business card to open details panel (skip if single result - already open)
+            is_single_result = basic_info.get('is_single_result', False)
             card = basic_info.get('element')
-            if card:
+            if card and not is_single_result:
                 card.click()
                 time.sleep(2)
             
@@ -515,13 +580,27 @@ class GoogleMapsScraper:
         if not data.city:
             parts = full_address.split(',')
             if len(parts) >= 3:
+                # Street indicators that should NOT be in city names
+                street_indicators = [
+                    'str.', 'strada', 'calea', 'bulevardul', 'b-dul', 'bd.', 
+                    'aleea', 'piața', 'piata', 'șoseaua', 'soseaua', 'intrarea',
+                    'bloc', 'nr.', 'et.', 'ap.', 'sector'
+                ]
                 # Usually city is second-to-last or third-to-last
                 for part in reversed(parts[:-1]):
                     part = part.strip()
+                    part_lower = part.lower()
                     # Skip if it looks like a postal code
-                    if not re.match(r'^\d{5,6}$', part):
-                        data.city = part
-                        break
+                    if re.match(r'^\d{5,6}$', part):
+                        continue
+                    # Skip if it contains street indicators (not a city name)
+                    if any(indicator in part_lower for indicator in street_indicators):
+                        continue
+                    # Skip if it starts with a number (likely a street number or address)
+                    if re.match(r'^\d', part):
+                        continue
+                    data.city = part
+                    break
     
     def enrich_from_website(self, business: MapsBusinessData) -> MapsBusinessData:
         """

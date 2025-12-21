@@ -27,6 +27,30 @@ WORKFLOW_PROGRESS_FILE = Path(__file__).parent / "data" / "workflow_progress.jso
 COUNTY_DELAY_SECONDS = 10  # Pause between counties to avoid rate limits
 
 
+def normalize_romanian(text: str) -> str:
+    """
+    Normalize Romanian text for comparison.
+    Handles both modern (comma-below) and old (cedilla) diacritics.
+    
+    - ș/ş → s  (U+0219 / U+015F)
+    - ț/ţ → t  (U+021B / U+0163)
+    - ă → a, â → a, î → i
+    """
+    if not text:
+        return ""
+    replacements = {
+        # Modern comma-below
+        'ș': 's', 'Ș': 'S', 'ț': 't', 'Ț': 'T',
+        # Old cedilla style (from Google Maps, etc.)
+        'ş': 's', 'Ş': 'S', 'ţ': 't', 'Ţ': 'T',
+        # Other Romanian diacritics
+        'ă': 'a', 'Ă': 'A', 'â': 'a', 'Â': 'A', 'î': 'i', 'Î': 'I',
+    }
+    for old, new in replacements.items():
+        text = text.replace(old, new)
+    return text.lower()
+
+
 class AutomatedWorkflow:
     """Orchestrates scraping and importing for all Romanian counties."""
     
@@ -57,9 +81,14 @@ class AutomatedWorkflow:
     
     def _get_county_file(self, county_name: str) -> Path:
         """Get the output JSON file path for a county."""
-        slug = county_name.lower().replace(' ', '_').replace('-', '_')
-        # Normalize Romanian characters
-        replacements = [('ș', 's'), ('ț', 't'), ('ă', 'a'), ('â', 'a'), ('î', 'i')]
+        # Must match scrape_romania.py's _get_county_output_file()
+        slug = county_name.lower().replace(' ', '_')
+        # Normalize Romanian characters (both modern comma-below and old cedilla)
+        # Keep hyphen as-is to match the scraper output
+        replacements = [
+            ('ș', 's'), ('ț', 't'), ('ă', 'a'), ('â', 'a'), ('î', 'i'),
+            ('ş', 's'), ('ţ', 't'),  # Old cedilla variants
+        ]
         for char, repl in replacements:
             slug = slug.replace(char, repl)
         return OUTPUT_DIR / f"maps_{slug}.json"
@@ -87,14 +116,16 @@ class AutomatedWorkflow:
                 return
         
         # Filter out already imported counties (if resume=True)
-        imported = set(self.progress.get('imported_counties', []))
+        # Use normalized comparison to handle diacritic variants (ș vs ş, ț vs ţ)
+        imported_raw = self.progress.get('imported_counties', [])
+        imported_normalized = {normalize_romanian(c) for c in imported_raw}
         if resume:
-            pending = [c for c in all_counties if c['name'] not in imported]
+            pending = [c for c in all_counties if normalize_romanian(c['name']) not in imported_normalized]
         else:
             pending = all_counties
         
         total_counties = len(all_counties)
-        already_done = len(imported)
+        already_done = len(imported_raw)
         to_process = len(pending)
         
         logger.info(f"\n{'='*60}")
