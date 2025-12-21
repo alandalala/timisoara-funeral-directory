@@ -6,13 +6,97 @@ import json
 import re
 import time
 import logging
+from pathlib import Path
 from typing import List, Dict, Optional
 from dataclasses import dataclass, asdict
-from urllib.parse import urlparse
+from urllib.parse import urlparse, quote
 
 from playwright.sync_api import sync_playwright, Page, Browser, TimeoutError as PlaywrightTimeout
 
+# Import geocoding for coordinate fallback
+try:
+    from tools.geocoding import GeocodingTool
+    GEOCODING_AVAILABLE = True
+except ImportError:
+    GEOCODING_AVAILABLE = False
+
 logger = logging.getLogger(__name__)
+
+# City coordinates for geo-locked Google Maps searches
+# Using @lat,lng,zoom format locks the map viewport to prevent wrong-city results
+CITY_COORDINATES = {
+    # București
+    'bucurești': {'lat': 44.4268, 'lng': 26.1025, 'zoom': 12},
+    'bucharest': {'lat': 44.4268, 'lng': 26.1025, 'zoom': 12},
+    'bucuresti': {'lat': 44.4268, 'lng': 26.1025, 'zoom': 12},
+    # Major cities
+    'timișoara': {'lat': 45.7489, 'lng': 21.2087, 'zoom': 13},
+    'timisoara': {'lat': 45.7489, 'lng': 21.2087, 'zoom': 13},
+    'cluj-napoca': {'lat': 46.7712, 'lng': 23.6236, 'zoom': 13},
+    'cluj': {'lat': 46.7712, 'lng': 23.6236, 'zoom': 13},
+    'iași': {'lat': 47.1585, 'lng': 27.6014, 'zoom': 13},
+    'iasi': {'lat': 47.1585, 'lng': 27.6014, 'zoom': 13},
+    'constanța': {'lat': 44.1598, 'lng': 28.6348, 'zoom': 13},
+    'constanta': {'lat': 44.1598, 'lng': 28.6348, 'zoom': 13},
+    'craiova': {'lat': 44.3302, 'lng': 23.7949, 'zoom': 13},
+    'brașov': {'lat': 45.6427, 'lng': 25.5887, 'zoom': 13},
+    'brasov': {'lat': 45.6427, 'lng': 25.5887, 'zoom': 13},
+    'galați': {'lat': 45.4353, 'lng': 28.0080, 'zoom': 13},
+    'galati': {'lat': 45.4353, 'lng': 28.0080, 'zoom': 13},
+    'ploiești': {'lat': 44.9365, 'lng': 26.0254, 'zoom': 13},
+    'ploiesti': {'lat': 44.9365, 'lng': 26.0254, 'zoom': 13},
+    'oradea': {'lat': 47.0722, 'lng': 21.9217, 'zoom': 13},
+    'brăila': {'lat': 45.2692, 'lng': 27.9575, 'zoom': 13},
+    'braila': {'lat': 45.2692, 'lng': 27.9575, 'zoom': 13},
+    'arad': {'lat': 46.1866, 'lng': 21.3123, 'zoom': 13},
+    'pitești': {'lat': 44.8565, 'lng': 24.8692, 'zoom': 13},
+    'pitesti': {'lat': 44.8565, 'lng': 24.8692, 'zoom': 13},
+    'sibiu': {'lat': 45.7983, 'lng': 24.1256, 'zoom': 13},
+    'bacău': {'lat': 46.5670, 'lng': 26.9146, 'zoom': 13},
+    'bacau': {'lat': 46.5670, 'lng': 26.9146, 'zoom': 13},
+    'târgu mureș': {'lat': 46.5386, 'lng': 24.5579, 'zoom': 13},
+    'targu mures': {'lat': 46.5386, 'lng': 24.5579, 'zoom': 13},
+    'baia mare': {'lat': 47.6567, 'lng': 23.5850, 'zoom': 13},
+    'buzău': {'lat': 45.1500, 'lng': 26.8333, 'zoom': 13},
+    'buzau': {'lat': 45.1500, 'lng': 26.8333, 'zoom': 13},
+    'botoșani': {'lat': 47.7487, 'lng': 26.6694, 'zoom': 13},
+    'botosani': {'lat': 47.7487, 'lng': 26.6694, 'zoom': 13},
+    'satu mare': {'lat': 47.7926, 'lng': 22.8859, 'zoom': 13},
+    'râmnicu vâlcea': {'lat': 45.0997, 'lng': 24.3693, 'zoom': 13},
+    'ramnicu valcea': {'lat': 45.0997, 'lng': 24.3693, 'zoom': 13},
+    'suceava': {'lat': 47.6635, 'lng': 26.2732, 'zoom': 13},
+    'piatra neamț': {'lat': 46.9275, 'lng': 26.3708, 'zoom': 13},
+    'piatra neamt': {'lat': 46.9275, 'lng': 26.3708, 'zoom': 13},
+    'drobeta-turnu severin': {'lat': 44.6269, 'lng': 22.6566, 'zoom': 13},
+    'târgu jiu': {'lat': 45.0378, 'lng': 23.2743, 'zoom': 13},
+    'targu jiu': {'lat': 45.0378, 'lng': 23.2743, 'zoom': 13},
+    'târgoviște': {'lat': 44.9254, 'lng': 25.4567, 'zoom': 13},
+    'targoviste': {'lat': 44.9254, 'lng': 25.4567, 'zoom': 13},
+    'focșani': {'lat': 45.6947, 'lng': 27.1858, 'zoom': 13},
+    'focsani': {'lat': 45.6947, 'lng': 27.1858, 'zoom': 13},
+    'bistrița': {'lat': 47.1325, 'lng': 24.5008, 'zoom': 13},
+    'bistrita': {'lat': 47.1325, 'lng': 24.5008, 'zoom': 13},
+    'reșița': {'lat': 45.3008, 'lng': 21.8893, 'zoom': 13},
+    'resita': {'lat': 45.3008, 'lng': 21.8893, 'zoom': 13},
+    'tulcea': {'lat': 45.1780, 'lng': 28.8003, 'zoom': 13},
+    'călărași': {'lat': 44.2048, 'lng': 27.3331, 'zoom': 13},
+    'calarasi': {'lat': 44.2048, 'lng': 27.3331, 'zoom': 13},
+    'hunedoara': {'lat': 45.7500, 'lng': 22.9000, 'zoom': 13},
+    'deva': {'lat': 45.8833, 'lng': 22.9000, 'zoom': 13},
+    'alba iulia': {'lat': 46.0667, 'lng': 23.5833, 'zoom': 13},
+    'giurgiu': {'lat': 43.9037, 'lng': 25.9699, 'zoom': 13},
+    'slobozia': {'lat': 44.5644, 'lng': 27.3664, 'zoom': 13},
+    'vaslui': {'lat': 46.6407, 'lng': 27.7276, 'zoom': 13},
+    'alexandria': {'lat': 43.9710, 'lng': 25.3316, 'zoom': 13},
+    'zalău': {'lat': 47.1918, 'lng': 23.0635, 'zoom': 13},
+    'zalau': {'lat': 47.1918, 'lng': 23.0635, 'zoom': 13},
+    'sfântu gheorghe': {'lat': 45.8667, 'lng': 25.7833, 'zoom': 13},
+    'sfantu gheorghe': {'lat': 45.8667, 'lng': 25.7833, 'zoom': 13},
+    'miercurea ciuc': {'lat': 46.3597, 'lng': 25.8042, 'zoom': 13},
+    'slatina': {'lat': 44.4304, 'lng': 24.3630, 'zoom': 13},
+    'mediaș': {'lat': 46.1667, 'lng': 24.3500, 'zoom': 14},
+    'medias': {'lat': 46.1667, 'lng': 24.3500, 'zoom': 14},
+}
 
 # Keywords that indicate a legitimate funeral business
 FUNERAL_KEYWORDS = [
@@ -50,6 +134,50 @@ EXCLUDED_CATEGORIES = [
 ALWAYS_EXCLUDE_KEYWORDS = [
     'monument', 'monumente', 'pietr', 'marmur', 'granit',
 ]
+
+
+def normalize_name(name: str) -> str:
+    """
+    Normalize a business name for deduplication.
+    Strips emojis, extra whitespace, normalizes case, removes common variations.
+    
+    Args:
+        name: Original business name
+        
+    Returns:
+        Normalized name for comparison
+    """
+    import unicodedata
+    
+    if not name:
+        return ""
+    
+    # Convert to lowercase
+    normalized = name.lower().strip()
+    
+    # Remove emojis and special symbols (keep Romanian diacritics)
+    # This regex removes emoji ranges while preserving letters/numbers
+    normalized = re.sub(r'[\U0001F300-\U0001F9FF\U00002600-\U000027BF\U0001F600-\U0001F64F\U0001F680-\U0001F6FF]', '', normalized)
+    
+    # Normalize Romanian diacritics (ă->a, â->a, î->i, ș->s, ț->t)
+    diacritic_map = {
+        'ă': 'a', 'â': 'a', 'î': 'i', 'ș': 's', 'ț': 't',
+        'Ă': 'a', 'Â': 'a', 'Î': 'i', 'Ș': 's', 'Ț': 't',
+        'ş': 's', 'ţ': 't',  # Old-style diacritics
+    }
+    for diac, repl in diacritic_map.items():
+        normalized = normalized.replace(diac, repl)
+    
+    # Remove common suffixes/prefixes that vary
+    normalized = re.sub(r'\b(srl|s\.r\.l|s\.r\.l\.|sa|s\.a|s\.a\.)\b', '', normalized)
+    
+    # Normalize whitespace (multiple spaces to single)
+    normalized = re.sub(r'\s+', ' ', normalized).strip()
+    
+    # Remove punctuation except spaces
+    normalized = re.sub(r'[^\w\s]', '', normalized)
+    
+    return normalized.strip()
 
 
 def is_funeral_business(name: str, category: str = None) -> bool:
@@ -122,6 +250,8 @@ class MapsBusinessData:
     latitude: Optional[float] = None
     longitude: Optional[float] = None
     place_id: Optional[str] = None
+    # Coordinate quality: 'exact' (street number), 'approximate' (street only), 'none' (failed)
+    coord_quality: Optional[str] = None
     # Website-extracted data
     email: Optional[str] = None
     fiscal_code: Optional[str] = None
@@ -139,16 +269,19 @@ class GoogleMapsScraper:
     Extracts comprehensive info from business panels and optionally their websites.
     """
     
-    def __init__(self, headless: bool = True, slow_mo: int = 100):
+    def __init__(self, headless: bool = True, slow_mo: int = 100, geocode: bool = True):
         """
         Initialize the scraper.
         
         Args:
             headless: Run browser in headless mode (no visible window)
             slow_mo: Slow down actions by this many ms (helps avoid detection)
+            geocode: If True, geocode addresses during extraction (slow but accurate).
+                     If False, skip geocoding for speed - run batch geocoding later.
         """
         self.headless = headless
         self.slow_mo = slow_mo
+        self.geocode = geocode
         self.browser: Optional[Browser] = None
         self.page: Optional[Page] = None
         self.playwright = None
@@ -250,28 +383,47 @@ class GoogleMapsScraper:
             logger.debug(f"No consent popup or error: {e}")
             return False
     
-    def search(self, query: str, location: str) -> List[MapsBusinessData]:
+    def search(self, query: str, location: str, skip_names: set = None, max_results: int = None) -> List[MapsBusinessData]:
         """
         Search Google Maps and extract all business data.
+        Uses coordinate-locked URLs to prevent wrong-city results.
         
         Args:
             query: Search term (e.g., "servicii funerare")
             location: Location (e.g., "Timișoara")
+            skip_names: Set of normalized business names to skip (already scraped in previous searches)
+            max_results: Maximum number of businesses to extract (None = use city-based defaults)
             
         Returns:
             List of MapsBusinessData objects
         """
-        search_term = f"{query} {location}"
-        url = f"https://www.google.com/maps/search/{search_term.replace(' ', '+')}"
+        if skip_names is None:
+            skip_names = set()
+            
+        # Extract city name from location (e.g., "București, București" -> "bucurești")
+        city_name = location.split(',')[0].strip().lower()
         
-        logger.info(f"Searching Google Maps: {search_term}")
+        # Get coordinates for this city
+        coords = CITY_COORDINATES.get(city_name)
+        
+        if coords:
+            # Use coordinate-locked URL - this prevents Google from showing results from other cities
+            search_term = quote(query)
+            url = f"https://www.google.com/maps/search/{search_term}/@{coords['lat']},{coords['lng']},{coords['zoom']}z"
+            logger.info(f"Searching Google Maps (geo-locked): {query} in {city_name} @ {coords['lat']},{coords['lng']}")
+        else:
+            # Fallback to text search if city not in coordinates database
+            search_term = f"{query} {location}"
+            url = f"https://www.google.com/maps/search/{search_term.replace(' ', '+')}"
+            logger.warning(f"City '{city_name}' not in coordinates database, using text search: {search_term}")
+        
         self.page.goto(url, wait_until='domcontentloaded', timeout=30000)
         
         # Handle consent popup
         self._handle_consent()
         
         # Wait for results to load (give Maps time to render)
-        time.sleep(4)
+        time.sleep(2.0)  # Reduced from 4s
         
         # Check if Google Maps opened a single business directly (no list)
         single_business = self._check_for_single_result()
@@ -280,7 +432,13 @@ class GoogleMapsScraper:
             businesses = [single_business]
         else:
             # Scroll results to load all businesses
-            businesses = self._scroll_and_collect_results()
+            # Use provided max_results, or city-based default
+            if max_results is None:
+                # București (2M+ population) needs higher limit than other cities
+                scroll_limit = 150 if 'bucuresti' in location.lower() or 'bucurești' in location.lower() else 50
+            else:
+                scroll_limit = max_results
+            businesses = self._scroll_and_collect_results(max_results=scroll_limit)
         
         logger.info(f"Found {len(businesses)} businesses")
         
@@ -325,6 +483,26 @@ class GoogleMapsScraper:
         query_lower = query.lower()
         location_lower = location.lower()
         
+        def is_city_match(city_name: str, text: str) -> bool:
+            """
+            Check if city_name appears as a standalone word in text.
+            Avoids false positives like 'giurgiului' (street) matching 'giurgiu' (city).
+            
+            Romanian street names often use genitive forms:
+            - Giurgiu → Giurgiului (Șoseaua Giurgiului)
+            - Timișoara → Timișoarei
+            - Craiova → Craiovei
+            """
+            # Use word boundary regex to match whole words only
+            # \b doesn't work well with Romanian chars, so we check manually
+            import re
+            # Match city_name only if it's:
+            # - at start/end of string, OR
+            # - surrounded by non-letter characters (space, comma, etc.)
+            # This excludes "giurgiului", "timișoarei" etc.
+            pattern = r'(?<![a-zA-ZăâîșțĂÂÎȘȚ])' + re.escape(city_name) + r'(?![a-zA-ZăâîșțĂÂÎȘȚ])'
+            return bool(re.search(pattern, text, re.IGNORECASE))
+        
         # Extract detailed info for each business, with early filtering
         detailed_businesses = []
         for i, basic_info in enumerate(businesses):
@@ -335,9 +513,9 @@ class GoogleMapsScraper:
             # Early filter: skip if name mentions a different major city
             skip_reason = None
             for city_name in MAJOR_CITIES:
-                if city_name in name_lower:
+                if is_city_match(city_name, name_lower):
                     # Check if this city is in our search location
-                    if city_name not in location_lower and city_name not in query_lower:
+                    if not is_city_match(city_name, location_lower) and not is_city_match(city_name, query_lower):
                         skip_reason = f"name mentions {city_name}"
                         break
             
@@ -345,16 +523,16 @@ class GoogleMapsScraper:
             if not skip_reason and card_snippet:
                 # Check for city names in snippet
                 for city_name in MAJOR_CITIES:
-                    if city_name in card_snippet:
-                        if city_name not in location_lower and city_name not in query_lower:
+                    if is_city_match(city_name, card_snippet):
+                        if not is_city_match(city_name, location_lower) and not is_city_match(city_name, query_lower):
                             skip_reason = f"card shows {city_name}"
                             break
                 
                 # Check for county indicators
                 if not skip_reason:
                     for county, city in COUNTY_INDICATORS.items():
-                        if county in card_snippet:
-                            if city not in location_lower and city not in query_lower:
+                        if is_city_match(county, card_snippet):
+                            if not is_city_match(city, location_lower) and not is_city_match(city, query_lower):
                                 skip_reason = f"card shows {county} county"
                                 break
             
@@ -362,23 +540,51 @@ class GoogleMapsScraper:
                 logger.info(f"  [SKIP] Wrong location ({skip_reason}): {name}")
                 continue
             
+            # Skip businesses already seen in previous searches (saves extraction time)
+            normalized_name = normalize_name(name)
+            if normalized_name in skip_names:
+                logger.info(f"  [SKIP] Already scraped: {name}")
+                continue
+            
             logger.info(f"Extracting details for [{i+1}/{len(businesses)}]: {name}")
             try:
                 detailed = self._extract_business_details(basic_info)
                 if detailed:
                     detailed_businesses.append(detailed)
-                time.sleep(1)  # Delay between extractions
+                time.sleep(0.3)  # Reduced from 1s - fast mode
             except Exception as e:
                 logger.error(f"Error extracting details: {e}")
                 continue
         
         return detailed_businesses
     
-    def _scroll_and_collect_results(self) -> List[Dict]:
-        """Scroll the results panel and collect all business cards."""
+    def _scroll_and_collect_results(self, max_results: int = 50) -> List[Dict]:
+        """Scroll the results panel and collect all business cards.
+        
+        Args:
+            max_results: Maximum number of businesses to collect per search query.
+                        Google Maps loads businesses beyond the visible map area,
+                        so we cap results to avoid collecting irrelevant businesses.
+        """
         businesses = []
         seen_names = set()
         skipped_count = 0
+        
+        # Recovery file to save progress during collection (prevents total data loss)
+        recovery_file = Path(__file__).parent.parent / "data" / "scrape_recovery.json"
+        
+        def save_recovery():
+            """Save collected names for recovery if scrape fails."""
+            try:
+                recovery_data = {
+                    'timestamp': time.strftime('%Y-%m-%d %H:%M:%S'),
+                    'collected_count': len(businesses),
+                    'names': [b.get('name', 'Unknown') for b in businesses]
+                }
+                with open(recovery_file, 'w', encoding='utf-8') as f:
+                    json.dump(recovery_data, f, ensure_ascii=False, indent=2)
+            except Exception as e:
+                logger.debug(f"Could not save recovery file: {e}")
         
         # Find the scrollable results container
         results_selector = '[role="feed"]'
@@ -391,7 +597,7 @@ class GoogleMapsScraper:
             results_selector = '.Nv2PK'
         
         scroll_attempts = 0
-        max_scrolls = 50  # Increased for big cities like București, Cluj
+        max_scrolls = 30  # Reduced - Google loads results from wider area as you scroll
         no_new_count = 0
         last_height = 0
         
@@ -456,18 +662,21 @@ class GoogleMapsScraper:
             scroll_attempts += 1
             logger.info(f"Scroll {scroll_attempts}: Found {new_found} new funeral businesses (total: {len(businesses)}, skipped: {skipped_count})")
             
+            # Save recovery after each scroll (prevents total data loss)
+            if len(businesses) > 0 and scroll_attempts % 3 == 0:  # Every 3 scrolls
+                save_recovery()
+            
+            # Stop if we've collected enough results - Google loads businesses from wider areas as you scroll
+            if len(businesses) >= max_results:
+                logger.info(f"Reached max results limit ({max_results}). Stopping collection.")
+                save_recovery()  # Final save before exit
+                break
+            
             if new_found == 0:
                 no_new_count += 1
-                if no_new_count >= 5:  # Increased from 3 - give more chances to load
-                    # Check if we've hit the "end of results" marker
-                    try:
-                        end_marker = self.page.locator('span.HlvSq').first
-                        if end_marker.count() > 0:
-                            logger.info("Reached end of results")
-                            break
-                    except:
-                        pass
-                    # No new results after 5 scrolls and no end marker, we're done
+                if no_new_count >= 2:  # Stop after 2 consecutive scrolls with 0 new results
+                    logger.info(f"No new results for {no_new_count} consecutive scrolls. Reached end of results")
+                    save_recovery()  # Final save before exit
                     break
             else:
                 no_new_count = 0
@@ -489,8 +698,8 @@ class GoogleMapsScraper:
                 # Alternative scroll method
                 self.page.keyboard.press('End')
             
-            # Wait longer for results to load (Google Maps can be slow)
-            time.sleep(2.0)  # Increased from 1.5
+            # Wait for results to load
+            time.sleep(1.0)  # Reduced from 2s
         
         logger.info(f"Collection complete: {len(businesses)} funeral businesses, {skipped_count} non-funeral skipped")
         return businesses
@@ -498,15 +707,71 @@ class GoogleMapsScraper:
     def _extract_business_details(self, basic_info: Dict) -> Optional[MapsBusinessData]:
         """Click on a business card and extract all details from the panel."""
         try:
+            expected_name = basic_info.get('name', 'Unknown')
+            
             # Click the business card to open details panel (skip if single result - already open)
             is_single_result = basic_info.get('is_single_result', False)
             card = basic_info.get('element')
+            
             if card and not is_single_result:
-                card.click()
-                time.sleep(2)
+                # Click and wait for the correct panel to load
+                # Try up to 2 times if the panel doesn't show the right business
+                for attempt in range(2):
+                    card.click()
+                    time.sleep(0.5)  # Initial wait for click to register
+                    
+                    # Wait for the h1 title to appear with correct business name
+                    max_wait = 4.0
+                    wait_interval = 0.2
+                    waited = 0
+                    panel_loaded = False
+                    
+                    while waited < max_wait:
+                        time.sleep(wait_interval)
+                        waited += wait_interval
+                        
+                        try:
+                            panel_title = self.page.locator('h1.DUwDvf').first
+                            if panel_title.count() > 0:
+                                panel_name = panel_title.text_content()
+                                if panel_name:
+                                    # Normalize both names for comparison
+                                    panel_clean = panel_name.strip().lower()
+                                    expected_clean = expected_name.strip().lower()
+                                    # Check if they match (or are very similar - first 20 chars)
+                                    if panel_clean == expected_clean or panel_clean[:20] == expected_clean[:20]:
+                                        panel_loaded = True
+                                        break
+                        except:
+                            pass
+                    
+                    if panel_loaded:
+                        time.sleep(0.3)  # Reduced from 0.5s
+                        break
+                    elif attempt == 0:
+                        # First attempt failed, try scrolling the card into view and clicking again
+                        try:
+                            card.scroll_into_view_if_needed()
+                        except:
+                            pass
+                        time.sleep(0.3)
+                
+                # If still not loaded after retries, wait longer and hope for the best
+                if not panel_loaded:
+                    time.sleep(2.0)
             
             # Wait for details panel to load
             self.page.wait_for_selector('[role="main"]', timeout=5000)
+            
+            # Wait for address element to be populated (confirms full panel load)
+            try:
+                for _ in range(10):  # Max 2 seconds
+                    addr_elem = self.page.locator('[data-item-id="address"] .Io6YTe').first
+                    if addr_elem.count() > 0 and addr_elem.text_content():
+                        break
+                    time.sleep(0.2)
+            except:
+                pass
             
             data = MapsBusinessData(
                 name=basic_info.get('name', 'Unknown'),
@@ -514,22 +779,20 @@ class GoogleMapsScraper:
                 category=basic_info.get('category')
             )
             
-            # Extract from URL (contains coordinates)
+            # Extract place_id from URL first (this is reliable)
             try:
                 url = self.page.url
-                coord_match = re.search(r'@(-?\d+\.\d+),(-?\d+\.\d+)', url)
-                if coord_match:
-                    data.latitude = float(coord_match.group(1))
-                    data.longitude = float(coord_match.group(2))
-                
-                # Extract place ID
-                place_match = re.search(r'place/[^/]+/([^/]+)', url)
-                if place_match:
-                    data.place_id = place_match.group(1)
+                place_id_match = re.search(r'!1s(0x[0-9a-fA-F]+:[0-9a-fA-Fx]+)', url)
+                if place_id_match:
+                    data.place_id = place_id_match.group(1)
+                else:
+                    place_match = re.search(r'/data=.*?!1s([^!]+)', url)
+                    if place_match:
+                        data.place_id = place_match.group(1)
             except:
                 pass
             
-            # Extract address
+            # Extract address FIRST - we need this for geocoding
             try:
                 address_button = self.page.locator('[data-item-id="address"] .Io6YTe').first
                 if address_button.count() > 0:
@@ -540,6 +803,52 @@ class GoogleMapsScraper:
                     self._parse_address(data, full_address)
             except:
                 pass
+            
+            # Extract coordinates via GEOCODING the address (most reliable method)
+            # Skip if self.geocode=False for speed - can batch geocode later
+            coord_method = None
+            
+            if self.geocode and data.address and GEOCODING_AVAILABLE:
+                try:
+                    from tools.geocoding import has_street_number
+                    geocoder = GeocodingTool()
+                    coords = geocoder.geocode(
+                        address=data.address,
+                        city=data.city,
+                        county=data.county,
+                        company_name=data.name
+                    )
+                    if coords:
+                        data.latitude, data.longitude = coords
+                        coord_method = "geocoding"
+                        # Track coordinate quality based on address completeness
+                        if has_street_number(data.address):
+                            data.coord_quality = "exact"
+                        else:
+                            data.coord_quality = "approximate"
+                            logger.warning(f"Address without street number: {data.address}")
+                except Exception as e:
+                    logger.debug(f"Geocoding failed: {e}")
+            
+            # Fallback: URL coordinates (less reliable - may be viewport center)
+            if not coord_method:
+                try:
+                    url = self.page.url
+                    coord_match = re.search(r'@(-?\d+\.\d+),(-?\d+\.\d+)', url)
+                    if coord_match:
+                        data.latitude = float(coord_match.group(1))
+                        data.longitude = float(coord_match.group(2))
+                        coord_method = "url_pattern (fallback)"
+                        data.coord_quality = "approximate"  # URL coords are viewport, not exact
+                except:
+                    pass
+            
+            # Log which method worked
+            if coord_method:
+                logger.debug(f"Coordinates via {coord_method}: ({data.latitude}, {data.longitude})")
+            else:
+                logger.warning(f"No coordinates found for: {data.name}")
+                data.coord_quality = "none"
             
             # Extract phone
             try:
@@ -704,6 +1013,12 @@ class GoogleMapsScraper:
             data.county = 'București'
             data.city = 'București'
         
+        # If address contains "București" anywhere, set city/county
+        if 'bucureș' in address_lower or 'bucures' in address_lower:
+            data.county = 'București'
+            if not data.city:
+                data.city = 'București'
+        
         # Try to extract city from address parts
         if not data.city:
             parts = full_address.split(',')
@@ -711,24 +1026,32 @@ class GoogleMapsScraper:
                 # Street indicators that should NOT be in city names
                 street_indicators = [
                     'str.', 'strada', 'calea', 'bulevardul', 'b-dul', 'bd.', 
-                    'aleea', 'piața', 'piata', 'șoseaua', 'soseaua', 'intrarea',
-                    'bloc', 'nr.', 'et.', 'ap.', 'sector'
+                    'aleea', 'piața', 'piata', 'șoseaua', 'soseaua', 'șos.', 'sos.',
+                    'intrarea', 'fundătura', 'fundatura', 'drumul', 'pasaj',
+                    'bloc', 'bl.', 'nr.', 'et.', 'ap.', 'sector', 'sc.',
+                    'parter', 'subsol', 'etaj', 'mansardă', 'mansarda'
                 ]
-                # Usually city is second-to-last or third-to-last
+                # Usually city is second-to-last or third-to-last part
                 for part in reversed(parts[:-1]):
                     part = part.strip()
                     part_lower = part.lower()
-                    # Skip if it looks like a postal code
+                    # Skip if it looks like a postal code (5-6 digits)
                     if re.match(r'^\d{5,6}$', part):
+                        continue
+                    # Skip if it's mostly a number with optional letters (street number)
+                    if re.match(r'^\d+[a-zA-Z]?$', part):
+                        continue
+                    # Skip if it STARTS with a number (likely street number: "29A" or "bloc 5")
+                    if re.match(r'^\d', part):
                         continue
                     # Skip if it contains street indicators (not a city name)
                     if any(indicator in part_lower for indicator in street_indicators):
                         continue
-                    # Skip if it starts with a number (likely a street number or address)
-                    if re.match(r'^\d', part):
-                        continue
                     # Skip county names (already captured)
                     if part_lower in ROMANIAN_COUNTIES:
+                        continue
+                    # Skip if too short (likely abbreviation) or too long (likely street name)
+                    if len(part) < 3 or len(part) > 30:
                         continue
                     data.city = part
                     break

@@ -2,10 +2,34 @@
 Geocoding Tool - Convert addresses to coordinates using Nominatim (OpenStreetMap).
 Free, no API key required.
 """
+import re
 import requests
 import time
 from typing import Optional, Tuple
 from config.settings import USER_AGENT
+
+
+def has_street_number(address: str) -> bool:
+    """
+    Check if an address contains a street number.
+    Romanian addresses typically have numbers like:
+    - Strada Example 45
+    - Bulevardul Principal nr. 123
+    - Calea Victoriei 88A
+    """
+    if not address:
+        return False
+    # Look for patterns like: number at end, "nr." followed by number, or standalone number
+    patterns = [
+        r'\b\d+[A-Za-z]?\b',  # e.g., "45", "88A", "123"
+        r'\bnr\.?\s*\d+',     # e.g., "nr. 45", "nr 123"
+        r'\bbloc\s*[\dA-Za-z]+', # e.g., "bloc 5A", "bloc B3"
+    ]
+    for pattern in patterns:
+        if re.search(pattern, address, re.IGNORECASE):
+            return True
+    return False
+
 
 # Hardcoded city center coordinates for Romanian cities (guaranteed fallback)
 CITY_COORDINATES = {
@@ -306,13 +330,15 @@ class GeocodingTool:
             return None
     
     def _geocode_city(self, city: str, county: str = None) -> Optional[Tuple[float, float]]:
-        """Fallback to geocode just the city - uses hardcoded coordinates if API fails."""
-        # First check hardcoded coordinates (guaranteed to work)
-        city_lower = city.lower().strip()
-        if city_lower in CITY_COORDINATES:
-            coords = CITY_COORDINATES[city_lower]
-            print(f"  Using cached coordinates for '{city}' -> ({coords[0]}, {coords[1]})")
-            return coords
+        """Fallback to geocode just the city. Returns None to avoid city center coordinates."""
+        # DISABLED: City center fallback causes too many businesses at wrong location
+        # Better to return None and flag the address as needing manual review
+        # city_lower = city.lower().strip()
+        # if city_lower in CITY_COORDINATES:
+        #     coords = CITY_COORDINATES[city_lower]
+        #     print(f"  Using cached coordinates for '{city}' -> ({coords[0]}, {coords[1]})")
+        #     return coords
+        print(f"  SKIPPING city center fallback for '{city}' - address needs manual review")
         
         # Try Nominatim API
         self._rate_limit()

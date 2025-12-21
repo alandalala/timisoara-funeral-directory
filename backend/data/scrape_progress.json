@@ -1,6 +1,19 @@
 {
-  "started_at": "2025-12-21T12:49:10.881079",
+  "started_at": "2025-12-21T18:45:48.443083",
+  "last_updated": "2025-12-21T19:14:58.830975",
+  "completed_counties": [
+    "București"
+  ],
+  "completed_cities": {
+    "București": [
+      "București"
+    ]
+  },
   "current_county": "București",
   "current_city": "București",
-  "last_updated": "2025-12-21T12:49:11.481922"
+  "failed": [],
+  "total_businesses": 150,
+  "stats": {
+    "București": 150
+  }
 }

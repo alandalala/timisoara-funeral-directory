@@ -30,11 +30,21 @@ sys.path.insert(0, str(Path(__file__).parent))
 
 from tools.maps_scraper import GoogleMapsScraper, MapsBusinessData
 
+# Create timestamped log file
+from datetime import datetime
+log_timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+log_filename = f"scrape_romania_{log_timestamp}.log"
+
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s'
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.StreamHandler(),  # Console output
+        logging.FileHandler(log_filename, encoding='utf-8')  # File output
+    ]
 )
 logger = logging.getLogger(__name__)
+logger.info(f"📝 Log file: {log_filename}")
 
 # Paths
 DATA_DIR = Path(__file__).parent / "data"
@@ -42,20 +52,44 @@ CITIES_FILE = DATA_DIR / "romania_cities.json"
 PROGRESS_FILE = DATA_DIR / "scrape_progress.json"
 OUTPUT_DIR = DATA_DIR / "scraped"
 
+# București metropolitan area includes these Ilfov communes/cities
+# These should be included when searching for București
+# All 40 Ilfov county administrative units (8 cities + 32 communes)
+# Include diacritics and non-diacritics variants for matching
+BUCURESTI_METRO_AREA = {
+    # Cities (orașe)
+    'voluntari', 'pantelimon', 'popești-leordeni', 'popesti-leordeni',
+    'bragadiru', 'chitila', 'buftea', 'otopeni', 'măgurele', 'magurele',
+    # Communes (comune) - alphabetically
+    '1 decembrie', 'afumați', 'afumati', 'balotești', 'balotesti',
+    'berceni', 'brănești', 'branesti', 'cernica', 'chiajna',
+    'ciolpani', 'ciorogârla', 'ciorogarla', 'clinceni', 'corbeanca',
+    'cornetu', 'dascălu', 'dascalu', 'dărăști-ilfov', 'darasti-ilfov',
+    'dobroești', 'dobroesti', 'domnești', 'domnesti', 'dragomirești-vale',
+    'dragomiresti-vale', 'găneasa', 'ganeasa', 'glina', 'grădiștea', 'gradistea',
+    'gruiu', 'jilava', 'moara vlăsiei', 'moara vlasiei', 'mogoșoaia', 'mogosoaia',
+    'nuci', 'periș', 'peris', 'petrăchioaia', 'petrachioaia',
+    'snagov', 'ștefăneștii de jos', 'stefanestii de jos', 'tunari', 'vidra',
+    'ilfov',  # Accept Ilfov county name for București searches
+}
+
 
 class RomaniaScraper:
     """Orchestrates scraping across all Romanian counties and cities."""
     
-    def __init__(self, headless: bool = True, enrich: bool = False):
+    def __init__(self, headless: bool = True, enrich: bool = False, geocode: bool = False):
         """
         Initialize the Romania-wide scraper.
         
         Args:
             headless: Run browser in headless mode
             enrich: Enrich data from company websites (slower but more data)
+            geocode: If True, geocode addresses during scraping (slow).
+                     If False (default), skip geocoding - run batch geocoding later.
         """
         self.headless = headless
         self.enrich = enrich
+        self.geocode = geocode
         self.stop_requested = False
         self.counties_data = self._load_cities()
         
@@ -112,10 +146,13 @@ class RomaniaScraper:
         return []
     
     def _save_county_data(self, county_name: str, businesses: List[Dict]):
-        """Save scraped data for a county."""
+        """Save scraped data for a county with immediate flush to disk."""
         filepath = self._get_county_output_file(county_name)
         with open(filepath, 'w', encoding='utf-8') as f:
             json.dump(businesses, f, ensure_ascii=False, indent=2)
+            f.flush()  # Force write to OS buffer
+            import os
+            os.fsync(f.fileno())  # Force OS to write to disk
         logger.info(f"💾 Saved {len(businesses)} businesses to {filepath}")
     
     def _append_businesses(self, county_name: str, new_businesses: List[MapsBusinessData]):
@@ -185,6 +222,32 @@ class RomaniaScraper:
         if business.city:
             business_city_normalized = self._normalize_city_name(business.city)
         
+        business_county_normalized = ""
+        if business.county:
+            business_county_normalized = self._normalize_city_name(business.county)
+        
+        # SPECIAL CASE: București metropolitan area
+        # Include businesses from Ilfov county suburbs when searching București
+        if city_normalized == 'bucuresti' and county_normalized == 'bucuresti':
+            # Check if business is in București proper
+            if 'bucuresti' in address_normalized or business_city_normalized == 'bucuresti':
+                return True
+            # Check if business is in București metro area (Ilfov suburbs)
+            if business_city_normalized in BUCURESTI_METRO_AREA:
+                return True
+            if business_county_normalized == 'ilfov':
+                # Check if specific city is in metro area
+                if business_city_normalized in BUCURESTI_METRO_AREA:
+                    return True
+                # Or if address contains a known metro area city
+                for metro_city in BUCURESTI_METRO_AREA:
+                    if metro_city in address_normalized:
+                        return True
+            # Also check if address contains any known metro area city
+            for metro_city in BUCURESTI_METRO_AREA:
+                if metro_city in address_normalized and len(metro_city) > 4:  # Avoid short matches
+                    return True
+        
         # Check if city name appears in address - this is the primary check
         city_in_address = city_normalized in address_normalized
         city_in_field = city_normalized in business_city_normalized or business_city_normalized in city_normalized
@@ -208,10 +271,7 @@ class RomaniaScraper:
         if verify_county:
             # Check if county appears anywhere
             county_in_address = county_normalized in address_normalized
-            county_in_field = False
-            if business.county:
-                business_county_normalized = self._normalize_city_name(business.county)
-                county_in_field = county_normalized in business_county_normalized or business_county_normalized in county_normalized
+            county_in_field = county_normalized in business_county_normalized or business_county_normalized in county_normalized
             
             # If neither city nor county found, reject
             if not county_in_address and not county_in_field:
@@ -244,34 +304,36 @@ class RomaniaScraper:
         
         try:
             # Use multiple search terms to find more businesses
+            # Order: most natural term first ("servicii funerare") to maximize unique finds early
             search_queries = [
-                ("funerare", location),
-                ("pompe funebre", location),
                 ("servicii funerare", location),
+                ("pompe funebre", location),
+                ("funerare", location),
             ]
             
-            # For capital or county seat, also try without county
-            if city == county or city == county.replace('-', ' '):
-                search_queries.append(("funerare", f"{city}, Romania"))
+            # Note: Removed redundant 4th search for county capitals - geo-locked URLs make it unnecessary
             
             all_businesses = []
-            seen_names = set()
+            seen_names = set()  # Normalized names for deduplication
             
             for query, loc in search_queries:
                 if self.stop_requested:
                     break
                     
                 logger.info(f"  🔎 Searching: {query} {loc}")
-                businesses = scraper.search(query, loc)
+                # Pass seen_names to skip re-extracting already-found businesses
+                businesses = scraper.search(query, loc, skip_names=seen_names)
                 
-                # Merge results, avoiding duplicates
+                # Merge results, avoiding duplicates (using normalized names)
+                from tools.maps_scraper import normalize_name
                 for biz in businesses:
-                    if biz.name not in seen_names:
-                        seen_names.add(biz.name)
+                    normalized = normalize_name(biz.name)
+                    if normalized not in seen_names:
+                        seen_names.add(normalized)
                         all_businesses.append(biz)
                         
                 if len(all_businesses) > 0:
-                    logger.info(f"     Found {len(businesses)} results, total unique: {len(all_businesses)}")
+                    logger.info(f"     Found {len(businesses)} new results, total unique: {len(all_businesses)}")
             
             basic_businesses = all_businesses
             
@@ -361,7 +423,8 @@ class RomaniaScraper:
         city_stats = {}
         total_found = 0
         
-        with GoogleMapsScraper(headless=self.headless) as scraper:
+        # Use geocode=False for fast scraping (batch geocode later)
+        with GoogleMapsScraper(headless=self.headless, geocode=self.geocode) as scraper:
             for city in cities_to_scrape:
                 if self.stop_requested:
                     logger.warning(f"⏹️ Stopping after {city}")
